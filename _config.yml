@@ -1,4 +1,16 @@
-theme: jekyll-theme-slate
 title: Denmoth
-description: Minecraft Mods & Development
+description: Minecraft Development Hub
+theme: jekyll-theme-minimal
 url: "https://denmoth.pp.ua"
+plugins:
+  - jekyll-seo-tag
+  - jekyll-include-cache
+
+show_downloads: false
+google_analytics:
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      lang: "en"
