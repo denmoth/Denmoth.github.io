@@ -1,16 +1,32 @@
-title: Denmoth
-description: Minecraft Development Hub
-theme: jekyll-theme-minimal
+title: Denmoth Hub
+description: Advanced Minecraft Modding
 url: "https://denmoth.pp.ua"
+
+
+remote_theme: just-the-docs/just-the-docs
+
+
+color_scheme: dark
+search_enabled: true
+heading_anchors: true
+
+
 plugins:
   - jekyll-seo-tag
-  - jekyll-include-cache
 
-show_downloads: false
-google_analytics:
 
-defaults:
-  - scope:
-      path: ""
-    values:
-      lang: "en"
+aux_links:
+  "GitHub": "https://github.com/Denmoth"
+
+
+exclude:
+  - .sass-cache
+  - .jekyll-cache
+  - gemfiles
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
