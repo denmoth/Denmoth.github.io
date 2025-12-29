@@ -1,71 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="site_title">Denmoth's Mods</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denmoth Hub</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="dark">
-  <div class="wrapper">
-    <header>
-      <div class="header-top">
-        <div class="brand"><span class="brand-text">Denmoth Hub</span></div>
-        <div class="controls">
-          <select id="language-select">
-            <option value="en">🇬🇧 EN</option>
-            <option value="ru">🇷🇺 RU</option>
-          </select>
-        </div>
-      </div>
-    </header>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="header-inner">
+                <a href="/" class="brand">
+                    <img src="assets/img/logo.png" alt="D">
+                    <span>Denmoth</span>
+                </a>
+                <div class="nav-controls">
+                    <select id="lang-select" class="lang-select">
+                        <option value="en">EN</option>
+                        <option value="ru">RU</option>
+                    </select>
+                    <button id="theme-toggle" class="theme-toggle">🌙</button>
+                </div>
+            </div>
+        </header>
 
-    <main id="content">
-      <section class="hero">
-        <div class="hero-badge" data-i18n="hub_badge">Official Hub</div>
-        <h1 data-i18n="hub_title">Denmoth's Mods</h1>
-        <p data-i18n="hub_subtitle">Quality of life, structures, and tools for Minecraft.</p>
-      </section>
+        <main>
+            <section class="hero">
+                <h1 data-i18n="hero_title">Denmoth's Mods</h1>
+                <p data-i18n="hero_desc">Next-generation structures, interfaces, and tools.</p>
+            </section>
 
-      <section class="page-section">
-        <h2 data-i18n="proj_title">Projects</h2>
-        <div class="card-grid">
-          
-          <div class="content-card">
-            <h3>Create: Structures Overhaul</h3>
-            <p data-i18n="cso_desc">World generation addon for Create.</p>
-            <div class="callout info"> Includes BOP Integration </div>
-            <br>
-            <a href="/cso/" class="btn" data-i18n="cso_btn">Documentation</a>
-          </div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>CubeUI</h3>
+                        <span class="badge beta">BETA 0.1.0</span>
+                    </div>
+                    <p>Advanced GUI library for Forge. 9-slice rendering, widgets, and container API.</p>
+                    <div class="stats">
+                        <span><i class="fa-solid fa-download"></i> 1.2k</span>
+                        <span><i class="fa-solid fa-code"></i> Lib</span>
+                        <span><i class="fa-brands fa-java"></i> Forge</span>
+                    </div>
+                    <br>
+                    <a href="/cubeui/" class="btn">Documentation →</a>
+                </div>
 
-          <div class="content-card">
-            <h3>CubeUI</h3>
-            <p data-i18n="cui_desc">GUI Library for Forge.</p>
-            <p><small style="opacity: 0.7;" data-i18n="cui_note">Beta 0.1.0</small></p>
-            <a href="/cubeui/" class="btn secondary" data-i18n="cui_btn">API Reference</a>
-          </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Create: Structures</h3>
+                        <span class="badge release">RELEASE</span>
+                    </div>
+                    <p>World generation addon. Adds handcrafted structures with functional contraptions.</p>
+                    <div class="stats">
+                        <span><i class="fa-solid fa-download"></i> 45k</span>
+                        <span><i class="fa-solid fa-earth-americas"></i> World Gen</span>
+                    </div>
+                    <br>
+                    <a href="/cso/" class="btn">Details →</a>
+                </div>
 
-          <div class="content-card">
-            <h3>Ad Astra: Structures</h3>
-            <p data-i18n="aaso_desc">Expansion for Ad Astra.</p>
-            <button class="btn secondary" disabled data-i18n="aaso_btn">Coming Soon</button>
-          </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Uncanny</h3>
+                        <span class="badge">WIP</span>
+                    </div>
+                    <p>Atmospheric horror expansion. Something is wrong with the silence.</p>
+                    <div class="stats">
+                        <span><i class="fa-solid fa-clock"></i> Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-          <div class="content-card">
-            <h3>Uncanny</h3>
-            <p data-i18n="uncanny_desc">Atmospheric horror.</p>
-            <button class="btn secondary" disabled data-i18n="uncanny_btn">Coming Soon</button>
-          </div>
-
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <p data-i18n="footer_text">© 2025 Denmoth</p>
-    </footer>
-  </div>
-  <script src="assets/js/scripts.js"></script>
+        <footer>
+            <div class="socials">
+                <a href="https://github.com/Denmoth"><i class="fa-brands fa-github"></i></a>
+                <a href="#"><i class="fa-brands fa-discord"></i></a>
+                <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.9rem;">© 2025 Denmoth</p>
+        </footer>
+    </div>
+    <script src="assets/js/main.js"></script>
 </body>
 </html>
