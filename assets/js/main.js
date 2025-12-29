@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ЗАЩИТА ОТ СБОЕВ: Если что-то пошло не так, раскомментируй эту строку один раз, запушь, зайди на сайт, потом закомментируй обратно.
+    // localStorage.clear(); 
+
     try { initTheme(); } catch(e) {}
     try { initLanguage(); } catch(e) {}
     initSidebar();
@@ -9,7 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initTheme() {
     const btn = document.getElementById('theme-toggle');
+    // По умолчанию ставим DARK, чтобы не слепило белым экраном при ошибке
     let stored = localStorage.getItem('theme') || 'dark';
+    
+    // Если вдруг сохранился мусор, сбрасываем на dark
+    if(stored !== 'dark' && stored !== 'light') stored = 'dark';
+    
     document.documentElement.setAttribute('data-theme', stored);
     if(btn) btn.textContent = stored === 'dark' ? '☀️' : '🌙';
 
@@ -26,6 +34,9 @@ function initLanguage() {
     const sel = document.getElementById('lang-select');
     let stored = localStorage.getItem('lang') || 'en';
     
+    // Защита от кривых значений
+    if(stored !== 'en' && stored !== 'ru') stored = 'en';
+
     document.body.classList.remove('lang-en', 'lang-ru');
     document.body.classList.add('lang-' + stored);
     
@@ -94,7 +105,7 @@ function initCopy() {
 }
 
 function initStats() {
-
+    // Твой ID проекта Create: Structures
     const projectId = 1303344; 
     
     if(projectId === 0) return;
@@ -105,11 +116,13 @@ function initStats() {
             const dlEl = document.querySelector('.cf-downloads');
             if(dlEl) dlEl.textContent = formatNumber(data.downloads.total);
 
+            // Ищем файл Forge 1.20.1
             const file = data.files.find(f => f.versions.includes("1.20.1") && f.versions.includes("Forge"));
             
             if(file) {
                 const vEl = document.querySelector('.cf-version');
-                if(vEl) vEl.textContent = file.display_name;
+                // Берем название файла (обычно там есть версия)
+                if(vEl) vEl.textContent = file.display_name.replace('.jar', '');
 
                 const logBtn = document.querySelector('.open-changelog');
                 if(logBtn) {
@@ -132,16 +145,15 @@ function showChangelog(file, url) {
     const modal = document.getElementById('changelog-modal');
     const body = modal.querySelector('.modal-body');
     
-    // CFWidget не отдает полный текст, только имя файла
-    // Мы показываем имя файла и ссылку
     body.innerHTML = `
-        <div class="changelog-item">
-            <span class="changelog-ver">${file.display_name}</span>
+        <div class="changelog-item" style="border:none;">
+            <span class="changelog-ver" style="font-size:1.1rem;">${file.display_name}</span>
             <span class="changelog-date">Type: ${file.type}</span>
-            <p style="margin-top:10px; color:var(--text-muted)">
-                View full changelog on CurseForge:
+            <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem;">
+                CurseForge API does not provide full changelog text remotely. 
+                Please view it on the official page.
             </p>
-            <a href="${url}/files/${file.id}" target="_blank" style="margin-top:5px; display:inline-block;">Open File Page</a>
+            <a href="${url}/files/${file.id}" target="_blank" class="btn primary" style="margin-top:15px; width:100%;">View on CurseForge</a>
         </div>
     `;
     
