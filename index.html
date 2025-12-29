@@ -3,62 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Denmoth Hub</title>
+    <title>Denmoth</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="lang-en">
     <div class="wrapper">
         <header>
             <div class="header-inner">
-                <a href="/" class="brand">
-                    <img src="assets/img/logo.png" alt="D">
-                    <span>Denmoth</span>
-                </a>
-                <div class="nav-controls">
-                    <select id="lang-select" class="lang-select">
+                <div class="brand">
+                    <img src="assets/img/logo.png" alt="D"> Denmoth
+                </div>
+                <div class="controls">
+                    <select id="lang-select">
                         <option value="en">EN</option>
                         <option value="ru">RU</option>
                     </select>
-                    <button id="theme-toggle" class="theme-toggle">🌙</button>
+                    <button id="theme-toggle">🌙</button>
                 </div>
             </div>
         </header>
 
-        <main>
-            <section class="hero">
-                <h1 data-i18n="hero_title">Denmoth's Mods</h1>
-                <p data-i18n="hero_desc">Next-generation structures, interfaces, and tools.</p>
-            </section>
+        <main class="content hub-layout">
+            <div class="hero">
+                <h1 class="lang-en">Mod Development</h1>
+                <h1 class="lang-ru">Разработка Модов</h1>
+                
+                <p class="lang-en">Structures, UI libraries, and tools for Minecraft Forge.</p>
+                <p class="lang-ru">Структуры, UI библиотеки и инструменты для Minecraft Forge.</p>
+            </div>
 
-            <div class="grid">
+            <div class="card-grid">
                 <div class="card">
                     <div class="card-header">
                         <h3>CubeUI</h3>
-                        <span class="badge beta">BETA 0.1.0</span>
+                        <span class="badge">BETA 0.1.0</span>
                     </div>
-                    <p>Advanced GUI library for Forge. 9-slice rendering, widgets, and container API.</p>
-                    <div class="stats">
-                        <span><i class="fa-solid fa-download"></i> 1.2k</span>
-                        <span><i class="fa-solid fa-code"></i> Lib</span>
-                        <span><i class="fa-brands fa-java"></i> Forge</span>
-                    </div>
-                    <br>
-                    <a href="/cubeui/" class="btn">Documentation →</a>
+                    <p class="lang-en">Advanced GUI library. 9-slice rendering, widgets, and container API.</p>
+                    <p class="lang-ru">Библиотека GUI. 9-slice рендер, виджеты и API контейнеров.</p>
+                    <a href="/cubeui/" class="btn"><span class="lang-en">Documentation</span><span class="lang-ru">Документация</span></a>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
                         <h3>Create: Structures</h3>
-                        <span class="badge release">RELEASE</span>
+                        <span class="badge">RELEASE</span>
                     </div>
-                    <p>World generation addon. Adds handcrafted structures with functional contraptions.</p>
-                    <div class="stats">
-                        <span><i class="fa-solid fa-download"></i> 45k</span>
-                        <span><i class="fa-solid fa-earth-americas"></i> World Gen</span>
-                    </div>
-                    <br>
-                    <a href="/cso/" class="btn">Details →</a>
+                    <p class="lang-en">World gen addon for Create. Handcrafted aesthetic structures.</p>
+                    <p class="lang-ru">Аддон генерации для Create. Проработанные структуры.</p>
+                    <a href="#" class="btn"><span class="lang-en">CurseForge</span><span class="lang-ru">CurseForge</span></a>
                 </div>
 
                 <div class="card">
@@ -66,21 +59,21 @@
                         <h3>Uncanny</h3>
                         <span class="badge">WIP</span>
                     </div>
-                    <p>Atmospheric horror expansion. Something is wrong with the silence.</p>
-                    <div class="stats">
-                        <span><i class="fa-solid fa-clock"></i> Coming Soon</span>
+                    <p class="lang-en">Atmospheric horror expansion.</p>
+                    <p class="lang-ru">Атмосферный хоррор мод.</p>
+                    <div style="margin-top:15px; color:var(--text-muted); font-size:0.9rem;">
+                        <i class="fa-solid fa-clock"></i> <span class="lang-en">Coming Soon</span><span class="lang-ru">Скоро</span>
                     </div>
                 </div>
             </div>
         </main>
 
-        <footer>
+        <footer class="footer">
             <div class="socials">
                 <a href="https://github.com/Denmoth"><i class="fa-brands fa-github"></i></a>
-                <a href="#"><i class="fa-brands fa-discord"></i></a>
-                <a href="#"><i class="fa-brands fa-youtube"></i></a>
             </div>
-            <p style="margin-top: 10px; font-size: 0.9rem;">© 2025 Denmoth</p>
+            <br>
+            © 2025 Denmoth
         </footer>
     </div>
     <script src="assets/js/main.js"></script>
