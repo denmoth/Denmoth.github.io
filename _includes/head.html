@@ -13,11 +13,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ЗАМЕНИ НА СВОИ ДАННЫЕ С SUPABASE.COM
   const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
   const SUPABASE_KEY = 'sb_publishable_WQ-ET1XxvVxFQ0kvkNDEIg_5eJz9MEq';
   
-  // Инициализация (безопасно, если ключи не валидны, просто не залогинит)
   let supabase;
   try {
       supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
