@@ -27,10 +27,33 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg-body); color: var(--text-main); font-family: var(--font-main); line-height: 1.5; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+
+body { 
+    background-color: #0d1117; /* Фолбэк, если переменные не подгрузятся */
+    background: var(--bg-body); 
+    color: var(--text-main); 
+    font-family: var(--font-main); 
+    line-height: 1.5; 
+    font-size: 16px; 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+}
+
 a { color: #58a6ff; text-decoration: none; transition: 0.2s; }
 a:hover { text-decoration: underline; }
 
+/* === ЛОГИКА ЯЗЫКОВ (FIX) === */
+/* По умолчанию показываем EN, скрываем RU. 
+   Это работает даже если JS сломался. */
+.lang-ru { display: none; }
+.lang-en { display: block; }
+
+/* Если JS повесил класс .lang-ru на body, переключаем */
+body.lang-ru .lang-en { display: none !important; }
+body.lang-ru .lang-ru { display: block !important; }
+
+/* === ОСТАЛЬНОЙ ДИЗАЙН === */
 header { background: var(--bg-header); border-bottom: 1px solid var(--border); height: var(--header-h); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; }
 .header-inner { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
 .brand { font-weight: 600; font-size: 1.1rem; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
@@ -48,6 +71,7 @@ button:hover, select:hover { border-color: var(--text-muted); background: var(--
 .sidebar ul { list-style: none; }
 .sidebar li a { display: block; padding: 6px 10px; color: var(--text-main); font-size: 0.95rem; border-radius: 6px; }
 .sidebar li a:hover { background: var(--bg-panel); text-decoration: none; color: #58a6ff; }
+
 .sidebar-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 200; border-radius: 50%; width: 50px; height: 50px; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); background: var(--accent); color: white; border: none; font-size: 1.2rem; }
 
 .content { flex-grow: 1; padding: 40px; width: 100%; min-width: 0; }
@@ -69,9 +93,6 @@ button:hover, select:hover { border-color: var(--text-muted); background: var(--
 .code-head { background: var(--bg-panel); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted); }
 pre { padding: 16px; overflow-x: auto; background: var(--code-bg); font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-main); }
 
-.lang-ru, .lang-en { display: none; }
-body.lang-en .lang-en { display: block; }
-body.lang-ru .lang-ru { display: block; }
 .copy-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.8rem; padding: 2px 8px; }
 .copy-btn:hover { color: var(--accent); background: transparent; border-color: transparent; }
 .footer { padding: 40px 0; text-align: center; border-top: 1px solid var(--border); color: var(--text-muted); margin-top: auto; background: var(--bg-body); }
