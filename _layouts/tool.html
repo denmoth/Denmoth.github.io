@@ -3,15 +3,16 @@
 <head>
     {% include head.html %}
     <style>
-        /* Специфичные стили для фулскрина элемента */
         :fullscreen .tool-card {
             width: 100%; height: 100%; 
             max-width: none;
             display: flex; flex-direction: column; 
             justify-content: center;
             border: none; border-radius: 0;
+            padding: 40px;
+            overflow-y: auto;
         }
-        ::backdrop { background: #000; }
+        ::backdrop { background: #0d1117; }
     </style>
 </head>
 <body class="lang-en tool-body">
@@ -35,6 +36,9 @@
             </div>
             
             <div class="tool-card" id="tool-card-container">
+                <button id="exit-fs" class="fullscreen-exit">
+                    <i class="fa-solid fa-compress"></i> Exit
+                </button>
                 {{ content }}
             </div>
         </main>
@@ -49,15 +53,22 @@
     <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
     <script>
         const fsBtn = document.getElementById('fullscreen-btn');
+        const exitBtn = document.getElementById('exit-fs');
         const target = document.getElementById('tool-card-container');
         
         if(fsBtn && target) {
             fsBtn.addEventListener('click', () => {
                 if (!document.fullscreenElement) {
                     target.requestFullscreen().catch(err => {
-                        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                        alert(`Error: ${err.message}`);
                     });
-                } else {
+                }
+            });
+        }
+        
+        if(exitBtn) {
+            exitBtn.addEventListener('click', () => {
+                if (document.fullscreenElement) {
                     document.exitFullscreen();
                 }
             });
