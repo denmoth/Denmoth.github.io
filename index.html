@@ -1,100 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Denmoth</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="lang-en">
-    <div class="wrapper">
-        <header>
-            <div class="header-inner">
-                <div class="brand">
-                    <img src="assets/img/logo.png" alt="D"> Denmoth
-                </div>
-                <div class="controls">
-                    <select id="lang-select">
-                        <option value="en">EN</option>
-                        <option value="ru">RU</option>
-                    </select>
-                    <button id="theme-toggle">🌙</button>
-                </div>
-            </div>
-        </header>
+---
+layout: default
+title: Home
+permalink: /
+---
 
-        <main class="hub-layout">
-            <div class="hero">
-                <img src="assets/img/logo.png" style="width:80px; height:80px; border-radius:12px; margin-bottom:20px;">
-                <h1>Denmoth</h1>
-                <p class="lang-en">Minecraft Mods & Tools</p>
-                <p class="lang-ru">Моды и инструменты для Minecraft</p>
-            </div>
-
-            <div class="card-grid">
-                
-                <div class="card" data-project="structures">
-                    <div class="card-header">
-                        <h3>Create: Structures Overhaul</h3>
-                        <span class="badge">...</span> </div>
-                    <p class="lang-en">World gen addon for Create. Handcrafted aesthetic structures.</p>
-                    <p class="lang-ru">Аддон генерации для Create. Проработанные структуры.</p>
-                    
-                    <div class="stat-row">
-                        <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
-                    </div>
-
-                    <div class="btn-group">
-                        <a href="#" class="btn primary">CurseForge</a>
-                        <a href="#" class="btn">Modrinth</a>
-                        <a href="#" class="btn"><span class="lang-en">Wiki</span><span class="lang-ru">Вики</span></a>
-                    </div>
-                </div>
-
-                <div class="card" data-project="cubeui">
-                    <div class="card-header">
-                        <h3>CubeUI</h3>
-                        <span class="badge">BETA</span> </div>
-                    <p class="lang-en">UI Library. 9-slice rendering, widgets, and container API.</p>
-                    <p class="lang-ru">UI Библиотека. 9-slice рендер, виджеты и API контейнеров.</p>
-                    
-                    <div class="stat-row">
-                        <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
-                    </div>
-
-                    <div class="btn-group">
-                        <a href="cubeui/index.html" class="btn primary"><span class="lang-en">Docs</span><span class="lang-ru">Доки</span></a>
-                        <a href="#" class="btn">CurseForge</a>
-                        <a href="#" class="btn">Modrinth</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Uncanny</h3>
-                        <span class="badge">WIP</span>
-                    </div>
-                    <p class="lang-en">Atmospheric horror expansion.</p>
-                    <p class="lang-ru">Атмосферный хоррор мод.</p>
-                    <div style="margin-top:auto; color:var(--text-muted); font-size:0.9rem;">
-                        <i class="fa-solid fa-clock"></i> <span class="lang-en">Coming Soon</span><span class="lang-ru">Скоро</span>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="footer">
-            <div class="socials">
-                <a href="https://discord.com/invite/BCXqNfPnSh" title="Discord"><i class="fa-brands fa-discord"></i></a>
-                <a href="https://github.com/Denmoth" title="GitHub"><i class="fa-brands fa-github"></i></a>
-                <a href="https://www.curseforge.com/members/denmoth/projects" title="CurseForge"><i class="fa-solid fa-fire"></i></a> 
-                <a href="https://modrinth.com/user/Denmoth" title="Modrinth"><i class="fa-solid fa-cube"></i></a>
-            </div>
-            © 2025 Denmoth
-        </footer>
+<div class="hub-layout">
+    <div class="hero">
+        <img src="{{ '/assets/img/logo.png' | relative_url }}" style="width:80px; height:80px; border-radius:12px; margin-bottom:20px;">
+        <h1>Denmoth</h1>
+        <p class="lang-en">Minecraft Mods & Tools</p>
+        <p class="lang-ru">Моды и инструменты для Minecraft</p>
     </div>
 
-    <script src="assets/js/main.js"></script>
-</body>
-</html>
+    <div class="card-grid">
+        <div class="card" data-project="structures">
+            <div class="card-header">
+                <h3>Create: Structures Overhaul</h3>
+                <span class="badge">...</span> </div>
+            <p class="lang-en">World gen addon for Create. Handcrafted aesthetic structures.</p>
+            <p class="lang-ru">Аддон генерации для Create. Проработанные структуры.</p>
+            <div class="stat-row">
+                <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
+            </div>
+            <div class="btn-group">
+                <a href="#" class="btn primary">CurseForge</a>
+                <a href="#" class="btn">Modrinth</a>
+            </div>
+        </div>
+
+        <div class="card" data-project="cubeui">
+            <div class="card-header">
+                <h3>CubeUI</h3>
+                <span class="badge">BETA</span> </div>
+            <p class="lang-en">UI Library. 9-slice rendering, widgets, and container API.</p>
+            <p class="lang-ru">UI Библиотека. 9-slice рендер, виджеты и API контейнеров.</p>
+            <div class="btn-group">
+                <a href="{{ '/cubeui/' | relative_url }}" class="btn primary"><span class="lang-en">Docs</span><span class="lang-ru">Доки</span></a>
+            </div>
+        </div>
+    </div>
+</div>
