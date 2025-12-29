@@ -2,18 +2,6 @@
 <html lang="en">
 <head>
     {% include head.html %}
-    <style>
-        :fullscreen .tool-card {
-            width: 100%; height: 100%; 
-            max-width: none;
-            display: flex; flex-direction: column; 
-            justify-content: center;
-            border: none; border-radius: 0;
-            padding: 40px;
-            overflow-y: auto;
-        }
-        ::backdrop { background: #0d1117; }
-    </style>
 </head>
 <body class="lang-en tool-body">
     {% include header.html %}
@@ -36,9 +24,6 @@
             </div>
             
             <div class="tool-card" id="tool-card-container">
-                <button id="exit-fs" class="fullscreen-exit">
-                    <i class="fa-solid fa-compress"></i> Exit
-                </button>
                 {{ content }}
             </div>
         </main>
@@ -53,23 +38,22 @@
     <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
     <script>
         const fsBtn = document.getElementById('fullscreen-btn');
-        const exitBtn = document.getElementById('exit-fs');
-        const target = document.getElementById('tool-card-container');
+        const wrapper = document.getElementById('tool-wrapper');
+        const icon = fsBtn.querySelector('i');
         
-        if(fsBtn && target) {
+        if(fsBtn && wrapper) {
             fsBtn.addEventListener('click', () => {
-                if (!document.fullscreenElement) {
-                    target.requestFullscreen().catch(err => {
-                        alert(`Error: ${err.message}`);
-                    });
-                }
-            });
-        }
-        
-        if(exitBtn) {
-            exitBtn.addEventListener('click', () => {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
+                // Переключаем класс CSS вместо использования API браузера
+                wrapper.classList.toggle('maximized');
+                
+                if (wrapper.classList.contains('maximized')) {
+                    icon.classList.remove('fa-expand');
+                    icon.classList.add('fa-compress');
+                    fsBtn.title = "Exit Maximize";
+                } else {
+                    icon.classList.remove('fa-compress');
+                    icon.classList.add('fa-expand');
+                    fsBtn.title = "Maximize Workspace";
                 }
             });
         }
