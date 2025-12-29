@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include head.html %}
+</head>
+<body class="lang-en tool-body">
+    {% include header.html %}
+
+    <div class="tool-wrapper" id="tool-wrapper">
+        <aside class="ad-sidebar left">
+            <div class="ad-placeholder">
+                <span class="lang-en">Ad Space</span><span class="lang-ru">Реклама</span>
+            </div>
+        </aside>
+
+        <main class="tool-content">
+            <div class="tool-header">
+                <h1 class="page-title">{{ page.title }}</h1>
+                <div class="tool-controls">
+                    <button id="fullscreen-btn" class="btn-icon" title="Toggle Fullscreen">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                {{ content }}
+            </div>
+        </main>
+
+        <aside class="ad-sidebar right">
+            <div class="ad-placeholder">
+                <span class="lang-en">Ad Space</span><span class="lang-ru">Реклама</span>
+            </div>
+        </aside>
+    </div>
+
+    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+    <script>
+        const fsBtn = document.getElementById('fullscreen-btn');
+        const wrapper = document.getElementById('tool-wrapper');
+        
+        if(fsBtn && wrapper) {
+            fsBtn.addEventListener('click', () => {
+                wrapper.classList.toggle('fullscreen-mode');
+                const icon = fsBtn.querySelector('i');
+                if(wrapper.classList.contains('fullscreen-mode')) {
+                    icon.classList.replace('fa-expand', 'fa-compress');
+                } else {
+                    icon.classList.replace('fa-compress', 'fa-expand');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
