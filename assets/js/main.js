@@ -91,36 +91,35 @@ function initGradleGen() {
     const ver = document.getElementById('mc-version');
     const out = document.getElementById('gradle-output');
 
-    const projectId = "1415948";
+    // !!! ВАЖНО: ЗАМЕНИ 12345 НА РЕАЛЬНЫЙ CURSEFORGE PROJECT ID !!!
+    const projectId = "12345";
     const projectSlug = "cubeui";
+
+    let abortController = null;
 
     function update() {
         if(!loader || !ver || !out) return;
         
-        const lVal = loader.value;
-        const vVal = ver.value;
+        // Отменяем предыдущий запрос если он еще идет
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
+        const signal = abortController.signal;
         
-        if(lVal === 'fabric') {
-            let text = "repositories {\n";
-            text += `    maven { url "https://api.modrinth.com/maven" }\n`;
-            text += "}\n\n";
-            text += "dependencies {\n";
-            text += `    modImplementation "maven.modrinth:${projectSlug}:1.0.0+${vVal}"\n`;
-            text += "}";
-            out.textContent = text;
-            return;
-        }
+        const vVal = ver.value;
+        out.textContent = "// Loading version info...";
+        
+        // Тайм-аут 10 секунд
+        const timeoutId = setTimeout(() => abortController.abort(), 10000);
 
-        out.textContent = "Loading...";
-
-        fetch(`https://api.cfwidget.com/${projectId}`)
-            .then(r => r.json())
+        fetch(`https://api.cfwidget.com/${projectId}`, { signal })
+            .then(r => {
+                clearTimeout(timeoutId);
+                return r.json();
+            })
             .then(data => {
-                const searchLoader = lVal === 'forge' ? 'Forge' : 'Fabric';
-                
                 const file = data.files.find(f => 
                     f.versions.includes(vVal) && 
-                    f.versions.includes(searchLoader)
+                    f.versions.includes("Forge")
                 );
 
                 let text = "repositories {\n";
@@ -131,20 +130,33 @@ function initGradleGen() {
                 if (file) {
                     text += `    implementation fg.deobf("curse.maven:${projectSlug}-${projectId}:${file.id}")\n`;
                 } else {
+                    text += `    // Warning: Could not find auto-match for ${vVal}\n`;
                     text += `    implementation fg.deobf("curse.maven:${projectSlug}-${projectId}:FILE_ID")\n`;
                 }
                 text += "}";
                 out.textContent = text;
             })
             .catch(e => {
-                out.textContent = "Error";
-                console.error(e);
+                let errorMsg = "// Error: Could not fetch data from CurseForge.";
+                if (e.name === 'AbortError') {
+                    errorMsg = "// Error: Request timed out (>10s).\n// Please find the File ID manually on CurseForge.";
+                }
+
+                let text = errorMsg + "\n\n";
+                text += "repositories {\n";
+                text += `    maven { url "https://cursemaven.com" }\n`;
+                text += "}\n\n";
+                text += "dependencies {\n";
+                text += `    implementation fg.deobf("curse.maven:${projectSlug}-${projectId}:FILE_ID")\n`;
+                text += "}";
+                out.textContent = text;
             });
     }
 
     if(loader && ver) {
         loader.addEventListener('change', update);
         ver.addEventListener('change', update);
+        // Запускаем первый раз
         update();
     }
 }
