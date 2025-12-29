@@ -3,108 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CubeUI Documentation</title>
+    <title>CubeUI Docs</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div class="wrapper">
-        <header>
-            <div class="header-inner">
-                <a href="/" class="brand">
-                    <img src="../assets/img/logo.png" alt="D">
-                    <span>CubeUI Docs</span>
+<body class="lang-en">
+    <header>
+        <div class="header-inner">
+            <div class="brand">
+                <a href="../index.html" style="color:var(--text-main); display:flex; gap:10px; align-items:center;">
+                    <i class="fa-solid fa-arrow-left"></i> CubeUI
                 </a>
-                <div class="nav-controls">
-                    <a href="../index.html" style="margin-right: 15px;">← Back to Hub</a>
-                    <button id="theme-toggle" class="theme-toggle">🌙</button>
-                </div>
             </div>
-        </header>
+            <div class="controls">
+                <select id="lang-select">
+                    <option value="en">EN</option>
+                    <option value="ru">RU</option>
+                </select>
+                <button id="theme-toggle">🌙</button>
+            </div>
+        </div>
+    </header>
 
-        <div class="docs-layout">
-            <aside class="sidebar">
-                <h4>Getting Started</h4>
-                <ul>
-                    <li><a href="#install" class="active">Installation</a></li>
-                    <li><a href="#setup">Basic Setup</a></li>
-                </ul>
-                <h4>Widgets API</h4>
-                <ul>
-                    <li><a href="#w-button">CuiButton</a></li>
-                    <li><a href="#w-input">CuiTextField</a></li>
-                    <li><a href="#w-panel">CuiPanel</a></li>
-                    <li><a href="#w-slot">CuiSlot</a></li>
-                </ul>
-                <h4>Theming</h4>
-                <ul>
-                    <li><a href="#atlas">Atlas & UVs</a></li>
-                </ul>
-            </aside>
+    <div class="docs-layout">
+        <aside class="sidebar">
+            <h4 class="lang-en">Getting Started</h4><h4 class="lang-ru">Начало</h4>
+            <ul>
+                <li><a href="#install">Installation</a></li>
+            </ul>
+            
+            <h4 class="lang-en">Widgets</h4><h4 class="lang-ru">Виджеты</h4>
+            <ul>
+                <li><a href="#w-button">CuiButton</a></li>
+                <li><a href="#w-input">CuiTextField</a></li>
+                <li><a href="#w-panel">CuiPanel</a></li>
+                <li><a href="#w-slot">CuiSlot</a></li>
+            </ul>
 
-            <main>
-                <article>
-                    <h2 id="install" data-i18n="gen_title">Dependency Generator</h2>
-                    <p>Select your environment to generate the Gradle code.</p>
-                    
-                    <div class="dependency-gen">
-                        <div class="gen-controls">
-                            <select id="mc-version" class="gen-select">
-                                <option value="1.20.1">1.20.1</option>
-                                <option value="1.19.2">1.19.2</option>
-                            </select>
-                            <select id="loader-select" class="gen-select">
-                                <option value="forge">Forge</option>
-                                <option value="fabric">Fabric (Planned)</option>
-                            </select>
-                        </div>
-                        <div class="code-block" style="margin:0">
-                            <div class="code-header">build.gradle <button class="copy-btn" data-i18n="gen_copy">Copy</button></div>
-                            <pre id="gradle-output">// Loading...</pre>
-                        </div>
+            <h4 class="lang-en">Screens</h4><h4 class="lang-ru">Экраны</h4>
+            <ul>
+                <li><a href="#s-base">Base Screen</a></li>
+                <li><a href="#s-cont">Container Screen</a></li>
+            </ul>
+            
+            <h4>Resources</h4>
+            <ul>
+                <li><a href="#atlas">Atlas & UV</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <button id="sidebar-toggle" class="sidebar-toggle"><i class="fa-solid fa-bars"></i></button>
+
+            <section id="install">
+                <h1 class="lang-en">Installation</h1>
+                <h1 class="lang-ru">Установка</h1>
+                
+                <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:6px; margin-bottom:30px;">
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <select id="mc-version"><option value="1.20.1">1.20.1</option><option value="1.19.2">1.19.2</option></select>
+                        <select id="loader-select"><option value="forge">Forge</option><option value="fabric">Fabric</option></select>
                     </div>
+                    <div class="code-container" style="margin:0;">
+                        <div class="code-head">build.gradle <button class="copy-btn">Copy</button></div>
+                        <pre id="gradle-output">Loading...</pre>
+                    </div>
+                </div>
+            </section>
 
-                    <h2 id="w-button">CuiButton</h2>
-                    <p>A resizable button with 3-slice rendering (Left Cap, Center Tile, Right Cap).</p>
-                    <div class="code-block">
-                        <div class="code-header">Java <button class="copy-btn">Copy</button></div>
-                        <pre>this.addRenderableWidget(new CuiButton(x, y, 100, 20, Component.literal("Save"), btn -> {
-    // On Press Logic
+            <section id="widgets">
+                <h2>CuiButton</h2>
+                <p class="lang-en">Resizable button with 3-slice rendering.</p>
+                <p class="lang-ru">Растягиваемая кнопка с 3-slice рендером.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>this.addRenderableWidget(new CuiButton(x, y, 100, 20, Component.literal("Save"), btn -> {
+    // Logic
 }));</pre>
-                    </div>
+                </div>
 
-                    <h2 id="w-input">CuiTextField</h2>
-                    <p>Replacement for EditBox. Supports custom backgrounds via Atlas and placeholders.</p>
-                    <div class="code-block">
-                        <div class="code-header">Java <button class="copy-btn">Copy</button></div>
-                        <pre>CuiTextField input = new CuiTextField(font, x, y, 150, 20, Component.empty());
+                <hr style="border:0; border-top:1px solid var(--border); margin:40px 0;">
+
+                <h2 id="w-input">CuiTextField</h2>
+                <p class="lang-en">EditBox replacement with Atlas background support.</p>
+                <p class="lang-ru">Замена EditBox с поддержкой фона из Атласа.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>CuiTextField input = new CuiTextField(font, x, y, 150, 20, Component.empty());
 input.setPlaceholder(Component.literal("Search..."));
 this.addRenderableWidget(input);</pre>
-                    </div>
+                </div>
 
-                    <h2 id="w-slot">CuiSlot</h2>
-                    <p>Decorative item slot. <strong style="color: #ff6b6b">Note:</strong> For interactive inventory, use <code>CuiContainerScreen</code>.</p>
-                    <div class="code-block">
-                        <div class="code-header">Java <button class="copy-btn">Copy</button></div>
-                        <pre>CuiSlot slot = new CuiSlot(x, y);
+                <h2 id="w-slot">CuiSlot</h2>
+                <p class="lang-en">Visual slot. For decoration only.</p>
+                <p class="lang-ru">Визуальный слот. Только для декорации.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>CuiSlot slot = new CuiSlot(x, y);
 slot.setItem(new ItemStack(Items.DIAMOND));
 this.addRenderableWidget(slot);</pre>
-                    </div>
+                </div>
+            </section>
 
-                    <h2 id="atlas">Resource Pack Guide</h2>
-                    <p>CubeUI uses a single atlas texture located at <code>assets/cubeui/textures/gui/gui_components.png</code>.</p>
-                    <ul>
-                        <li><strong>Panel (9-slice):</strong> 0,0 to 10,10 (Corner size: 4px)</li>
-                        <li><strong>Button (Normal):</strong> 22,0 (Left), 25,0 (Center), 42,0 (Right)</li>
-                        <li><strong>TextField:</strong> Uses specific UVs defined in <code>VanillaTheme.java</code>.</li>
-                    </ul>
-                </article>
-            </main>
-        </div>
+            <section id="screens" style="margin-top:40px;">
+                <h1 class="lang-en">Screens</h1>
+                <h1 class="lang-ru">Экраны</h1>
 
-        <footer>
-            <p>© 2025 Denmoth</p>
-        </footer>
+                <h3 id="s-base">Base Screen</h3>
+                <p class="lang-en">Standard screen with background.</p>
+                <p class="lang-ru">Обычный экран с фоном.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>public class MyScreen extends Screen {
+    @Override
+    protected void init() {
+        this.addRenderableWidget(new CuiPanel(x, y, w, h));
+    }
+}</pre>
+                </div>
+
+                <h3 id="s-cont">Container Screen</h3>
+                <p class="lang-en">Auto-renders slots linked to Menu.</p>
+                <p class="lang-ru">Авто-рендер слотов, привязанных к Menu.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>public class MyGui extends CuiContainerScreen<MyMenu> {
+    public MyGui(MyMenu menu, Inventory inv, Component title) {
+        super(menu, inv, title);
+    }
+}</pre>
+                </div>
+            </section>
+        </main>
     </div>
     <script src="../assets/js/main.js"></script>
 </body>
