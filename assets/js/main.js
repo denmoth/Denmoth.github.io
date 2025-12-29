@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initLanguage();
+    // Безопасный запуск функций
+    try { initTheme(); } catch(e) { console.warn('Theme init failed', e); }
+    try { initLanguage(); } catch(e) { console.warn('Lang init failed', e); }
+    
     initSidebar();
     
-    // Запускаем генератор только если элемент существует на странице
     if(document.getElementById('gradle-output')) {
         initGradleGen();
     }
@@ -13,7 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initTheme() {
     const btn = document.getElementById('theme-toggle');
-    const stored = localStorage.getItem('theme') || 'dark';
+    // Безопасное чтение
+    let stored = 'dark';
+    try { stored = localStorage.getItem('theme') || 'dark'; } catch(e) {}
+    
     document.documentElement.setAttribute('data-theme', stored);
     if(btn) btn.textContent = stored === 'dark' ? '☀️' : '🌙';
 
@@ -21,15 +25,17 @@ function initTheme() {
         const current = document.documentElement.getAttribute('data-theme');
         const next = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
+        try { localStorage.setItem('theme', next); } catch(e) {}
         btn.textContent = next === 'dark' ? '☀️' : '🌙';
     });
 }
 
 function initLanguage() {
     const sel = document.getElementById('lang-select');
-    const stored = localStorage.getItem('lang') || 'en';
+    let stored = 'en';
+    try { stored = localStorage.getItem('lang') || 'en'; } catch(e) {}
     
+    // Ставим класс на боди
     document.body.classList.remove('lang-en', 'lang-ru');
     document.body.classList.add('lang-' + stored);
     
@@ -37,7 +43,7 @@ function initLanguage() {
         sel.value = stored;
         sel.addEventListener('change', (e) => {
             const val = e.target.value;
-            localStorage.setItem('lang', val);
+            try { localStorage.setItem('lang', val); } catch(e) {}
             document.body.classList.remove('lang-en', 'lang-ru');
             document.body.classList.add('lang-' + val);
         });
@@ -49,8 +55,7 @@ function initSidebar() {
     const sidebar = document.querySelector('.sidebar');
     if(btn && sidebar) {
         btn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed'); // Desktop
-            sidebar.classList.toggle('active'); // Mobile
+            sidebar.classList.toggle('active');
         });
     }
 }
@@ -61,15 +66,16 @@ function initGradleGen() {
     const out = document.getElementById('gradle-output');
 
     function update() {
+        if(!loader || !ver || !out) return;
+        
         const lVal = loader.value;
         const vVal = ver.value;
         const id = "cubeui"; 
         
-        // Простая конкатенация, чтобы избежать ошибок парсера
         let text = "dependencies {\n";
         
         if(lVal === 'forge') {
-            let fileId = (vVal === '1.20.1') ? '5991001' : '5882002'; // Пример ID
+            let fileId = (vVal === '1.20.1') ? '5991001' : '5882002';
             text += '    implementation fg.deobf("cursemaven:com.denmoth:' + id + '-12345:' + fileId + '")\n';
         } else {
             text += '    modImplementation "maven.modrinth:' + id + ':1.0.0+' + vVal + '"\n';
@@ -89,7 +95,9 @@ function initGradleGen() {
 function initCopy() {
     document.querySelectorAll('.copy-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const code = btn.closest('.code-container').querySelector('pre').textContent;
+            const container = btn.closest('.code-container');
+            if(!container) return;
+            const code = container.querySelector('pre').textContent;
             navigator.clipboard.writeText(code);
             const oldText = btn.textContent;
             btn.textContent = "✓";
