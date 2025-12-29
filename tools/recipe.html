@@ -4,22 +4,22 @@ title: Recipe Generator
 permalink: /tools/recipe/
 ---
 
-<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Create Shaped Crafting Recipes for Data Packs.</p></div>
-<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Генератор рецептов крафта (Верстак) для датапаков.</p></div>
+<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Create Shaped Crafting Recipes with visual selector.</p></div>
+<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Визуальный генератор рецептов крафта.</p></div>
 
 <div style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap; margin-bottom:30px;">
     <div>
         <h3 style="text-align:center; margin-bottom:10px;">Crafting Table</h3>
-        <div style="display:grid; grid-template-columns:repeat(3, 50px); gap:5px; background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555;">
-            <input type="text" id="s1" class="craft-slot" placeholder="I">
-            <input type="text" id="s2" class="craft-slot" placeholder="I">
-            <input type="text" id="s3" class="craft-slot" placeholder="I">
-            <input type="text" id="s4" class="craft-slot" placeholder="I">
-            <input type="text" id="s5" class="craft-slot" placeholder="I">
-            <input type="text" id="s6" class="craft-slot" placeholder="I">
-            <input type="text" id="s7" class="craft-slot" placeholder="I">
-            <input type="text" id="s8" class="craft-slot" placeholder="I">
-            <input type="text" id="s9" class="craft-slot" placeholder="I">
+        <div style="display:grid; grid-template-columns:repeat(3, 60px); gap:4px; background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555;">
+            <div id="s0" class="craft-slot" onclick="openPicker(0)"></div>
+            <div id="s1" class="craft-slot" onclick="openPicker(1)"></div>
+            <div id="s2" class="craft-slot" onclick="openPicker(2)"></div>
+            <div id="s3" class="craft-slot" onclick="openPicker(3)"></div>
+            <div id="s4" class="craft-slot" onclick="openPicker(4)"></div>
+            <div id="s5" class="craft-slot" onclick="openPicker(5)"></div>
+            <div id="s6" class="craft-slot" onclick="openPicker(6)"></div>
+            <div id="s7" class="craft-slot" onclick="openPicker(7)"></div>
+            <div id="s8" class="craft-slot" onclick="openPicker(8)"></div>
         </div>
     </div>
 
@@ -29,82 +29,142 @@ permalink: /tools/recipe/
 
     <div>
         <h3 style="text-align:center; margin-bottom:10px;">Result</h3>
-        <div style="background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555; width:70px; height:70px; display:flex; align-items:center; justify-content:center;">
-            <input type="text" id="res-item" class="craft-slot" placeholder="minecraft:diamond" style="width:50px; height:50px;">
+        <div style="background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555; width:84px; height:84px; display:flex; align-items:center; justify-content:center;">
+            <div id="res-slot" class="craft-slot" onclick="openPicker(-1)" style="width:60px; height:60px;"></div>
         </div>
-        <input type="number" id="res-count" class="form-input" value="1" style="width:70px; margin-top:5px; text-align:center;" min="1" max="64">
+        <input type="number" id="res-count" class="form-input" value="1" style="width:84px; margin-top:5px; text-align:center;" min="1" max="64">
     </div>
-</div>
-
-<div class="form-group">
-    <label class="form-label">Keys Definition (e.g., I = minecraft:iron_ingot)</label>
-    <textarea id="keys-def" class="form-area" placeholder="I: minecraft:iron_ingot&#10;S: minecraft:stick"></textarea>
 </div>
 
 <button onclick="genRecipe()" class="btn primary" style="width:100%;">Generate JSON</button>
 
 <div class="form-group" style="margin-top:20px;">
-    <textarea id="recipe-out" class="form-area" readonly style="height:200px; font-family:monospace;"></textarea>
+    <textarea id="recipe-out" class="form-area" readonly style="height:250px; font-family:monospace;"></textarea>
+</div>
+<button onclick="copyRecipe()" class="btn">Copy JSON</button>
+
+<div id="picker-modal" class="item-picker-modal" onclick="if(event.target === this) closePicker()">
+    <div class="item-picker-content">
+        <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; gap:10px;">
+            <input type="text" id="picker-search" class="form-input" placeholder="Search item..." style="flex:1;" oninput="filterItems()">
+            <button onclick="closePicker()" class="btn">Close</button>
+        </div>
+        <div id="picker-list" class="item-list"></div>
+    </div>
 </div>
 
-<style>
-    .craft-slot {
-        width: 50px; height: 50px;
-        background: #8b8b8b;
-        border: 2px solid #373737;
-        color: white; text-align: center;
-        font-family: monospace; font-size: 1.2rem;
-        border-top-color: #373737; border-left-color: #373737;
-        border-bottom-color: #fff; border-right-color: #fff;
-    }
-    .craft-slot:focus { outline: 2px solid #58a6ff; }
-</style>
-
 <script>
+    const itemsDB = [
+        "minecraft:air", "minecraft:stone", "minecraft:dirt", "minecraft:cobblestone", "minecraft:planks",
+        "minecraft:stick", "minecraft:torch", "minecraft:crafting_table", "minecraft:furnace", "minecraft:chest",
+        "minecraft:diamond", "minecraft:iron_ingot", "minecraft:gold_ingot", "minecraft:emerald", "minecraft:coal",
+        "minecraft:diamond_sword", "minecraft:diamond_pickaxe", "minecraft:iron_sword", "minecraft:bow", "minecraft:arrow",
+        "minecraft:apple", "minecraft:bread", "minecraft:porkchop", "minecraft:cooked_beef", "minecraft:golden_apple",
+        "minecraft:oak_log", "minecraft:spruce_log", "minecraft:birch_log", "minecraft:rotten_flesh", "minecraft:bone",
+        "minecraft:gunpowder", "minecraft:string", "minecraft:spider_eye", "minecraft:ender_pearl", "minecraft:blaze_rod",
+        "minecraft:redstone", "minecraft:lapis_lazuli", "minecraft:obsidian", "minecraft:bedrock", "minecraft:tnt"
+    ];
+
+    let currentSlot = -1;
+    let grid = new Array(9).fill("minecraft:air");
+    let result = "minecraft:diamond";
+
+    function openPicker(slotIdx) {
+        currentSlot = slotIdx;
+        document.getElementById('picker-modal').style.display = 'flex';
+        document.getElementById('picker-search').value = '';
+        document.getElementById('picker-search').focus();
+        filterItems();
+    }
+
+    function closePicker() {
+        document.getElementById('picker-modal').style.display = 'none';
+    }
+
+    function selectItem(id) {
+        if(currentSlot === -1) {
+            result = id;
+            updateSlotUI('res-slot', id);
+        } else {
+            grid[currentSlot] = id;
+            updateSlotUI('s' + currentSlot, id);
+        }
+        closePicker();
+    }
+
+    function updateSlotUI(elId, itemId) {
+        const el = document.getElementById(elId);
+        el.innerHTML = '';
+        if(itemId !== 'minecraft:air') {
+            const img = document.createElement('img');
+            img.src = `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${itemId.replace('minecraft:', '')}.png`;
+            img.onerror = function() { this.src = 'https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/stone.png'; };
+            el.appendChild(img);
+            el.title = itemId;
+        }
+    }
+
+    function filterItems() {
+        const q = document.getElementById('picker-search').value.toLowerCase();
+        const list = document.getElementById('picker-list');
+        list.innerHTML = '';
+
+        const customOpt = document.createElement('div');
+        customOpt.className = 'item-option';
+        customOpt.innerHTML = `<span style="color:#58a6ff">Use "${q}"</span>`;
+        customOpt.onclick = () => selectItem(q || 'minecraft:air');
+        list.appendChild(customOpt);
+
+        itemsDB.filter(i => i.includes(q)).forEach(i => {
+            const div = document.createElement('div');
+            div.className = 'item-option';
+            div.onclick = () => selectItem(i);
+            
+            const img = document.createElement('img');
+            img.src = `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${i.replace('minecraft:', '')}.png`;
+            
+            const span = document.createElement('span');
+            span.innerText = i.replace('minecraft:', '');
+            
+            div.appendChild(img);
+            div.appendChild(span);
+            list.appendChild(div);
+        });
+    }
+
     function genRecipe() {
-        const slots = [
-            document.getElementById('s1').value || " ",
-            document.getElementById('s2').value || " ",
-            document.getElementById('s3').value || " ",
-            document.getElementById('s4').value || " ",
-            document.getElementById('s5').value || " ",
-            document.getElementById('s6').value || " ",
-            document.getElementById('s7').value || " ",
-            document.getElementById('s8').value || " ",
-            document.getElementById('s9').value || " "
-        ];
-
-        const pattern = [
-            slots.slice(0,3).join(""),
-            slots.slice(3,6).join(""),
-            slots.slice(6,9).join("")
-        ];
-
-        // Parse Keys
-        const keyDefRaw = document.getElementById('keys-def').value.split('\n');
-        const keyMap = {};
-        keyDefRaw.forEach(line => {
-            const parts = line.split(':');
-            if(parts.length >= 2) {
-                const k = parts[0].trim();
-                const v = parts.slice(1).join(':').trim();
-                if(k) keyMap[k] = { item: v };
+        const keys = {};
+        const chars = "ABCDEFGHI";
+        const patternArr = ["", "", ""];
+        
+        grid.forEach((item, idx) => {
+            const row = Math.floor(idx / 3);
+            if(item === 'minecraft:air') {
+                patternArr[row] += " ";
+            } else {
+                let char = Object.keys(keys).find(k => keys[k].item === item);
+                if(!char) {
+                    char = chars[Object.keys(keys).length];
+                    keys[char] = { item: item };
+                }
+                patternArr[row] += char;
             }
         });
 
-        const resultItem = document.getElementById('res-item').value;
-        const resultCount = parseInt(document.getElementById('res-count').value);
-
         const recipe = {
             type: "minecraft:crafting_shaped",
-            pattern: pattern,
-            key: keyMap,
+            pattern: patternArr,
+            key: keys,
             result: {
-                item: resultItem,
-                count: resultCount
+                item: result,
+                count: parseInt(document.getElementById('res-count').value)
             }
         };
-
         document.getElementById('recipe-out').value = JSON.stringify(recipe, null, 4);
+    }
+
+    function copyRecipe() {
+        navigator.clipboard.writeText(document.getElementById('recipe-out').value);
+        alert("Copied!");
     }
 </script>
