@@ -1,0 +1,21 @@
+<header>
+    <div class="header-inner">
+        <div class="brand">
+            <a href="{{ '/' | relative_url }}" style="color:var(--text-main); display:flex; gap:10px; align-items:center; text-decoration:none;">
+                <img src="{{ '/assets/img/logo.png' | relative_url }}" alt="D"> Denmoth
+            </a>
+        </div>
+        <div class="controls">
+            <nav class="top-nav">
+                <a href="{{ '/tools/' | relative_url }}" class="nav-link"><i class="fa-solid fa-toolbox"></i> <span class="lang-en">Tools</span><span class="lang-ru">Тулзы</span></a>
+            </nav>
+            <div class="divider-v"></div>
+            <select id="lang-select">
+                <option value="en">EN</option>
+                <option value="ru">RU</option>
+            </select>
+            <button id="theme-toggle">🌙</button>
+            <button id="login-btn" class="btn-login"><i class="fa-brands fa-github"></i> <span class="lang-en">Log In</span><span class="lang-ru">Войти</span></button>
+        </div>
+    </div>
+</header>
