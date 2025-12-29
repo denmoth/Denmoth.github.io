@@ -62,19 +62,14 @@ function initGradleGen() {
         const lVal = loader.value;
         const vVal = ver.value;
         
-        // НАСТРОЙКИ ДЛЯ ГРАДЛ ГЕНЕРАТОРА
-        // Это просто текст, который формируется здесь.
-        // Чтобы CurseMaven работал, нужен Project ID и File ID.
-        const projectId = "12345"; // ID твоего проекта на CurseForge (цифры)
-        const projectSlug = "cubeui"; // Имя в URL (например cubeui)
+        const projectId = "12345"; 
+        const projectSlug = "cubeui"; 
         
-        // Примерные ID файлов (надо брать реальные с сайта CF)
         let fileId = (vVal === '1.20.1') ? '0000001' : '0000002'; 
 
         let text = "dependencies {\n";
         
         if(lVal === 'forge') {
-            // Формула CurseMaven: cursemaven:slug-projectId:fileId
             text += `    implementation fg.deobf("cursemaven:${projectSlug}-${projectId}:${fileId}")\n`;
         } else {
             text += `    modImplementation "maven.modrinth:${projectSlug}:1.0.0+${vVal}"\n`;
@@ -105,9 +100,8 @@ function initCopy() {
 }
 
 function initStats() {
-    // ВПИШИ СЮДА СВОИ ID
     const structuresId = 1303344; 
-    const cubeUiId = 0; // Впиши ID для CubeUI здесь (например 987654)
+    const cubeUiId = 0; 
 
     fetchStats(structuresId, 'structures');
     fetchStats(cubeUiId, 'cubeui');
@@ -119,23 +113,19 @@ function fetchStats(id, type) {
     fetch(`https://api.cfwidget.com/${id}`)
         .then(r => r.json())
         .then(data => {
-            // Ищем карточку по ID data-project, который добавим в HTML
             const card = document.querySelector(`[data-project="${type}"]`);
             if(!card) return;
 
-            // Скачивания
             const dlEl = card.querySelector('.cf-downloads');
-            if(dlEl) dlEl.textContent = formatNumber(data.downloads.total);
+            if(dlEl && data.downloads) dlEl.textContent = formatNumber(data.downloads.total);
 
-            // Версия (ищем Forge 1.20.1)
             const file = data.files.find(f => f.versions.includes("1.20.1") && f.versions.includes("Forge"));
             
             if(file) {
-                // Вставляем версию ВМЕСТО текста RELEASE/BETA
                 const badge = card.querySelector('.badge');
                 if(badge) {
-                     // Убираем лишнее ".jar" для красоты
-                    badge.textContent = file.display_name.replace('.jar', '');
+                    const fName = file.display_name || file.name || "Version";
+                    badge.textContent = fName.replace('.jar', '');
                     badge.style.color = "#58a6ff";
                     badge.style.borderColor = "#58a6ff";
                 }
