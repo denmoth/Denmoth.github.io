@@ -1,25 +1,17 @@
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
-<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BK5VTFSFL4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-BK5VTFSFL4');
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+
   const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
-  const SUPABASE_KEY = 'sb_publishable_WQ-ET1XxvVxFQ0kvkNDEIg_5eJz9MEq';
+  
+
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM'; 
   
   let supabase;
   try {
+
+      const { createClient } = window.supabase;
       supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
   } catch(e) {
-      console.log("Supabase not configured yet");
+      console.error("Supabase init error:", e);
   }
 </script>
