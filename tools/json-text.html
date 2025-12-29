@@ -1,175 +1,145 @@
 ---
 layout: tool
-title: JSON Text Generator
+title: JSON Text Builder
 permalink: /tools/json-text/
 ---
 
-<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Create complex JSON text components with colors, events, and formatting.</p></div>
-<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Создание сложных JSON компонентов с цветами, событиями и форматированием.</p></div>
+<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Construct complex tellraw messages component by component.</p></div>
+<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Конструктор сложных сообщений из нескольких компонентов.</p></div>
 
-<div class="tool-tabs">
-    <div class="tool-tab active" onclick="switchTab('main')">Main</div>
-    <div class="tool-tab" onclick="switchTab('click')">Click Event</div>
-    <div class="tool-tab" onclick="switchTab('hover')">Hover Event</div>
-</div>
-
-<div id="tab-main" class="tab-content active">
-    <div class="form-group">
-        <label class="form-label">Text Content</label>
-        <input type="text" id="json-input" class="form-input" placeholder="Hello World" oninput="updatePreview()">
-    </div>
+<div style="background: var(--bg-panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+    <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Add Component</h3>
     
     <div class="form-group">
-        <label class="form-label">Color & Formatting</label>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <input type="color" id="color-picker" value="#ffffff" style="height:40px; width:60px; padding:0; border:none; background:none; cursor:pointer;" onchange="updatePreview()">
-            
-            <button class="btn format-btn" data-fmt="bold" onclick="toggleStyle('bold')"><b>B</b></button>
-            <button class="btn format-btn" data-fmt="italic" onclick="toggleStyle('italic')"><i>I</i></button>
-            <button class="btn format-btn" data-fmt="underlined" onclick="toggleStyle('underlined')"><u>U</u></button>
-            <button class="btn format-btn" data-fmt="strikethrough" onclick="toggleStyle('strikethrough')"><s>S</s></button>
-            <button class="btn format-btn" data-fmt="obfuscated" onclick="toggleStyle('obfuscated')">k</button>
+        <input type="text" id="comp-text" class="form-input" placeholder="Text (e.g. 'Hello ')" onkeypress="if(event.key==='Enter') addComponent()">
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; align-items:center;">
+        <input type="color" id="comp-color" value="#ffffff" style="height:35px; border:none; background:none; cursor:pointer;">
+        
+        <button class="btn format-btn" id="btn-bold" onclick="toggleFmt('bold')"><b>B</b></button>
+        <button class="btn format-btn" id="btn-italic" onclick="toggleFmt('italic')"><i>I</i></button>
+        <button class="btn format-btn" id="btn-underlined" onclick="toggleFmt('underlined')"><u>U</u></button>
+        <button class="btn format-btn" id="btn-strikethrough" onclick="toggleFmt('strikethrough')"><s>S</s></button>
+        <button class="btn format-btn" id="btn-obfuscated" onclick="toggleFmt('obfuscated')">k</button>
+    </div>
+
+    <details style="margin-bottom: 15px; border: 1px solid var(--border); border-radius: 4px;">
+        <summary style="padding: 10px; cursor: pointer; background: var(--bg-body);">Click & Hover Events</summary>
+        <div style="padding: 15px;">
+            <label class="form-label">Click Action</label>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <select id="comp-click-action" class="form-select" style="width:150px;">
+                    <option value="none">None</option>
+                    <option value="run_command">Run Command</option>
+                    <option value="suggest_command">Suggest Command</option>
+                    <option value="open_url">Open URL</option>
+                    <option value="copy_to_clipboard">Copy Clipboard</option>
+                </select>
+                <input type="text" id="comp-click-value" class="form-input" placeholder="Value...">
+            </div>
+
+            <label class="form-label">Hover Text</label>
+            <input type="text" id="comp-hover-value" class="form-input" placeholder="Tooltip text...">
         </div>
-    </div>
+    </details>
+
+    <button onclick="addComponent()" class="btn primary" style="width:100%;"><i class="fa-solid fa-plus"></i> Add Component</button>
 </div>
 
-<div id="tab-click" class="tab-content">
-    <div class="form-group">
-        <label class="form-label">Action</label>
-        <select id="click-action" class="form-select" onchange="updatePreview()">
-            <option value="none">None</option>
-            <option value="run_command">Run Command</option>
-            <option value="suggest_command">Suggest Command</option>
-            <option value="open_url">Open URL</option>
-            <option value="copy_to_clipboard">Copy to Clipboard</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label class="form-label">Value (Command / URL)</label>
-        <input type="text" id="click-value" class="form-input" placeholder="/say Hello" oninput="updatePreview()">
-    </div>
+<div id="components-list" style="margin-bottom: 20px;"></div>
+
+<div class="form-group">
+    <label class="form-label">Output JSON</label>
+    <textarea id="json-output" class="form-area" readonly></textarea>
 </div>
-
-<div id="tab-hover" class="tab-content">
-    <div class="form-group">
-        <label class="form-label">Action</label>
-        <select id="hover-action" class="form-select" onchange="updatePreview()">
-            <option value="none">None</option>
-            <option value="show_text">Show Text</option>
-            <option value="show_item">Show Item (JSON)</option>
-            <option value="show_entity">Show Entity (JSON)</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label class="form-label">Value</label>
-        <input type="text" id="hover-value" class="form-input" placeholder="Tooltip text..." oninput="updatePreview()">
-    </div>
-</div>
-
-<div class="form-group" style="margin-top:30px;">
-    <label class="form-label">Preview</label>
-    <div id="live-preview" style="padding:15px; background:#1a1a1a; border-radius:6px; min-height:50px; display:flex; align-items:center; font-family:'Minecraft', monospace; font-size:1.2rem;">
-        Preview Text
-    </div>
-</div>
-
-<button onclick="generateJson()" class="btn primary" style="width:100%; margin-top:20px;">Generate JSON</button>
-
-<div class="result-box" id="json-result" style="display:none;"></div>
-
-<div class="guide-section">
-    <div class="lang-en">
-        <h2>How to use</h2>
-        <h3>Basic Formatting</h3>
-        <ul>
-            <li>Select a color using the picker.</li>
-            <li>Use buttons B, I, U, S to toggle styles.</li>
-        </ul>
-        <h3>Events</h3>
-        <ul>
-            <li><strong>Click Event:</strong> Triggers when a player clicks the text in chat. <code>run_command</code> executes immediately.</li>
-            <li><strong>Hover Event:</strong> Shows a tooltip when hovering.</li>
-        </ul>
-    </div>
-    <div class="lang-ru">
-        <h2>Как использовать</h2>
-        <h3>Форматирование</h3>
-        <ul>
-            <li>Выберите цвет через палитру.</li>
-            <li>Используйте кнопки B, I, U, S для стилей.</li>
-        </ul>
-        <h3>События</h3>
-        <ul>
-            <li><strong>Click Event:</strong> Срабатывает при клике. <code>suggest_command</code> подставляет команду в чат.</li>
-            <li><strong>Hover Event:</strong> Показывает подсказку при наведении.</li>
-        </ul>
-    </div>
+<div style="display:flex; gap:10px;">
+    <button onclick="copyJson()" class="btn primary" style="flex:1;">Copy Command</button>
+    <button onclick="clearAll()" class="btn" style="color:#d73a49; border-color:#d73a49;">Clear</button>
 </div>
 
 <script>
-    let styles = { bold: false, italic: false, underlined: false, strikethrough: false, obfuscated: false };
+    let components = [];
+    let currentFmt = { bold: false, italic: false, underlined: false, strikethrough: false, obfuscated: false };
 
-    function switchTab(name) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tool-tab').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab-' + name).classList.add('active');
-        document.querySelector(`.tool-tab[onclick="switchTab('${name}')"]`).classList.add('active');
-    }
-
-    function toggleStyle(key) {
-        styles[key] = !styles[key];
-        const btn = document.querySelector(`button[data-fmt="${key}"]`);
-        if(styles[key]) {
-            btn.style.backgroundColor = 'rgba(88, 166, 255, 0.2)';
+    function toggleFmt(fmt) {
+        currentFmt[fmt] = !currentFmt[fmt];
+        const btn = document.getElementById('btn-' + fmt);
+        if(currentFmt[fmt]) {
             btn.style.borderColor = '#58a6ff';
             btn.style.color = '#58a6ff';
         } else {
-            btn.style.backgroundColor = '';
             btn.style.borderColor = '';
             btn.style.color = '';
         }
-        updatePreview();
     }
 
-    function updatePreview() {
-        const text = document.getElementById('json-input').value || "Preview Text";
-        const color = document.getElementById('color-picker').value;
-        const preview = document.getElementById('live-preview');
+    function addComponent() {
+        const text = document.getElementById('comp-text').value;
+        if(!text) return;
 
-        preview.textContent = text;
-        preview.style.color = color;
-        preview.style.fontWeight = styles.bold ? 'bold' : 'normal';
-        preview.style.fontStyle = styles.italic ? 'italic' : 'normal';
-        preview.style.textDecoration = '';
-        if(styles.underlined) preview.style.textDecoration += ' underline';
-        if(styles.strikethrough) preview.style.textDecoration += ' line-through';
+        const comp = {
+            text: text,
+            color: document.getElementById('comp-color').value,
+            ...currentFmt // Copy styles
+        };
+
+        const cAction = document.getElementById('comp-click-action').value;
+        const cVal = document.getElementById('comp-click-value').value;
+        if(cAction !== 'none' && cVal) comp.clickEvent = { action: cAction, value: cVal };
+
+        const hVal = document.getElementById('comp-hover-value').value;
+        if(hVal) comp.hoverEvent = { action: 'show_text', value: hVal };
+
+        components.push(comp);
+        render();
+        
+        // Reset inputs
+        document.getElementById('comp-text').value = "";
+        document.getElementById('comp-text').focus();
     }
 
-    function generateJson() {
-        const text = document.getElementById('json-input').value;
-        const color = document.getElementById('color-picker').value;
+    function render() {
+        const list = document.getElementById('components-list');
+        list.innerHTML = "";
         
-        let obj = { text: text, color: color };
-        
-        for(let key in styles) {
-            if(styles[key]) obj[key] = true;
-        }
+        components.forEach((comp, idx) => {
+            const item = document.createElement('div');
+            item.style.cssText = "display:flex; align-items:center; background:var(--bg-body); padding:10px; margin-bottom:5px; border:1px solid var(--border); border-radius:4px;";
+            
+            const preview = document.createElement('span');
+            preview.textContent = comp.text;
+            preview.style.color = comp.color;
+            if(comp.bold) preview.style.fontWeight = "bold";
+            if(comp.italic) preview.style.fontStyle = "italic";
+            if(comp.underlined) preview.style.textDecoration = "underline";
+            preview.style.flex = "1";
+            preview.style.marginLeft = "10px";
 
-        const cAction = document.getElementById('click-action').value;
-        const cValue = document.getElementById('click-value').value;
-        if(cAction !== 'none' && cValue) {
-            obj.clickEvent = { action: cAction, value: cValue };
-        }
+            const delBtn = document.createElement('button');
+            delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            delBtn.className = "btn";
+            delBtn.style.padding = "5px 10px";
+            delBtn.onclick = () => { components.splice(idx, 1); render(); };
 
-        const hAction = document.getElementById('hover-action').value;
-        const hValue = document.getElementById('hover-value').value;
-        if(hAction !== 'none' && hValue) {
-            obj.hoverEvent = { action: hAction, value: hValue };
-        }
+            item.appendChild(preview);
+            item.appendChild(delBtn);
+            list.appendChild(item);
+        });
 
-        const out = JSON.stringify(obj);
-        const resBox = document.getElementById('json-result');
-        resBox.textContent = out;
-        resBox.style.display = 'block';
+        // Generate JSON output
+        // Format: ["", {"text":"..."}, {"text":"..."}]
+        const out = ["", ...components];
+        document.getElementById('json-output').value = '/tellraw @p ' + JSON.stringify(out);
+    }
+
+    function clearAll() {
+        components = [];
+        render();
+    }
+
+    function copyJson() {
+        navigator.clipboard.writeText(document.getElementById('json-output').value);
+        alert("Copied!");
     }
 </script>
