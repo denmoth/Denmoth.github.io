@@ -6,10 +6,23 @@
             </a>
         </div>
         <div class="controls">
-            <nav class="top-nav">
-                <a href="{{ '/tools/' | relative_url }}" class="nav-link"><i class="fa-solid fa-toolbox"></i> <span class="lang-en">Tools</span><span class="lang-ru">Тулзы</span></a>
-            </nav>
+            <div class="dropdown">
+                <button class="nav-link dropdown-btn">
+                    <i class="fa-solid fa-toolbox"></i> 
+                    <span class="lang-en">Tools</span><span class="lang-ru">Тулзы</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size:0.8em; margin-left:5px;"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="{{ '/tools/uuid/' | relative_url }}">UUID Generator</a>
+                    <a href="{{ '/tools/json-text/' | relative_url }}">JSON Text Builder</a>
+                    <a href="{{ '/tools/gradient/' | relative_url }}">RGB Gradient</a>
+                    <a href="{{ '/tools/pack-mcmeta/' | relative_url }}">Pack.mcmeta</a>
+                    <a href="{{ '/tools/recipe/' | relative_url }}">Recipe Generator</a>
+                </div>
+            </div>
+
             <div class="divider-v"></div>
+            
             <select id="lang-select">
                 <option value="en">EN</option>
                 <option value="ru">RU</option>
