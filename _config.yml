@@ -1,32 +1,16 @@
 title: Denmoth Hub
-description: Advanced Minecraft Modding
+description: Minecraft Modding
 url: "https://denmoth.pp.ua"
-
 
 remote_theme: just-the-docs/just-the-docs
 
-
 color_scheme: dark
+logo: /assets/images/logo.png 
 search_enabled: true
 heading_anchors: true
 
-
-plugins:
-  - jekyll-seo-tag
-
-
 aux_links:
   "GitHub": "https://github.com/Denmoth"
+  "Discord": "#"
 
-
-exclude:
-  - .sass-cache
-  - .jekyll-cache
-  - gemfiles
-  - Gemfile
-  - Gemfile.lock
-  - node_modules
-  - vendor/bundle/
-  - vendor/cache/
-  - vendor/gems/
-  - vendor/ruby/
+footer_content: "Copyright &copy; 2025 Denmoth. Distributed under MIT License."
