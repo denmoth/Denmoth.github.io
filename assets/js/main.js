@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(document.getElementById('gradle-output')) initGradleGen();
     initCopy();
     initStats();
+    initScrollSpy();
 });
 
 function initTheme() {
@@ -45,11 +46,44 @@ function initLanguage() {
 function initSidebar() {
     const btn = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
+    const links = document.querySelectorAll('.sidebar a');
+
     if(btn && sidebar) {
         btn.addEventListener('click', () => {
             sidebar.classList.toggle('active');
         });
     }
+    
+    links.forEach(link => {
+        link.addEventListener('click', () => {
+            if(window.innerWidth <= 1000 && sidebar) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+}
+
+function initScrollSpy() {
+    const sections = document.querySelectorAll('.doc-section');
+    const navLinks = document.querySelectorAll('.sidebar li a');
+    
+    if(sections.length === 0) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+
+    sections.forEach(section => observer.observe(section));
 }
 
 function initGradleGen() {
