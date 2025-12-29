@@ -26,24 +26,13 @@
 
         <main class="hub-layout">
             <div class="hero">
-                <h1 class="lang-en">Mod Development</h1>
-                <h1 class="lang-ru">Разработка Модов</h1>
-                
-                <p class="lang-en">Structures, UI libraries, and tools for Minecraft Forge.</p>
-                <p class="lang-ru">Структуры, UI библиотеки и инструменты для Minecraft Forge.</p>
+                <img src="assets/img/logo.png" style="width:80px; height:80px; border-radius:12px; margin-bottom:20px;">
+                <h1>Denmoth</h1>
+                <p class="lang-en">Minecraft Mods & Tools</p>
+                <p class="lang-ru">Моды и инструменты для Minecraft</p>
             </div>
 
             <div class="card-grid">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>CubeUI</h3>
-                        <span class="badge">BETA 0.1.0</span>
-                    </div>
-                    <p class="lang-en">Advanced GUI library. 9-slice rendering, widgets, and container API.</p>
-                    <p class="lang-ru">Библиотека GUI. 9-slice рендер, виджеты и API контейнеров.</p>
-                    <a href="cubeui/index.html" class="btn"><span class="lang-en">Documentation</span><span class="lang-ru">Документация</span></a>
-                </div>
-
                 <div class="card">
                     <div class="card-header">
                         <h3>Create: Structures</h3>
@@ -51,7 +40,28 @@
                     </div>
                     <p class="lang-en">World gen addon for Create. Handcrafted aesthetic structures.</p>
                     <p class="lang-ru">Аддон генерации для Create. Проработанные структуры.</p>
-                    <a href="#" class="btn"><span class="lang-en">CurseForge</span><span class="lang-ru">CurseForge</span></a>
+                    
+                    <div class="stat-row">
+                        <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
+                        <span title="Latest 1.20.1"><i class="fa-solid fa-code-branch"></i> <span class="cf-version">---</span></span>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="#" class="btn primary">CurseForge</a>
+                        <button class="btn open-changelog" style="display:none;"><i class="fa-solid fa-list"></i></button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>CubeUI</h3>
+                        <span class="badge">BETA 0.1.0</span>
+                    </div>
+                    <p class="lang-en">Advanced GUI library. 9-slice rendering, widgets, and container API.</p>
+                    <p class="lang-ru">Библиотека GUI. 9-slice рендер, виджеты и API контейнеров.</p>
+                    <div class="btn-group">
+                        <a href="cubeui/index.html" class="btn"><span class="lang-en">Docs</span><span class="lang-ru">Доки</span></a>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -76,6 +86,19 @@
             © 2025 Denmoth
         </footer>
     </div>
+
+    <div id="changelog-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-head">
+                <span>Changelog (1.20.1)</span>
+                <button class="close-btn">×</button>
+            </div>
+            <div class="modal-body">
+                Loading...
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/main.js"></script>
 </body>
 </html>
