@@ -1,0 +1,138 @@
+---
+layout: tool
+title: Loot Table Gen
+permalink: /tools/loot-table/
+---
+
+<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Basic Block Loot Table Generator.</p></div>
+<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Базовый генератор лута для блоков.</p></div>
+
+<div class="form-group">
+    <label class="form-label">Drop Item ID</label>
+    <input type="text" id="drop-item" class="form-input" placeholder="minecraft:diamond">
+</div>
+
+<div style="display:flex; gap:20px; margin-bottom:20px;">
+    <div style="flex:1;">
+        <label class="form-label">Min Count</label>
+        <input type="number" id="min-c" class="form-input" value="1">
+    </div>
+    <div style="flex:1;">
+        <label class="form-label">Max Count</label>
+        <input type="number" id="max-c" class="form-input" value="1">
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="form-label">Conditions</label>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+        <label style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="silk-touch"> Silk Touch Required
+        </label>
+        <label style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="fortune"> Apply Fortune
+        </label>
+    </div>
+</div>
+
+<button onclick="genLoot()" class="btn primary" style="width:100%;">Generate JSON</button>
+
+<div class="form-group" style="margin-top:20px;">
+    <textarea id="loot-out" class="form-area" readonly style="height:250px; font-family:monospace;"></textarea>
+</div>
+<button onclick="copyLoot()" class="btn">Copy JSON</button>
+
+<div class="guide-section" style="display:none;">
+    <div class="lang-en">
+        <h2>Guide</h2>
+        <p>Generates a standard loot table for a block.</p>
+        <ul>
+            <li><strong>Silk Touch:</strong> If checked, item only drops with Silk Touch.</li>
+            <li><strong>Fortune:</strong> Applies standard fortune multiplier formula.</li>
+        </ul>
+    </div>
+    <div class="lang-ru">
+        <h2>Гайд</h2>
+        <p>Генерирует стандартную таблицу лута для блока.</p>
+        <ul>
+            <li><strong>Silk Touch:</strong> Если выбрано, предмет выпадает только с Шелковым касанием.</li>
+            <li><strong>Fortune:</strong> Применяет стандартную формулу удачи.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function genLoot() {
+        const item = document.getElementById('drop-item').value || 'minecraft:air';
+        const min = parseInt(document.getElementById('min-c').value);
+        const max = parseInt(document.getElementById('max-c').value);
+        const silk = document.getElementById('silk-touch').checked;
+        const fortune = document.getElementById('fortune').checked;
+
+        const pool = {
+            rolls: 1,
+            entries: [
+                {
+                    type: "minecraft:item",
+                    name: item
+                }
+            ]
+        };
+
+        const functions = [];
+        
+        if (min !== 1 || max !== 1) {
+            functions.push({
+                function: "minecraft:set_count",
+                count: {
+                    min: min,
+                    max: max,
+                    type: "minecraft:uniform"
+                }
+            });
+        }
+
+        if (fortune) {
+            functions.push({
+                function: "minecraft:apply_bonus",
+                enchantment: "minecraft:fortune",
+                formula: "minecraft:uniform_bonus_count",
+                parameters: {
+                    bonusMultiplier: 1
+                }
+            });
+        }
+
+        if (functions.length > 0) {
+            pool.entries[0].functions = functions;
+        }
+
+        if (silk) {
+            pool.entries[0].conditions = [
+                {
+                    condition: "minecraft:match_tool",
+                    predicate: {
+                        enchantments: [
+                            {
+                                enchantment: "minecraft:silk_touch",
+                                levels: { min: 1 }
+                            }
+                        ]
+                    }
+                }
+            ];
+        }
+
+        const table = {
+            type: "minecraft:block",
+            pools: [pool]
+        };
+
+        document.getElementById('loot-out').value = JSON.stringify(table, null, 4);
+    }
+
+    function copyLoot() {
+        navigator.clipboard.writeText(document.getElementById('loot-out').value);
+        alert("Copied!");
+    }
+</script>
