@@ -1,0 +1,60 @@
+---
+layout: tool
+title: JSON Text Generator
+permalink: /tools/json-text/
+---
+
+<div class="lang-en"><p style="color:var(--text-muted);">Create colorful JSON text components for tellraw, titles, and lore.</p></div>
+<div class="lang-ru"><p style="color:var(--text-muted);">Создание цветного JSON текста для tellraw, титулов и описания предметов.</p></div>
+
+<div style="margin-bottom:20px;">
+    <div class="form-group">
+        <label class="form-label">Input Text</label>
+        <input type="text" id="json-input" class="form-input" placeholder="Hello World">
+    </div>
+    
+    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+        <input type="color" id="color-picker" value="#ffffff" style="height:35px; width:50px; padding:0; border:none; background:none;">
+        
+        <button class="btn" onclick="toggleStyle('bold')"><b>B</b></button>
+        <button class="btn" onclick="toggleStyle('italic')"><i>I</i></button>
+        <button class="btn" onclick="toggleStyle('underlined')"><u>U</u></button>
+        <button class="btn" onclick="toggleStyle('strikethrough')"><s>S</s></button>
+        <button class="btn" onclick="toggleStyle('obfuscated')">k</button>
+    </div>
+
+    <button onclick="generateJson()" class="btn primary" style="width:100%;">Convert to JSON</button>
+</div>
+
+<div class="result-box" id="json-result" style="display:block; min-height:60px;">
+    // Result will appear here
+</div>
+
+<script>
+    let styles = { bold: false, italic: false, underlined: false, strikethrough: false, obfuscated: false };
+
+    function toggleStyle(key) {
+        styles[key] = !styles[key];
+        const btn = event.target.closest('button');
+        if(styles[key]) btn.style.borderColor = '#58a6ff';
+        else btn.style.borderColor = '';
+    }
+
+    function generateJson() {
+        const text = document.getElementById('json-input').value;
+        const color = document.getElementById('color-picker').value;
+        
+        let obj = { text: text, color: color };
+        
+        // Add active styles
+        for(let key in styles) {
+            if(styles[key]) obj[key] = true;
+        }
+
+        const out = JSON.stringify(obj);
+        document.getElementById('json-result').textContent = out;
+        
+        // Simple visualization in console
+        console.log("Generated:", out);
+    }
+</script>
