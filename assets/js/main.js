@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ЗАЩИТА ОТ СБОЕВ: Если что-то пошло не так, раскомментируй эту строку один раз, запушь, зайди на сайт, потом закомментируй обратно.
-    // localStorage.clear(); 
-
     try { initTheme(); } catch(e) {}
     try { initLanguage(); } catch(e) {}
     initSidebar();
@@ -12,12 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initTheme() {
     const btn = document.getElementById('theme-toggle');
-    // По умолчанию ставим DARK, чтобы не слепило белым экраном при ошибке
     let stored = localStorage.getItem('theme') || 'dark';
-    
-    // Если вдруг сохранился мусор, сбрасываем на dark
     if(stored !== 'dark' && stored !== 'light') stored = 'dark';
-    
     document.documentElement.setAttribute('data-theme', stored);
     if(btn) btn.textContent = stored === 'dark' ? '☀️' : '🌙';
 
@@ -33,8 +26,6 @@ function initTheme() {
 function initLanguage() {
     const sel = document.getElementById('lang-select');
     let stored = localStorage.getItem('lang') || 'en';
-    
-    // Защита от кривых значений
     if(stored !== 'en' && stored !== 'ru') stored = 'en';
 
     document.body.classList.remove('lang-en', 'lang-ru');
@@ -70,14 +61,23 @@ function initGradleGen() {
         if(!loader || !ver || !out) return;
         const lVal = loader.value;
         const vVal = ver.value;
-        const id = "cubeui"; 
+        
+        // НАСТРОЙКИ ДЛЯ ГРАДЛ ГЕНЕРАТОРА
+        // Это просто текст, который формируется здесь.
+        // Чтобы CurseMaven работал, нужен Project ID и File ID.
+        const projectId = "12345"; // ID твоего проекта на CurseForge (цифры)
+        const projectSlug = "cubeui"; // Имя в URL (например cubeui)
+        
+        // Примерные ID файлов (надо брать реальные с сайта CF)
+        let fileId = (vVal === '1.20.1') ? '0000001' : '0000002'; 
+
         let text = "dependencies {\n";
         
         if(lVal === 'forge') {
-            let fileId = (vVal === '1.20.1') ? '5991001' : '5882002';
-            text += '    implementation fg.deobf("cursemaven:com.denmoth:' + id + '-12345:' + fileId + '")\n';
+            // Формула CurseMaven: cursemaven:slug-projectId:fileId
+            text += `    implementation fg.deobf("cursemaven:${projectSlug}-${projectId}:${fileId}")\n`;
         } else {
-            text += '    modImplementation "maven.modrinth:' + id + ':1.0.0+' + vVal + '"\n';
+            text += `    modImplementation "maven.modrinth:${projectSlug}:1.0.0+${vVal}"\n`;
         }
         text += "}";
         out.textContent = text;
@@ -105,32 +105,39 @@ function initCopy() {
 }
 
 function initStats() {
-    // Твой ID проекта Create: Structures
-    const projectId = 1303344; 
-    
-    if(projectId === 0) return;
+    // ВПИШИ СЮДА СВОИ ID
+    const structuresId = 1303344; 
+    const cubeUiId = 0; // Впиши ID для CubeUI здесь (например 987654)
 
-    fetch(`https://api.cfwidget.com/${projectId}`)
+    fetchStats(structuresId, 'structures');
+    fetchStats(cubeUiId, 'cubeui');
+}
+
+function fetchStats(id, type) {
+    if(!id || id === 0) return;
+
+    fetch(`https://api.cfwidget.com/${id}`)
         .then(r => r.json())
         .then(data => {
-            const dlEl = document.querySelector('.cf-downloads');
+            // Ищем карточку по ID data-project, который добавим в HTML
+            const card = document.querySelector(`[data-project="${type}"]`);
+            if(!card) return;
+
+            // Скачивания
+            const dlEl = card.querySelector('.cf-downloads');
             if(dlEl) dlEl.textContent = formatNumber(data.downloads.total);
 
-            // Ищем файл Forge 1.20.1
+            // Версия (ищем Forge 1.20.1)
             const file = data.files.find(f => f.versions.includes("1.20.1") && f.versions.includes("Forge"));
             
             if(file) {
-                const vEl = document.querySelector('.cf-version');
-                // Берем название файла (обычно там есть версия)
-                if(vEl) vEl.textContent = file.display_name.replace('.jar', '');
-
-                const logBtn = document.querySelector('.open-changelog');
-                if(logBtn) {
-                    logBtn.style.display = 'inline-flex';
-                    logBtn.onclick = (e) => {
-                        e.preventDefault();
-                        showChangelog(file, data.urls.curseforge);
-                    };
+                // Вставляем версию ВМЕСТО текста RELEASE/BETA
+                const badge = card.querySelector('.badge');
+                if(badge) {
+                     // Убираем лишнее ".jar" для красоты
+                    badge.textContent = file.display_name.replace('.jar', '');
+                    badge.style.color = "#58a6ff";
+                    badge.style.borderColor = "#58a6ff";
                 }
             }
         })
@@ -139,28 +146,4 @@ function initStats() {
 
 function formatNumber(num) {
     return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(num);
-}
-
-function showChangelog(file, url) {
-    const modal = document.getElementById('changelog-modal');
-    const body = modal.querySelector('.modal-body');
-    
-    body.innerHTML = `
-        <div class="changelog-item" style="border:none;">
-            <span class="changelog-ver" style="font-size:1.1rem;">${file.display_name}</span>
-            <span class="changelog-date">Type: ${file.type}</span>
-            <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem;">
-                CurseForge API does not provide full changelog text remotely. 
-                Please view it on the official page.
-            </p>
-            <a href="${url}/files/${file.id}" target="_blank" class="btn primary" style="margin-top:15px; width:100%;">View on CurseForge</a>
-        </div>
-    `;
-    
-    modal.style.display = 'flex';
-    
-    modal.querySelector('.close-btn').onclick = () => modal.style.display = 'none';
-    modal.onclick = (e) => {
-        if(e.target === modal) modal.style.display = 'none';
-    };
 }
