@@ -91,36 +91,55 @@ function initGradleGen() {
     const ver = document.getElementById('mc-version');
     const out = document.getElementById('gradle-output');
 
+    const projectId = "1415948";
+    const projectSlug = "cubeui";
+
     function update() {
         if(!loader || !ver || !out) return;
+        
         const lVal = loader.value;
         const vVal = ver.value;
         
-        // ВАЖНО: Тут должен быть настоящий Project ID с CurseForge, а не "12345"
-        // Его можно найти на странице проекта в правой колонке "About Project" -> "Project ID"
-        const projectId = "12345"; 
-        const projectSlug = "cubeui"; 
-        
-        // Тут по-хорошему надо бы делать запрос к API, чтобы получать реальные ID файлов,
-        // но пока оставим заглушки
-        let fileId = (vVal === '1.20.1') ? '0000001' : '0000002'; 
-
-        let text = "repositories {\n";
-
-        if(lVal === 'forge') {
-            text += `    maven { url "https://cursemaven.com" }\n`;
-            text += "}\n\n";
-            text += "dependencies {\n";
-            // Исправленный формат: curse.maven
-            text += `    implementation fg.deobf("curse.maven:${projectSlug}-${projectId}:${fileId}")\n`;
-        } else {
+        if(lVal === 'fabric') {
+            let text = "repositories {\n";
             text += `    maven { url "https://api.modrinth.com/maven" }\n`;
             text += "}\n\n";
             text += "dependencies {\n";
             text += `    modImplementation "maven.modrinth:${projectSlug}:1.0.0+${vVal}"\n`;
+            text += "}";
+            out.textContent = text;
+            return;
         }
-        text += "}";
-        out.textContent = text;
+
+        out.textContent = "Loading...";
+
+        fetch(`https://api.cfwidget.com/${projectId}`)
+            .then(r => r.json())
+            .then(data => {
+                const searchLoader = lVal === 'forge' ? 'Forge' : 'Fabric';
+                
+                const file = data.files.find(f => 
+                    f.versions.includes(vVal) && 
+                    f.versions.includes(searchLoader)
+                );
+
+                let text = "repositories {\n";
+                text += `    maven { url "https://cursemaven.com" }\n`;
+                text += "}\n\n";
+                text += "dependencies {\n";
+
+                if (file) {
+                    text += `    implementation fg.deobf("curse.maven:${projectSlug}-${projectId}:${file.id}")\n`;
+                } else {
+                    text += `    implementation fg.deobf("curse.maven:${projectSlug}-${projectId}:FILE_ID")\n`;
+                }
+                text += "}";
+                out.textContent = text;
+            })
+            .catch(e => {
+                out.textContent = "Error";
+                console.error(e);
+            });
     }
 
     if(loader && ver) {
