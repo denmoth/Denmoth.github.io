@@ -1,0 +1,110 @@
+---
+layout: tool
+title: Recipe Generator
+permalink: /tools/recipe/
+---
+
+<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Create Shaped Crafting Recipes for Data Packs.</p></div>
+<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Генератор рецептов крафта (Верстак) для датапаков.</p></div>
+
+<div style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap; margin-bottom:30px;">
+    <div>
+        <h3 style="text-align:center; margin-bottom:10px;">Crafting Table</h3>
+        <div style="display:grid; grid-template-columns:repeat(3, 50px); gap:5px; background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555;">
+            <input type="text" id="s1" class="craft-slot" placeholder="I">
+            <input type="text" id="s2" class="craft-slot" placeholder="I">
+            <input type="text" id="s3" class="craft-slot" placeholder="I">
+            <input type="text" id="s4" class="craft-slot" placeholder="I">
+            <input type="text" id="s5" class="craft-slot" placeholder="I">
+            <input type="text" id="s6" class="craft-slot" placeholder="I">
+            <input type="text" id="s7" class="craft-slot" placeholder="I">
+            <input type="text" id="s8" class="craft-slot" placeholder="I">
+            <input type="text" id="s9" class="craft-slot" placeholder="I">
+        </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; justify-content:center;">
+        <i class="fa-solid fa-arrow-right" style="font-size:2rem; color:var(--text-muted);"></i>
+    </div>
+
+    <div>
+        <h3 style="text-align:center; margin-bottom:10px;">Result</h3>
+        <div style="background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555; width:70px; height:70px; display:flex; align-items:center; justify-content:center;">
+            <input type="text" id="res-item" class="craft-slot" placeholder="minecraft:diamond" style="width:50px; height:50px;">
+        </div>
+        <input type="number" id="res-count" class="form-input" value="1" style="width:70px; margin-top:5px; text-align:center;" min="1" max="64">
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="form-label">Keys Definition (e.g., I = minecraft:iron_ingot)</label>
+    <textarea id="keys-def" class="form-area" placeholder="I: minecraft:iron_ingot&#10;S: minecraft:stick"></textarea>
+</div>
+
+<button onclick="genRecipe()" class="btn primary" style="width:100%;">Generate JSON</button>
+
+<div class="form-group" style="margin-top:20px;">
+    <textarea id="recipe-out" class="form-area" readonly style="height:200px; font-family:monospace;"></textarea>
+</div>
+
+<style>
+    .craft-slot {
+        width: 50px; height: 50px;
+        background: #8b8b8b;
+        border: 2px solid #373737;
+        color: white; text-align: center;
+        font-family: monospace; font-size: 1.2rem;
+        border-top-color: #373737; border-left-color: #373737;
+        border-bottom-color: #fff; border-right-color: #fff;
+    }
+    .craft-slot:focus { outline: 2px solid #58a6ff; }
+</style>
+
+<script>
+    function genRecipe() {
+        const slots = [
+            document.getElementById('s1').value || " ",
+            document.getElementById('s2').value || " ",
+            document.getElementById('s3').value || " ",
+            document.getElementById('s4').value || " ",
+            document.getElementById('s5').value || " ",
+            document.getElementById('s6').value || " ",
+            document.getElementById('s7').value || " ",
+            document.getElementById('s8').value || " ",
+            document.getElementById('s9').value || " "
+        ];
+
+        const pattern = [
+            slots.slice(0,3).join(""),
+            slots.slice(3,6).join(""),
+            slots.slice(6,9).join("")
+        ];
+
+        // Parse Keys
+        const keyDefRaw = document.getElementById('keys-def').value.split('\n');
+        const keyMap = {};
+        keyDefRaw.forEach(line => {
+            const parts = line.split(':');
+            if(parts.length >= 2) {
+                const k = parts[0].trim();
+                const v = parts.slice(1).join(':').trim();
+                if(k) keyMap[k] = { item: v };
+            }
+        });
+
+        const resultItem = document.getElementById('res-item').value;
+        const resultCount = parseInt(document.getElementById('res-count').value);
+
+        const recipe = {
+            type: "minecraft:crafting_shaped",
+            pattern: pattern,
+            key: keyMap,
+            result: {
+                item: resultItem,
+                count: resultCount
+            }
+        };
+
+        document.getElementById('recipe-out').value = JSON.stringify(recipe, null, 4);
+    }
+</script>
