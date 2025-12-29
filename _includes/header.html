@@ -7,17 +7,18 @@
         </div>
         <div class="controls">
             <div class="dropdown">
-                <button class="nav-link dropdown-btn">
+                <a href="{{ '/tools/' | relative_url }}" class="nav-link dropdown-btn" style="text-decoration:none;">
                     <i class="fa-solid fa-toolbox"></i> 
                     <span class="lang-en">Tools</span><span class="lang-ru">Тулзы</span>
                     <i class="fa-solid fa-chevron-down" style="font-size:0.8em; margin-left:5px;"></i>
-                </button>
+                </a>
                 <div class="dropdown-content">
                     <a href="{{ '/tools/uuid/' | relative_url }}">UUID Generator</a>
                     <a href="{{ '/tools/json-text/' | relative_url }}">JSON Text Builder</a>
                     <a href="{{ '/tools/gradient/' | relative_url }}">RGB Gradient</a>
                     <a href="{{ '/tools/pack-mcmeta/' | relative_url }}">Pack.mcmeta</a>
                     <a href="{{ '/tools/recipe/' | relative_url }}">Recipe Generator</a>
+                    <a href="{{ '/tools/stack/' | relative_url }}">Stack Calculator</a>
                 </div>
             </div>
 
