@@ -91,8 +91,7 @@ function initGradleGen() {
     const ver = document.getElementById('mc-version');
     const out = document.getElementById('gradle-output');
 
-    // !!! ВАЖНО: ЗАМЕНИ 12345 НА РЕАЛЬНЫЙ CURSEFORGE PROJECT ID !!!
-    const projectId = "12345";
+    const projectId = "1415948";
     const projectSlug = "cubeui";
 
     let abortController = null;
