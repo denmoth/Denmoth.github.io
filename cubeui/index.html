@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CubeUI Docs</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="dark">
+  <div class="wrapper">
+    <header>
+      <div class="header-top">
+        <div class="brand"><span class="brand-text">CubeUI Docs</span></div>
+        <nav class="top-nav">
+          <ul>
+            <li><a href="../index.html">← Back to Hub</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="content">
+      <section class="page-hero">
+        <span class="badge">Library</span>
+        <h1>CubeUI</h1>
+        <p>Lightweight GUI library for Forge/NeoForge. Version 0.1.0.</p>
+      </section>
+
+      <section class="page-section">
+        <article>
+          <h2>Installation</h2>
+          <div class="content-card">
+            <p>Add to <code>build.gradle</code>:</p>
+            <code style="display:block; background:#111; padding:10px; border-radius:5px;">
+              implementation fg.deobf("com.denmoth:cubeui:0.1.0-beta")
+            </code>
+          </div>
+
+          <h2>Widgets</h2>
+
+          <div class="content-card">
+            <h3>CuiButton</h3>
+            <p>3-slice resizable button.</p>
+            <code>new CuiButton(x, y, 100, 20, Component.literal("Click"), btn -> {});</code>
+          </div>
+
+          <div class="content-card">
+            <h3>CuiTextField</h3>
+            <p>Input field with placeholder support.</p>
+            <code>
+              CuiTextField input = new CuiTextField(font, x, y, 100, 20, Component.empty());<br>
+              input.setPlaceholder(Component.literal("Search..."));
+            </code>
+          </div>
+
+          <div class="content-card">
+            <h3>CuiSlot</h3>
+            <p>Visual item slot.</p>
+            <div class="callout warning">
+              <strong>Note:</strong> Currently decorative only. Interaction updates coming in 0.2.0.
+            </div>
+            <code>
+              CuiSlot slot = new CuiSlot(x, y);<br>
+              slot.setItem(new ItemStack(Items.DIAMOND));
+            </code>
+          </div>
+
+        </article>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
