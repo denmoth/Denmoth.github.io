@@ -28,7 +28,7 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px; /* Фикс навигации: отступ сверху при клике на якорь */
+    scroll-padding-top: 80px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,16 +48,12 @@ body {
 a { color: #58a6ff; text-decoration: none; transition: 0.2s; }
 a:hover { text-decoration: underline; }
 
-/* === ЛОГИКА ЯЗЫКОВ === */
-/* По умолчанию: RU скрыт, EN виден */
 .lang-ru { display: none !important; }
 .lang-en { display: inline-block; } 
 
-/* Если включен RU: EN скрыт, RU виден */
 body.lang-ru .lang-en { display: none !important; }
 body.lang-ru .lang-ru { display: inline-block !important; }
 
-/* Для блочных элементов (заголовки, параграфы) */
 h1.lang-en, p.lang-en, div.lang-en { display: block; }
 body.lang-ru h1.lang-ru, body.lang-ru p.lang-ru, body.lang-ru div.lang-ru { display: block !important; }
 
