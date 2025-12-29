@@ -15,7 +15,12 @@
 
         <main class="tool-content">
             <div class="tool-header">
-                <h1 class="page-title">{{ page.title }}</h1>
+                <h1 class="page-title">
+                    {{ page.title }} 
+                    <button class="btn-icon" onclick="openHelp()" title="Help" style="margin-left:10px; font-size:1rem; border:none; background:none; color:var(--text-muted);">
+                        <i class="fa-regular fa-circle-question"></i>
+                    </button>
+                </h1>
                 <div class="tool-controls">
                     <button id="fullscreen-btn" class="btn-icon" title="Maximize Workspace">
                         <i class="fa-solid fa-expand"></i>
@@ -26,6 +31,8 @@
             <div class="tool-card" id="tool-card-container">
                 {{ content }}
             </div>
+
+            <div class="giscus"></div>
         </main>
 
         <aside class="ad-sidebar right">
@@ -33,6 +40,13 @@
                 <span class="lang-en">Ad Space</span><span class="lang-ru">Реклама</span>
             </div>
         </aside>
+    </div>
+
+    <div id="help-modal" class="help-modal">
+        <div class="help-content">
+            <button class="close-help" onclick="closeHelp()">&times;</button>
+            <div id="help-body"></div>
+        </div>
     </div>
 
     <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
@@ -43,9 +57,7 @@
         
         if(fsBtn && wrapper) {
             fsBtn.addEventListener('click', () => {
-                // Переключаем класс CSS вместо использования API браузера
                 wrapper.classList.toggle('maximized');
-                
                 if (wrapper.classList.contains('maximized')) {
                     icon.classList.remove('fa-expand');
                     icon.classList.add('fa-compress');
@@ -57,6 +69,36 @@
                 }
             });
         }
+
+        function openHelp() {
+            const guide = document.querySelector('.guide-section');
+            const body = document.getElementById('help-body');
+            if(guide) {
+                body.innerHTML = guide.innerHTML;
+                document.getElementById('help-modal').style.display = 'flex';
+            } else {
+                alert("No tutorial available for this tool.");
+            }
+        }
+
+        function closeHelp() {
+            document.getElementById('help-modal').style.display = 'none';
+        }
+    </script>
+    <script src="https://giscus.app/client.js"
+        data-repo="Denmoth/Denmoth.github.io"
+        data-repo-id="R_kgDOKgxxxxxxxx"
+        data-category="General"
+        data-category-id="DIC_kwDOKgxxxxxxxx"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="dark"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
     </script>
 </body>
 </html>
