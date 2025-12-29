@@ -124,8 +124,18 @@ function fetchStats(id, type) {
             if(file) {
                 const badge = card.querySelector('.badge');
                 if(badge) {
-                    const fName = file.display_name || file.name || "Version";
-                    badge.textContent = fName.replace('.jar', '');
+                    // Берем имя файла или дисплей нейм
+                    let fName = file.display_name || file.name || "";
+                    
+                    // Удаляем все буквы, оставляем только цифры, точки и дефисы, если нужно
+                    // Регулярка [^0-9.] означает "всё, кроме цифр и точки" -> заменить на пустоту
+                    // Также удаляем лишние точки в начале/конце, если остались
+                    let cleanVer = fName.replace(/[^0-9.]/g, '');
+                    
+                    // Если вдруг вырезали вообще всё (например имя было "Release"), ставим заглушку
+                    if(cleanVer.length === 0) cleanVer = "Release";
+
+                    badge.textContent = cleanVer;
                     badge.style.color = "#58a6ff";
                     badge.style.borderColor = "#58a6ff";
                 }
