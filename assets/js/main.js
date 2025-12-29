@@ -8,7 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initCopy();
     initStats();
     try { initScrollSpy(); } catch(e) {}
-    initAdsSim();
+    
+    // Init Search only on tools page
+    const searchInput = document.getElementById('tool-search');
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => filterTools(e.target.value));
+    }
 });
 
 function initTheme() {
@@ -46,17 +51,24 @@ function initLanguage() {
 
 function initAuth() {
     const loginBtn = document.getElementById('login-btn');
-    if(!loginBtn) return;
+    if(!loginBtn || typeof supabase === 'undefined') return;
 
-    if(typeof supabase === 'undefined') {
-        console.warn("Supabase not configured");
-        return;
-    }
+    // Check session on load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        handleSession(session);
+    });
 
-    async function updateUI() {
-        const { data: { session } } = await supabase.auth.getSession();
+    // Listen for changes
+    supabase.auth.onAuthStateChange((event, session) => {
+        handleSession(session);
+    });
+
+    function handleSession(session) {
         if(session) {
-            loginBtn.innerHTML = `<img src="${session.user.user_metadata.avatar_url || 'https://github.com/identicons/user.png'}" style="width:20px;border-radius:50%"> ${session.user.user_metadata.user_name || 'User'}`;
+            // User Logged In
+            document.body.classList.add('premium-user');
+            loginBtn.innerHTML = `<img src="${session.user.user_metadata.avatar_url || 'https://github.com/identicons/user.png'}" style="width:20px;border-radius:50%">`;
+            loginBtn.title = "Log Out";
             loginBtn.onclick = async () => {
                 if(confirm("Log out?")) {
                     await supabase.auth.signOut();
@@ -64,17 +76,51 @@ function initAuth() {
                 }
             };
         } else {
+            // User Guest
+            document.body.classList.remove('premium-user');
+            initAds(); // Inject Ads only for guests
             loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> Log In`;
             loginBtn.onclick = async () => {
                 await supabase.auth.signInWithOAuth({ provider: 'github' });
             };
         }
     }
+}
 
-    supabase.auth.onAuthStateChange((event, session) => {
-        updateUI();
+function initAds() {
+    // Only load AdSense if not already loaded
+    if(!document.getElementById('adsense-script')) {
+        const script = document.createElement('script');
+        script.id = 'adsense-script';
+        script.async = true;
+        // REPLACE WITH YOUR REAL CLIENT ID
+        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX";
+        script.crossOrigin = "anonymous";
+        document.head.appendChild(script);
+        
+        // Simulating ads for placeholder
+        setTimeout(() => {
+            document.querySelectorAll('.ad-placeholder').forEach(el => {
+                el.style.backgroundImage = "url('https://placehold.co/160x600/222/444?text=Google+Ad')";
+                el.innerHTML = "";
+                el.style.border = "none";
+            });
+        }, 1000);
+    }
+}
+
+function filterTools(query) {
+    const cards = document.querySelectorAll('.card-grid .card');
+    const q = query.toLowerCase();
+    
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if(text.includes(q)) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
     });
-    updateUI();
 }
 
 function initSidebar() {
@@ -137,16 +183,6 @@ function fetchStats(id, type) {
 
 function formatNumber(num) {
     return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(num);
-}
-
-function initAdsSim() {
-    document.querySelectorAll('.ad-placeholder').forEach(el => {
-        setTimeout(() => {
-            el.style.backgroundImage = "url('https://placehold.co/160x600/222/444?text=Ad+Banner')";
-            el.innerHTML = "";
-            el.style.border = "none";
-        }, 1500);
-    });
 }
 
 function initGradleGen() {
