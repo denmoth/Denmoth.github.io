@@ -27,37 +27,38 @@
 
     <div class="docs-layout">
         <aside class="sidebar">
-            <h4 class="lang-en">Getting Started</h4><h4 class="lang-ru">Начало</h4>
+            <h4 class="lang-en">General</h4><h4 class="lang-ru">Общее</h4>
             <ul>
-                <li><a href="#install">Installation</a></li>
+                <li><a href="#install" class="active">Installation</a></li>
+                <li><a href="#theme">Theming</a></li>
             </ul>
             
             <h4 class="lang-en">Widgets</h4><h4 class="lang-ru">Виджеты</h4>
             <ul>
+                <li><a href="#w-common">Common Props</a></li>
                 <li><a href="#w-button">CuiButton</a></li>
                 <li><a href="#w-input">CuiTextField</a></li>
                 <li><a href="#w-panel">CuiPanel</a></li>
                 <li><a href="#w-slot">CuiSlot</a></li>
+                <li><a href="#w-arrow">CuiArrow</a></li>
             </ul>
 
             <h4 class="lang-en">Screens</h4><h4 class="lang-ru">Экраны</h4>
             <ul>
-                <li><a href="#s-base">Base Screen</a></li>
-                <li><a href="#s-cont">Container Screen</a></li>
-            </ul>
-            
-            <h4>Resources</h4>
-            <ul>
-                <li><a href="#atlas">Atlas & UV</a></li>
+                <li><a href="#s-base">CuiScreen</a></li>
+                <li><a href="#s-cont">CuiContainerScreen</a></li>
             </ul>
         </aside>
 
         <main class="content">
             <button id="sidebar-toggle" class="sidebar-toggle"><i class="fa-solid fa-bars"></i></button>
 
-            <section id="install">
+            <section id="install" class="doc-section">
                 <h1 class="lang-en">Installation</h1>
                 <h1 class="lang-ru">Установка</h1>
+                
+                <p class="lang-en">Add the library to your development environment.</p>
+                <p class="lang-ru">Добавьте библиотеку в среду разработки.</p>
                 
                 <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:6px; margin-bottom:30px;">
                     <div style="display:flex; gap:10px; margin-bottom:10px;">
@@ -71,22 +72,55 @@
                 </div>
             </section>
 
-            <section id="widgets">
-                <h2>CuiButton</h2>
-                <p class="lang-en">Resizable button with 3-slice rendering.</p>
-                <p class="lang-ru">Растягиваемая кнопка с 3-slice рендером.</p>
+            <section id="theme" class="doc-section">
+                <h1 class="lang-en">Theming</h1>
+                <h1 class="lang-ru">Темизация</h1>
+                <p class="lang-en">CubeUI uses <code>ThemeManager</code> to handle rendering styles. The default theme is Vanilla-like dark.</p>
+                <p class="lang-ru">CubeUI использует <code>ThemeManager</code> для стилизации. Стандартная тема — темная ванильная.</p>
+
+                <h3 class="lang-en">Creating a Theme</h3><h3 class="lang-ru">Создание темы</h3>
                 <div class="code-container">
                     <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>this.addRenderableWidget(new CuiButton(x, y, 100, 20, Component.literal("Save"), btn -> {
+                    <pre>public class MyTheme implements ICuiTheme {
+    @Override
+    public ResourceLocation getAtlasTexture() {
+        return new ResourceLocation("mymod", "textures/gui/atlas.png");
+    }
     
-}));</pre>
+    // Implement UV getters...
+}</pre>
                 </div>
+            </section>
+
+            <section id="widgets" class="doc-section">
+                <h1 class="lang-en">Widgets</h1>
+                <h1 class="lang-ru">Виджеты</h1>
+
+                <h3 id="w-common">Common Properties</h3>
+                <p class="lang-en">All widgets extend <code>CuiWidget</code>.</p>
+                <p class="lang-ru">Все виджеты наследуют <code>CuiWidget</code>.</p>
+                <table class="api-table">
+                    <tr><th>Method</th><th>Description</th></tr>
+                    <tr><td><code>setPosition(x, y)</code></td><td>Updates widget position</td></tr>
+                    <tr><td><code>setFocused(bool)</code></td><td>Updates focus state</td></tr>
+                    <tr><td><code>visible</code></td><td>Controls rendering</td></tr>
+                </table>
 
                 <hr style="border:0; border-top:1px solid var(--border); margin:40px 0;">
 
+                <h2 id="w-button">CuiButton</h2>
+                <p class="lang-en">Resizable button with 3-slice rendering (Left, Center, Right). Supports hover and disabled states.</p>
+                <p class="lang-ru">Растягиваемая кнопка с 3-slice рендером. Поддерживает наведение и выключенное состояние.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>this.addRenderableWidget(new CuiButton(x, y, 100, 20, Component.literal("Save"), btn -> {
+    System.out.println("Clicked");
+}));</pre>
+                </div>
+
                 <h2 id="w-input">CuiTextField</h2>
-                <p class="lang-en">EditBox replacement with Atlas background support.</p>
-                <p class="lang-ru">Замена EditBox с поддержкой фона из Атласа.</p>
+                <p class="lang-en">Replacement for vanilla EditBox. Supports custom background from Atlas and placeholder text.</p>
+                <p class="lang-ru">Замена ванильному EditBox. Поддерживает фон из Атласа и плейсхолдер.</p>
                 <div class="code-container">
                     <div class="code-head">Java <button class="copy-btn">Copy</button></div>
                     <pre>CuiTextField input = new CuiTextField(font, x, y, 150, 20, Component.empty());
@@ -94,24 +128,42 @@ input.setPlaceholder(Component.literal("Search..."));
 this.addRenderableWidget(input);</pre>
                 </div>
 
+                <h2 id="w-panel">CuiPanel</h2>
+                <p class="lang-en">9-slice background panel for GUIs.</p>
+                <p class="lang-ru">9-slice панель для фона интерфейсов.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>this.addRenderableWidget(new CuiPanel(x, y, 200, 100));</pre>
+                </div>
+
                 <h2 id="w-slot">CuiSlot</h2>
-                <p class="lang-en">Visual slot. For decoration only.</p>
-                <p class="lang-ru">Визуальный слот. Только для декорации.</p>
+                <p class="lang-en">Visual item slot. Does not interact with Container Menu.</p>
+                <p class="lang-ru">Визуальный слот предмета. Не взаимодействует с контейнером.</p>
                 <div class="code-container">
                     <div class="code-head">Java <button class="copy-btn">Copy</button></div>
                     <pre>CuiSlot slot = new CuiSlot(x, y);
 slot.setItem(new ItemStack(Items.DIAMOND));
 this.addRenderableWidget(slot);</pre>
                 </div>
+
+                <h2 id="w-arrow">CuiArrow</h2>
+                <p class="lang-en">Progress arrow widget.</p>
+                <p class="lang-ru">Виджет стрелки прогресса.</p>
+                <div class="code-container">
+                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+                    <pre>CuiArrow arrow = new CuiArrow(x, y);
+arrow.setProgress(0.5f); // 0.0 to 1.0
+this.addRenderableWidget(arrow);</pre>
+                </div>
             </section>
 
-            <section id="screens" style="margin-top:40px;">
+            <section id="screens" class="doc-section">
                 <h1 class="lang-en">Screens</h1>
                 <h1 class="lang-ru">Экраны</h1>
 
                 <h3 id="s-base">Base Screen</h3>
-                <p class="lang-en">Standard screen with background.</p>
-                <p class="lang-ru">Обычный экран с фоном.</p>
+                <p class="lang-en">For simple GUIs without inventory.</p>
+                <p class="lang-ru">Для простых интерфейсов без инвентаря.</p>
                 <div class="code-container">
                     <div class="code-head">Java <button class="copy-btn">Copy</button></div>
                     <pre>public class MyScreen extends Screen {
@@ -123,8 +175,8 @@ this.addRenderableWidget(slot);</pre>
                 </div>
 
                 <h3 id="s-cont">Container Screen</h3>
-                <p class="lang-en">Auto-renders slots linked to Menu.</p>
-                <p class="lang-ru">Авто-рендер слотов, привязанных к Menu.</p>
+                <p class="lang-en">Extends <code>AbstractContainerScreen</code>. Auto-renders slots and highlights using <code>CuiRenderHelper</code>.</p>
+                <p class="lang-ru">Наследует <code>AbstractContainerScreen</code>. Автоматически рендерит слоты и подсветку через <code>CuiRenderHelper</code>.</p>
                 <div class="code-container">
                     <div class="code-head">Java <button class="copy-btn">Copy</button></div>
                     <pre>public class MyGui extends CuiContainerScreen<MyMenu> {
