@@ -1,17 +1,24 @@
 ---
 layout: default
-title: Справочник Виджетов
+title: Виджеты
 parent: Документация CubeUI
 nav_order: 2
 permalink: /ru/cubeui/widgets/
 ---
 
 # Справочник Виджетов
+{: .no_toc }
 
-Полное описание стандартных виджетов библиотеки.
+Полное описание компонентов UI.
+{: .fs-6 .fw-300 }
 
-## CuiPanel (Панель)
-Отрисовывает фон окна, используя 9-slice масштабирование (углы остаются четкими при растягивании).
+1. TOC
+{:toc}
+
+---
+
+## CuiPanel (Фон)
+Базовый контейнер для окон. Использует 9-slice масштабирование.
 
 ```java
 // x, y, ширина, высота
@@ -22,31 +29,31 @@ this.addRenderableWidget(panel);
 ---
 
 ## CuiButton (Кнопка)
-Кнопка с поддержкой изменения размера по ширине (3-slice рендер).
+Кнопка с поддержкой изменения ширины. Текст центрируется автоматически.
 
 ```java
 // x, y, ширина, высота, текст, действие
-CuiButton btn = new CuiButton(x, y, 100, 20, Component.literal("Сохранить"), button -> {
-    System.out.println("Нажато!");
+CuiButton btn = new CuiButton(x, y, 100, 20, Component.literal("Сохранить"), btn -> {
+    System.out.println("Клик!");
 });
 this.addRenderableWidget(btn);
 ```
 
 ---
 
-## CuiTextField (Поле ввода)
-Замена ванильному EditBox. Поддерживает кастомные текстуры и плейсхолдеры.
+## CuiTextField (Поле Ввода)
+Модернизированное поле ввода. В отличие от ванильного, поддерживает плейсхолдеры и кастомный рендер фона.
 
 ```java
 // font, x, y, ширина, высота, текст_по_умолчанию
 CuiTextField input = new CuiTextField(this.font, x, y, 150, 20, Component.empty());
 
-// Установить текст-подсказку (виден, когда поле пустое)
-input.setPlaceholder(Component.literal("Введите значение..."));
+// Текст-подсказка (серый, когда поле пустое)
+input.setPlaceholder(Component.literal("Поиск предметов..."));
 
-// Обработчик изменений
-input.setResponder(value -> {
-    // Логика при вводе
+// Логика при вводе
+input.setResponder(val -> {
+    // Делаем что-то с val
 });
 
 this.addRenderableWidget(input);
@@ -54,29 +61,13 @@ this.addRenderableWidget(input);
 
 ---
 
-## CuiSlot (Слот)
-Декоративный слот для предмета.
-**Важно:** Для интерактивных слотов инвентаря используйте `CuiContainerScreen`. Этот виджет только для визуализации.
+## CuiSlot (Декоративный Слот)
+Рисует фон слота и предмет внутри.
+{: .note }
+> **Важно:** Этот виджет чисто визуальный. Если вам нужен функциональный слот инвентаря (чтобы брать предметы), используйте `CuiContainerScreen`.
 
 ```java
 CuiSlot slot = new CuiSlot(x, y);
-
-// Установить предмет для отображения
-slot.setItem(new ItemStack(Items.DIAMOND_SWORD));
-
+slot.setItem(new ItemStack(Items.DIAMOND));
 this.addRenderableWidget(slot);
-```
-
----
-
-## CuiArrow (Стрелка)
-Стрелка прогресса (как в печи).
-
-```java
-CuiArrow arrow = new CuiArrow(x, y);
-
-// 0.0f = пустая, 1.0f = полная
-arrow.setProgress(0.5f);
-
-this.addRenderableWidget(arrow);
 ```
