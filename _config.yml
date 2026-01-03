@@ -9,3 +9,4 @@ markdown: kramdown
 theme: jekyll-theme-primer
 plugins:
   - jekyll-seo-tag
+  - jekyll-sitemap
