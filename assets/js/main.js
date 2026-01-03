@@ -1,3 +1,7 @@
+{
+type: file_content_fetcher:fetch
+contentFetchId: uploaded:denmoth/denmoth.github.io/Denmoth.github.io-44d0bb1a9416821315e49d2dd205b89ffd69b8f2/assets/js/main.js
+}
 document.addEventListener('DOMContentLoaded', () => {
     try { initTheme(); } catch(e) {}
     try { initLanguage(); } catch(e) {}
@@ -53,19 +57,16 @@ function initAuth() {
     const loginBtn = document.getElementById('login-btn');
     if(!loginBtn || typeof supabase === 'undefined') return;
 
-    // Check session on load
     supabase.auth.getSession().then(({ data: { session } }) => {
         handleSession(session);
     });
 
-    // Listen for changes
     supabase.auth.onAuthStateChange((event, session) => {
         handleSession(session);
     });
 
     function handleSession(session) {
         if(session) {
-            // User Logged In
             document.body.classList.add('premium-user');
             loginBtn.innerHTML = `<img src="${session.user.user_metadata.avatar_url || 'https://github.com/identicons/user.png'}" style="width:20px;border-radius:50%">`;
             loginBtn.title = "Log Out";
@@ -76,9 +77,8 @@ function initAuth() {
                 }
             };
         } else {
-            // User Guest
             document.body.classList.remove('premium-user');
-            initAds(); // Inject Ads only for guests
+            initAds();
             loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> Log In`;
             loginBtn.onclick = async () => {
                 await supabase.auth.signInWithOAuth({ provider: 'github' });
@@ -88,17 +88,15 @@ function initAuth() {
 }
 
 function initAds() {
-    // Only load AdSense if not already loaded
     if(!document.getElementById('adsense-script')) {
         const script = document.createElement('script');
         script.id = 'adsense-script';
         script.async = true;
-        // REPLACE WITH YOUR REAL CLIENT ID
+        // REPLACE WITH REAL CLIENT ID
         script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX";
         script.crossOrigin = "anonymous";
         document.head.appendChild(script);
         
-        // Simulating ads for placeholder
         setTimeout(() => {
             document.querySelectorAll('.ad-placeholder').forEach(el => {
                 el.style.backgroundImage = "url('https://placehold.co/160x600/222/444?text=Google+Ad')";
@@ -112,14 +110,10 @@ function initAds() {
 function filterTools(query) {
     const cards = document.querySelectorAll('.card-grid .card');
     const q = query.toLowerCase();
-    
     cards.forEach(card => {
         const text = card.textContent.toLowerCase();
-        if(text.includes(q)) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
+        if(text.includes(q)) card.classList.remove('hidden');
+        else card.classList.add('hidden');
     });
 }
 
@@ -163,9 +157,16 @@ function initCopy() {
     });
 }
 
+// --- STATS & SUMMARY LOGIC ---
+
 function initStats() {
-    const structuresId = 1303344; 
-    fetchStats(structuresId, 'structures');
+    // Project IDs from CurseForge
+    const projects = [
+        { id: 1303344, type: 'structures' }, // Create: Structures Overhaul
+        { id: 1415948, type: 'cubeui' }      // CubeUI
+    ];
+
+    projects.forEach(p => fetchStats(p.id, p.type));
 }
 
 function fetchStats(id, type) {
@@ -175,14 +176,29 @@ function fetchStats(id, type) {
         .then(data => {
             const card = document.querySelector(`[data-project="${type}"]`);
             if(!card) return;
+
+            // Update Downloads
             const dlEl = card.querySelector('.cf-downloads');
-            if(dlEl && data.downloads) dlEl.textContent = formatNumber(data.downloads.total);
+            if(dlEl && data.downloads) {
+                dlEl.textContent = formatNumber(data.downloads.total);
+            }
+
+            // Update Summary (English only)
+            const sumEl = card.querySelector('.cf-summary');
+            if(sumEl && data.summary) {
+                sumEl.textContent = data.summary;
+            }
         })
         .catch(e => console.log('CF Error:', e));
 }
 
 function formatNumber(num) {
-    return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(num);
+    // Returns 22.6K, 1.5M etc.
+    return new Intl.NumberFormat('en-US', { 
+        notation: "compact", 
+        compactDisplay: "short",
+        maximumFractionDigits: 1 
+    }).format(num);
 }
 
 function initGradleGen() {
