@@ -28,11 +28,21 @@
                 </div>
             </div>
             
-            <div class="tool-card" id="tool-card-container">
+            <div class="tool-card" id="tool-card-container" style="margin-bottom: 40px;">
                 {{ content }}
             </div>
 
-            <div class="giscus"></div>
+            <footer class="footer" style="width:100%; border:none; background:transparent;">
+                <div class="socials">
+                    <a href="https://github.com/Denmoth" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://discord.com/invite/BCXqNfPnSh" title="Discord"><i class="fa-brands fa-discord"></i></a>
+                </div>
+                <div style="margin-top:10px; font-size:0.8rem;">
+                    <a href="/privacy/" style="color:var(--text-muted); margin:0 10px;">Privacy Policy</a>
+                    <a href="/terms/" style="color:var(--text-muted); margin:0 10px;">Terms of Use</a>
+                </div>
+                <div style="margin-top:10px;">© 2026 Denmoth</div>
+            </footer>
         </main>
 
         <aside class="ad-sidebar right">
@@ -49,56 +59,27 @@
         </div>
     </div>
 
-    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+    <script src="/assets/js/main.js"></script>
     <script>
+        // Скрипт фуллскрина оставляем без изменений
         const fsBtn = document.getElementById('fullscreen-btn');
         const wrapper = document.getElementById('tool-wrapper');
-        const icon = fsBtn.querySelector('i');
-        
         if(fsBtn && wrapper) {
             fsBtn.addEventListener('click', () => {
                 wrapper.classList.toggle('maximized');
-                if (wrapper.classList.contains('maximized')) {
-                    icon.classList.remove('fa-expand');
-                    icon.classList.add('fa-compress');
-                    fsBtn.title = "Exit Maximize";
-                } else {
-                    icon.classList.remove('fa-compress');
-                    icon.classList.add('fa-expand');
-                    fsBtn.title = "Maximize Workspace";
-                }
+                const icon = fsBtn.querySelector('i');
+                icon.classList.toggle('fa-expand');
+                icon.classList.toggle('fa-compress');
             });
         }
-
         function openHelp() {
             const guide = document.querySelector('.guide-section');
-            const body = document.getElementById('help-body');
             if(guide) {
-                body.innerHTML = guide.innerHTML;
+                document.getElementById('help-body').innerHTML = guide.innerHTML;
                 document.getElementById('help-modal').style.display = 'flex';
-            } else {
-                alert("No tutorial available for this tool.");
             }
         }
-
-        function closeHelp() {
-            document.getElementById('help-modal').style.display = 'none';
-        }
+        function closeHelp() { document.getElementById('help-modal').style.display = 'none'; }
     </script>
-   <script src="https://giscus.app/client.js"
-        data-repo="denmoth/Denmoth.github.io"
-        data-repo-id="R_kgDOQv18wg"
-        data-category="Ideas"
-        data-category-id="DIC_kwDOQv18ws4C0XuK"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        crossorigin="anonymous"
-        async>
-</script>
 </body>
 </html>
