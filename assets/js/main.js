@@ -1,7 +1,3 @@
-{
-type: file_content_fetcher:fetch
-contentFetchId: uploaded:denmoth/denmoth.github.io/Denmoth.github.io-44d0bb1a9416821315e49d2dd205b89ffd69b8f2/assets/js/main.js
-}
 document.addEventListener('DOMContentLoaded', () => {
     try { initTheme(); } catch(e) {}
     try { initLanguage(); } catch(e) {}
