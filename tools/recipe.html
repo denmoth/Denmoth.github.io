@@ -4,29 +4,19 @@ title: Recipe Generator
 permalink: /tools/recipe/
 ---
 
-<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Create Shaped Crafting Recipes with visual selector.</p></div>
-<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Визуальный генератор рецептов крафта.</p></div>
+<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Create Shaped Crafting Recipes. Search for any Minecraft item.</p></div>
+<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Создание рецептов крафта. Поиск по всем предметам Minecraft.</p></div>
 
 <div style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap; margin-bottom:30px;">
     <div>
         <h3 style="text-align:center; margin-bottom:10px;">Crafting Table</h3>
         <div style="display:grid; grid-template-columns:repeat(3, 60px); gap:4px; background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555;">
-            <div id="s0" class="craft-slot" onclick="openPicker(0)"></div>
-            <div id="s1" class="craft-slot" onclick="openPicker(1)"></div>
-            <div id="s2" class="craft-slot" onclick="openPicker(2)"></div>
-            <div id="s3" class="craft-slot" onclick="openPicker(3)"></div>
-            <div id="s4" class="craft-slot" onclick="openPicker(4)"></div>
-            <div id="s5" class="craft-slot" onclick="openPicker(5)"></div>
-            <div id="s6" class="craft-slot" onclick="openPicker(6)"></div>
-            <div id="s7" class="craft-slot" onclick="openPicker(7)"></div>
-            <div id="s8" class="craft-slot" onclick="openPicker(8)"></div>
+            {% for i in (0..8) %}
+            <div id="s{{i}}" class="craft-slot" onclick="openPicker({{i}})"></div>
+            {% endfor %}
         </div>
     </div>
-
-    <div style="display:flex; flex-direction:column; justify-content:center;">
-        <i class="fa-solid fa-arrow-right" style="font-size:2rem; color:var(--text-muted);"></i>
-    </div>
-
+    <div style="display:flex; flex-direction:column; justify-content:center;"><i class="fa-solid fa-arrow-right" style="font-size:2rem; color:var(--text-muted);"></i></div>
     <div>
         <h3 style="text-align:center; margin-bottom:10px;">Result</h3>
         <div style="background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555; width:84px; height:84px; display:flex; align-items:center; justify-content:center;">
@@ -37,16 +27,13 @@ permalink: /tools/recipe/
 </div>
 
 <button onclick="genRecipe()" class="btn primary" style="width:100%;">Generate JSON</button>
-
-<div class="form-group" style="margin-top:20px;">
-    <textarea id="recipe-out" class="form-area" readonly style="height:250px; font-family:monospace;"></textarea>
-</div>
-<button onclick="copyRecipe()" class="btn">Copy JSON</button>
+<textarea id="recipe-out" class="form-area" readonly style="height:200px; font-family:monospace; margin-top:20px;"></textarea>
+<button onclick="copyOut('recipe-out')" class="btn" style="width:100%; margin-top:10px;">Copy JSON</button>
 
 <div id="picker-modal" class="item-picker-modal" onclick="if(event.target === this) closePicker()">
     <div class="item-picker-content">
         <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; gap:10px;">
-            <input type="text" id="picker-search" class="form-input" placeholder="Search item..." style="flex:1;" oninput="filterItems()">
+            <input type="text" id="picker-search" class="form-input" placeholder="Search (e.g. netherite_sword)" style="flex:1;" oninput="filterItems()">
             <button onclick="closePicker()" class="btn">Close</button>
         </div>
         <div id="picker-list" class="item-list"></div>
@@ -54,117 +41,59 @@ permalink: /tools/recipe/
 </div>
 
 <script>
-    const itemsDB = [
-        "minecraft:air", "minecraft:stone", "minecraft:dirt", "minecraft:cobblestone", "minecraft:planks",
-        "minecraft:stick", "minecraft:torch", "minecraft:crafting_table", "minecraft:furnace", "minecraft:chest",
-        "minecraft:diamond", "minecraft:iron_ingot", "minecraft:gold_ingot", "minecraft:emerald", "minecraft:coal",
-        "minecraft:diamond_sword", "minecraft:diamond_pickaxe", "minecraft:iron_sword", "minecraft:bow", "minecraft:arrow",
-        "minecraft:apple", "minecraft:bread", "minecraft:porkchop", "minecraft:cooked_beef", "minecraft:golden_apple",
-        "minecraft:oak_log", "minecraft:spruce_log", "minecraft:birch_log", "minecraft:rotten_flesh", "minecraft:bone",
-        "minecraft:gunpowder", "minecraft:string", "minecraft:spider_eye", "minecraft:ender_pearl", "minecraft:blaze_rod",
-        "minecraft:redstone", "minecraft:lapis_lazuli", "minecraft:obsidian", "minecraft:bedrock", "minecraft:tnt"
-    ];
-
     let currentSlot = -1;
     let grid = new Array(9).fill("minecraft:air");
-    let result = "minecraft:diamond";
+    let resultItem = "minecraft:diamond";
 
-    function openPicker(slotIdx) {
-        currentSlot = slotIdx;
+    function openPicker(idx) {
+        currentSlot = idx;
         document.getElementById('picker-modal').style.display = 'flex';
-        document.getElementById('picker-search').value = '';
         document.getElementById('picker-search').focus();
-        filterItems();
     }
-
-    function closePicker() {
-        document.getElementById('picker-modal').style.display = 'none';
-    }
-
-    function selectItem(id) {
-        if(currentSlot === -1) {
-            result = id;
-            updateSlotUI('res-slot', id);
-        } else {
-            grid[currentSlot] = id;
-            updateSlotUI('s' + currentSlot, id);
-        }
-        closePicker();
-    }
-
-    function updateSlotUI(elId, itemId) {
-        const el = document.getElementById(elId);
-        el.innerHTML = '';
-        if(itemId !== 'minecraft:air') {
-            const img = document.createElement('img');
-            img.src = `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${itemId.replace('minecraft:', '')}.png`;
-            img.onerror = function() { this.src = 'https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/stone.png'; };
-            el.appendChild(img);
-            el.title = itemId;
-        }
-    }
+    function closePicker() { document.getElementById('picker-modal').style.display = 'none'; }
 
     function filterItems() {
         const q = document.getElementById('picker-search').value.toLowerCase();
         const list = document.getElementById('picker-list');
         list.innerHTML = '';
+        if(q.length < 2) return;
+        
+        // Поиск по "всем" предметам (через динамический ввод)
+        const opt = document.createElement('div');
+        opt.className = 'item-option';
+        const fullId = q.includes(':') ? q : 'minecraft:' + q;
+        opt.innerHTML = `<span>Use: ${fullId}</span>`;
+        opt.onclick = () => selectItem(fullId);
+        list.appendChild(opt);
+    }
 
-        const customOpt = document.createElement('div');
-        customOpt.className = 'item-option';
-        customOpt.innerHTML = `<span style="color:#58a6ff">Use "${q}"</span>`;
-        customOpt.onclick = () => selectItem(q || 'minecraft:air');
-        list.appendChild(customOpt);
+    function selectItem(id) {
+        if(currentSlot === -1) { resultItem = id; updateSlotUI('res-slot', id); }
+        else { grid[currentSlot] = id; updateSlotUI('s' + currentSlot, id); }
+        closePicker();
+    }
 
-        itemsDB.filter(i => i.includes(q)).forEach(i => {
-            const div = document.createElement('div');
-            div.className = 'item-option';
-            div.onclick = () => selectItem(i);
-            
-            const img = document.createElement('img');
-            img.src = `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${i.replace('minecraft:', '')}.png`;
-            
-            const span = document.createElement('span');
-            span.innerText = i.replace('minecraft:', '');
-            
-            div.appendChild(img);
-            div.appendChild(span);
-            list.appendChild(div);
-        });
+    function updateSlotUI(elId, id) {
+        const el = document.getElementById(elId);
+        const name = id.split(':')[1];
+        el.innerHTML = `<img src="https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${name}.png" onerror="this.src='https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${name}.png'; this.onerror=()=>this.src='/assets/img/logo.png'">`;
+        el.title = id;
     }
 
     function genRecipe() {
         const keys = {};
         const chars = "ABCDEFGHI";
-        const patternArr = ["", "", ""];
-        
-        grid.forEach((item, idx) => {
-            const row = Math.floor(idx / 3);
-            if(item === 'minecraft:air') {
-                patternArr[row] += " ";
-            } else {
+        const pattern = ["", "", ""];
+        let keyIdx = 0;
+        grid.forEach((item, i) => {
+            if(item === 'minecraft:air') pattern[Math.floor(i/3)] += " ";
+            else {
                 let char = Object.keys(keys).find(k => keys[k].item === item);
-                if(!char) {
-                    char = chars[Object.keys(keys).length];
-                    keys[char] = { item: item };
-                }
-                patternArr[row] += char;
+                if(!char) { char = chars[keyIdx++]; keys[char] = { item: item }; }
+                pattern[Math.floor(i/3)] += char;
             }
         });
-
-        const recipe = {
-            type: "minecraft:crafting_shaped",
-            pattern: patternArr,
-            key: keys,
-            result: {
-                item: result,
-                count: parseInt(document.getElementById('res-count').value)
-            }
-        };
-        document.getElementById('recipe-out').value = JSON.stringify(recipe, null, 4);
+        document.getElementById('recipe-out').value = JSON.stringify({ type: "minecraft:crafting_shaped", pattern, key: keys, result: { item: resultItem, count: parseInt(document.getElementById('res-count').value) } }, null, 4);
     }
-
-    function copyRecipe() {
-        navigator.clipboard.writeText(document.getElementById('recipe-out').value);
-        alert("Copied!");
-    }
+    function copyOut(id) { const el = document.getElementById(id); el.select(); document.execCommand('copy'); }
 </script>
