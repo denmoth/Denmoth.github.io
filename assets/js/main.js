@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initStats();
     try { initScrollSpy(); } catch(e) {}
     
-    // Init Search only on tools page
     const searchInput = document.getElementById('tool-search');
     if(searchInput) {
         searchInput.addEventListener('input', (e) => filterTools(e.target.value));
@@ -153,12 +152,11 @@ function initCopy() {
     });
 }
 
-// --- STATS & SUMMARY LOGIC ---
+// --- STATS LOGIC UPDATED ---
 
 function initStats() {
-    // Project IDs from CurseForge
     const projects = [
-        { id: 1303344, type: 'structures' }, // Create: Structures Overhaul
+        { id: 1303344, type: 'structures' }, // CSO
         { id: 1415948, type: 'cubeui' }      // CubeUI
     ];
 
@@ -167,29 +165,54 @@ function initStats() {
 
 function fetchStats(id, type) {
     if(!id) return;
+    
+    // Using cfwidget API
     fetch(`https://api.cfwidget.com/${id}`)
         .then(r => r.json())
         .then(data => {
             const card = document.querySelector(`[data-project="${type}"]`);
             if(!card) return;
 
-            // Update Downloads
+            // 1. Downloads
             const dlEl = card.querySelector('.cf-downloads');
             if(dlEl && data.downloads) {
                 dlEl.textContent = formatNumber(data.downloads.total);
             }
 
-            // Update Summary (English only)
+            // 2. Summary (Description)
             const sumEl = card.querySelector('.cf-summary');
             if(sumEl && data.summary) {
                 sumEl.textContent = data.summary;
             }
+
+            // 3. Version Parsing
+            const verEl = card.querySelector('.cf-version');
+            if(verEl && data.files && data.files.length > 0) {
+                const latestFile = data.files[0].name; // e.g., "[Forge 1.20.1]CSO 1.4.0 - Nether Update"
+                let version = "Release";
+
+                if (type === 'structures') {
+                    // Ищем паттерн "CSO 1.4.0"
+                    const match = latestFile.match(/CSO\s+([\d\.]+)/i);
+                    if(match && match[1]) version = match[1];
+                    else {
+                        // Фолбэк: ищем просто версию X.X.X, если CSO не найдено
+                        const vMatch = latestFile.match(/(\d+\.\d+\.\d+)/);
+                        if(vMatch) version = vMatch[1];
+                    }
+                } else if (type === 'cubeui') {
+                    // Для CubeUI ищем просто версию
+                    const match = latestFile.match(/(\d+\.\d+\.\d+)/);
+                    if(match) version = match[0];
+                }
+
+                verEl.textContent = version;
+            }
         })
-        .catch(e => console.log('CF Error:', e));
+        .catch(e => console.error('CF Error:', e));
 }
 
 function formatNumber(num) {
-    // Returns 22.6K, 1.5M etc.
     return new Intl.NumberFormat('en-US', { 
         notation: "compact", 
         compactDisplay: "short",
