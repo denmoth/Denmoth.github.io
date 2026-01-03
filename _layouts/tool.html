@@ -5,81 +5,30 @@
 </head>
 <body class="lang-en tool-body">
     {% include header.html %}
-
     <div class="tool-wrapper" id="tool-wrapper">
-        <aside class="ad-sidebar left">
-            <div class="ad-placeholder">
-                <span class="lang-en">Ad Space</span><span class="lang-ru">Реклама</span>
-            </div>
-        </aside>
-
+        <aside class="ad-sidebar left"><div class="ad-placeholder">Ad</div></aside>
         <main class="tool-content">
             <div class="tool-header">
-                <h1 class="page-title">
-                    {{ page.title }} 
-                    <button class="btn-icon" onclick="openHelp()" title="Help" style="margin-left:10px; font-size:1rem; border:none; background:none; color:var(--text-muted);">
-                        <i class="fa-regular fa-circle-question"></i>
-                    </button>
-                </h1>
+                <h1 class="page-title">{{ page.title }}</h1>
                 <div class="tool-controls">
-                    <button id="fullscreen-btn" class="btn-icon" title="Maximize Workspace">
-                        <i class="fa-solid fa-expand"></i>
-                    </button>
+                    <button id="fullscreen-btn" class="btn-icon"><i class="fa-solid fa-expand"></i></button>
                 </div>
             </div>
+            <div class="tool-card">{{ content }}</div>
             
-            <div class="tool-card" id="tool-card-container" style="margin-bottom: 40px;">
-                {{ content }}
-            </div>
-
-            <footer class="footer" style="width:100%; border:none; background:transparent;">
+            <footer class="footer" style="margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
                 <div class="socials">
-                    <a href="https://github.com/Denmoth" title="GitHub"><i class="fa-brands fa-github"></i></a>
-                    <a href="https://discord.com/invite/BCXqNfPnSh" title="Discord"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://github.com/Denmoth"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://discord.gg/BCXqNfPnSh"><i class="fa-brands fa-discord"></i></a>
                 </div>
-                <div style="margin-top:10px; font-size:0.8rem;">
-                    <a href="/privacy/" style="color:var(--text-muted); margin:0 10px;">Privacy Policy</a>
-                    <a href="/terms/" style="color:var(--text-muted); margin:0 10px;">Terms of Use</a>
+                <div style="font-size:0.85rem; margin-top:10px;">
+                    <a href="/privacy/">Privacy Policy</a> | <a href="/terms/">Terms</a>
                 </div>
-                <div style="margin-top:10px;">© 2026 Denmoth</div>
+                <div style="margin-top:10px; opacity:0.6;">© 2026 Denmoth</div>
             </footer>
         </main>
-
-        <aside class="ad-sidebar right">
-            <div class="ad-placeholder">
-                <span class="lang-en">Ad Space</span><span class="lang-ru">Реклама</span>
-            </div>
-        </aside>
+        <aside class="ad-sidebar right"><div class="ad-placeholder">Ad</div></aside>
     </div>
-
-    <div id="help-modal" class="help-modal">
-        <div class="help-content">
-            <button class="close-help" onclick="closeHelp()">&times;</button>
-            <div id="help-body"></div>
-        </div>
-    </div>
-
     <script src="/assets/js/main.js"></script>
-    <script>
-        // Скрипт фуллскрина оставляем без изменений
-        const fsBtn = document.getElementById('fullscreen-btn');
-        const wrapper = document.getElementById('tool-wrapper');
-        if(fsBtn && wrapper) {
-            fsBtn.addEventListener('click', () => {
-                wrapper.classList.toggle('maximized');
-                const icon = fsBtn.querySelector('i');
-                icon.classList.toggle('fa-expand');
-                icon.classList.toggle('fa-compress');
-            });
-        }
-        function openHelp() {
-            const guide = document.querySelector('.guide-section');
-            if(guide) {
-                document.getElementById('help-body').innerHTML = guide.innerHTML;
-                document.getElementById('help-modal').style.display = 'flex';
-            }
-        }
-        function closeHelp() { document.getElementById('help-modal').style.display = 'none'; }
-    </script>
 </body>
 </html>
