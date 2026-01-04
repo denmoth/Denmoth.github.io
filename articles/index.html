@@ -7,10 +7,12 @@ permalink: /articles/
 <div class="hub-layout" style="max-width:1000px; margin:0 auto;">
     
     <div class="articles-hero">
-        <h1 class="lang-en">Knowledge Base</h1>
-        <h1 class="lang-ru">База Знаний</h1>
-        <p class="lang-en">Deep dives into architecture, platform analysis, and development insights.</p>
-        <p class="lang-ru">Глубокий разбор архитектуры, анализ платформ и инсайты разработки.</p>
+        <h1>
+            {% lang en %}Knowledge Base{% endlang %}
+            {% lang ru %}База Знаний{% endlang %}
+        </h1>
+        {% lang en %}<p>Deep dives into architecture, platform analysis, and development insights.</p>{% endlang %}
+        {% lang ru %}<p>Глубокий разбор архитектуры, анализ платформ и инсайты разработки.</p>{% endlang %}
     </div>
 
     <div class="articles-filter">
@@ -39,17 +41,17 @@ permalink: /articles/
             </p>
             
             <div class="read-link">
-                <span class="lang-en">Read Article <i class="fa-solid fa-arrow-right-long"></i></span>
-                <span class="lang-ru">Читать <i class="fa-solid fa-arrow-right-long"></i></span>
+                {% lang en %}<span>Read Article <i class="fa-solid fa-arrow-right-long"></i></span>{% endlang %}
+                {% lang ru %}<span>Читать <i class="fa-solid fa-arrow-right-long"></i></span>{% endlang %}
             </div>
         </a>
         {% else %}
         <div class="empty-state">
             <i class="fa-solid fa-pen-ruler"></i>
-            <h3 class="lang-en">Content in production</h3>
-            <h3 class="lang-ru">Материалы в работе</h3>
-            <p class="lang-en">First analytical articles are being written right now.</p>
-            <p class="lang-ru">Первые аналитические статьи пишутся прямо сейчас.</p>
+            {% lang en %}<h3>Content in production</h3>{% endlang %}
+            {% lang ru %}<h3>Материалы в работе</h3>{% endlang %}
+            {% lang en %}<p>First analytical articles are being written right now.</p>{% endlang %}
+            {% lang ru %}<p>Первые аналитические статьи пишутся прямо сейчас.</p>{% endlang %}
         </div>
         {% endfor %}
     </div>
@@ -57,6 +59,7 @@ permalink: /articles/
 </div>
 
 <style>
+/* Стили без изменений, можно скопировать из оригинала */
     .articles-hero { padding: 40px 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
     .articles-hero h1 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; letter-spacing: -1px; }
     .articles-hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; }
