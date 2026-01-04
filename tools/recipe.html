@@ -4,11 +4,15 @@ title: Recipe Generator
 permalink: /tools/recipe/
 ---
 
-<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Create Shaped Crafting Recipes. Search for any Minecraft item.</p></div>
-<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Создание рецептов крафта. Поиск по всем предметам Minecraft.</p></div>
+{% lang en %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Create Shaped Crafting Recipes. Search for any Minecraft item.</p>
+{% endlang %}
+{% lang ru %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Создание рецептов крафта. Поиск по всем предметам Minecraft.</p>
+{% endlang %}
 
 <div style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap; margin-bottom:30px;">
-    <div>
+<div>
         <h3 style="text-align:center; margin-bottom:10px;">Crafting Table</h3>
         <div style="display:grid; grid-template-columns:repeat(3, 60px); gap:4px; background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555;">
             {% for i in (0..8) %}
