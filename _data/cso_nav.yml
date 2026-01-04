@@ -14,13 +14,13 @@
     - title_en: Structures & Loot
       title_ru: Структуры и Лут
       url: /cso/structures/
-    - title_en: Configs
+    - title_en: Configuration
       title_ru: Конфигурация
       url: /cso/config/
 
-- title_en: Developers
-  title_ru: Разработчикам
+- title_en: Addons
+  title_ru: Аддоны
   items:
-    - title_en: Integration (API)
-      title_ru: Интеграция (API)
+    - title_en: BOP Integration
+      title_ru: Интеграция с BOP
       url: /cso/integration/
