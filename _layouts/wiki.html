@@ -3,39 +3,48 @@
 <head>
     {% include head.html %}
     <style>
-        /* Layout */
-        body { display: flex; flex-direction: column; min-height: 100vh; }
+        body { display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
         .wiki-wrapper { display: flex; flex: 1; width: 100%; max-width: 1400px; margin: 0 auto; position: relative; }
-        .wiki-sidebar { width: 300px; flex-shrink: 0; border-right: 1px solid var(--border); position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; padding: 20px; background: var(--bg-body); }
-        .wiki-content { flex-grow: 1; padding: 40px; min-width: 0; }
-        .wiki-inner { max-width: 850px; margin: 0 auto; }
+        
+        .wiki-sidebar { 
+            width: 280px; flex-shrink: 0; border-right: 1px solid var(--border); 
+            position: sticky; top: 64px; height: calc(100vh - 64px); 
+            overflow-y: auto; padding: 20px; background: var(--bg-body); 
+            scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+        }
+        
+        .wiki-content { flex-grow: 1; padding: 40px 60px; min-width: 0; }
+        .wiki-inner { max-width: 900px; margin: 0 auto; }
 
-        /* Search */
         .search-box-wiki { position: relative; margin-bottom: 20px; }
-        .search-box-wiki input { width: 100%; padding: 10px 35px 10px 15px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); }
-        .search-box-wiki i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-box-wiki input { width: 100%; padding: 8px 35px 8px 12px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-size: 0.9rem; }
+        .search-box-wiki i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); opacity: 0.7; }
 
-        /* Nav */
+        /* Version Switcher */
+        .version-box { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .version-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .version-select { width: 100%; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border); padding: 6px; border-radius: 6px; cursor: pointer; }
+
         .nav-group { margin-bottom: 25px; }
-        .nav-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; padding-left: 10px; letter-spacing: 0.5px; }
-        .nav-link { display: block; padding: 6px 10px; color: var(--text-main); border-radius: 4px; font-size: 0.95rem; text-decoration: none; border-left: 2px solid transparent; }
-        .nav-link:hover { background: var(--bg-panel); color: #58a6ff; }
-        .nav-link.active { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border-left-color: #58a6ff; font-weight: 500; }
+        .nav-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; padding-left: 8px; letter-spacing: 0.5px; opacity: 0.8; }
+        .nav-link { display: block; padding: 6px 12px; color: var(--text-main); border-radius: 6px; font-size: 0.95rem; text-decoration: none; margin-bottom: 2px; transition: 0.1s; border-left: 3px solid transparent; }
+        .nav-link:hover { background: var(--bg-panel); color: var(--accent); }
+        .nav-link.active { background: rgba(56, 139, 253, 0.1); color: #58a6ff; border-left-color: #58a6ff; font-weight: 600; }
 
-        /* Spoiler Overlay Fixed */
+        /* Spoiler Overlay */
         .spoiler-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); /* Полупрозрачный черный */
-            backdrop-filter: blur(10px); /* Сильный блюр */
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
             z-index: 9999;
             display: none; align-items: center; justify-content: center;
             animation: fadeIn 0.4s ease-out;
+            padding: 20px;
         }
         .spoiler-box {
             background: var(--bg-panel); border: 1px solid var(--border);
-            padding: 40px; border-radius: 12px; max-width: 500px;
-            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            padding: 40px; border-radius: 16px; max-width: 480px; width: 100%;
+            text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.5);
             transform: scale(0.95); animation: scaleUp 0.3s forwards 0.1s; opacity: 0;
         }
 
@@ -43,9 +52,9 @@
         @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         @media (max-width: 1000px) {
-            .wiki-sidebar { display: none; position: fixed; left: 0; z-index: 1000; transform: translateX(-100%); transition: 0.3s; width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            .wiki-sidebar { display: none; position: fixed; left: 0; z-index: 2000; transform: translateX(-100%); transition: 0.3s; width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
             .wiki-sidebar.open { display: block; transform: translateX(0); }
-            .wiki-content { padding: 20px; }
+            .wiki-content { padding: 30px 20px; }
         }
     </style>
 </head>
@@ -54,14 +63,14 @@
 
     <div id="spoiler-modal" class="spoiler-overlay">
         <div class="spoiler-box">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size:3rem; color:#d73a49; margin-bottom:20px;"></i>
-            <h2 class="lang-en">Spoiler Alert!</h2>
-            <h2 class="lang-ru">Осторожно, Спойлеры!</h2>
-            <p style="color:var(--text-muted); margin:15px 0; line-height: 1.6;">
-                <span class="lang-en">This wiki reveals secrets, loot tables, and hidden mechanics. If you want to explore the world yourself, turn back now.</span>
-                <span class="lang-ru">Эта вики раскрывает секреты, таблицы лута и скрытые механики. Если хотите сохранить дух исследования — не читайте дальше.</span>
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:3.5rem; color:#d73a49; margin-bottom:20px;"></i>
+            <h2 class="lang-en" style="margin-bottom:10px;">Spoiler Alert!</h2>
+            <h2 class="lang-ru" style="margin-bottom:10px;">Спойлеры!</h2>
+            <p style="color:var(--text-muted); margin:0 0 25px; line-height: 1.6; font-size:1.05rem;">
+                <span class="lang-en">This wiki reveals secrets and loot tables. To preserve the sense of exploration, we recommend playing without it first.</span>
+                <span class="lang-ru">Эта вики раскрывает все секреты и таблицы лута. Чтобы сохранить дух исследования, рекомендуем сначала поиграть без неё.</span>
             </p>
-            <div style="display:flex; gap:10px; justify-content:center; margin-top:25px;">
+            <div style="display:flex; gap:12px; justify-content:center;">
                 <a href="/" class="btn" style="border-color:#d73a49; color:#d73a49;">Exit</a>
                 <button onclick="acceptSpoilers()" class="btn primary">I Understand</button>
             </div>
@@ -69,11 +78,20 @@
     </div>
 
     <div class="wiki-wrapper">
-        <aside class="wiki-sidebar" id="wiki-sidebar">
+        <aside class="wiki-sidebar">
             <div class="search-box-wiki">
-                <input type="text" id="wiki-search" placeholder="Search..." onkeyup="filterMenu()">
+                <input type="text" id="wiki-search" placeholder="Search docs..." onkeyup="filterMenu()">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
+            
+            <div class="version-box">
+                <div class="version-label"><span class="lang-en">Game Version</span><span class="lang-ru">Версия Игры</span></div>
+                <select class="version-select">
+                    <option value="1.20.1">Minecraft 1.20.1 (Current)</option>
+                    <option value="1.19.2">Minecraft 1.19.2 (Legacy)</option>
+                </select>
+            </div>
+
             <div id="nav-list">
                 {% for group in site.data.cso_nav %}
                 <div class="nav-group">
@@ -93,7 +111,7 @@
         </aside>
 
         <main class="wiki-content">
-            <button id="wiki-menu-btn" class="btn" style="display:none; margin-bottom:20px;" onclick="document.getElementById('wiki-sidebar').classList.toggle('open')">
+            <button id="sidebar-toggle" class="btn" style="display:none; margin-bottom:20px; width:auto;">
                 <i class="fa-solid fa-bars"></i> Menu
             </button>
             <div class="wiki-inner">{{ content }}</div>
@@ -107,15 +125,6 @@
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/analytics.js"></script>
     <script>
-        function acceptSpoilers() {
-            localStorage.setItem('cso_spoilers_accepted', 'true');
-            document.getElementById('spoiler-modal').style.display = 'none';
-        }
-        // Проверяем localStorage (постоянное хранилище)
-        if (!localStorage.getItem('cso_spoilers_accepted')) {
-            document.getElementById('spoiler-modal').style.display = 'flex';
-        }
-
         function filterMenu() {
             const input = document.getElementById('wiki-search');
             const filter = input.value.toLowerCase();
@@ -130,8 +139,10 @@
                 group.style.display = visible.length > 0 ? "" : "none";
             });
         }
-        const menuBtn = document.getElementById('wiki-menu-btn');
-        const checkMobile = () => { menuBtn.style.display = window.innerWidth <= 1000 ? 'inline-flex' : 'none'; };
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const checkMobile = () => { 
+            toggleBtn.style.display = window.innerWidth <= 1000 ? 'inline-flex' : 'none'; 
+        };
         window.addEventListener('resize', checkMobile);
         checkMobile();
     </script>
