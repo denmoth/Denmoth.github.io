@@ -11,12 +11,9 @@
 - title_en: World Generation
   title_ru: Генерация
   items:
-    - title_en: Structures & Loot
-      title_ru: Структуры и Лут
+    - title_en: Structures List
+      title_ru: Список Структур
       url: /cso/structures/
-    - title_en: Configuration
-      title_ru: Конфигурация
-      url: /cso/config/
 
 - title_en: Addons
   title_ru: Аддоны
