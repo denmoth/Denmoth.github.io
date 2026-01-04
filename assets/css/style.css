@@ -45,8 +45,7 @@ body {
 a { color: #58a6ff; text-decoration: none; transition: 0.2s; }
 a:hover { text-decoration: underline; }
 
-body:not(.lang-ru) .lang-ru { display: none !important; }
-body.lang-ru .lang-en { display: none !important; }
+/* УДАЛЕНО: Скрытие языков через CSS. Polyglot делает это сам при билде. */
 
 header { 
     background: var(--bg-header); 
@@ -122,7 +121,6 @@ select option { background-color: var(--bg-panel); color: var(--text-main); padd
 .wrapper { display: flex; flex-direction: column; flex: 1; align-items: center; width: 100%; }
 .hub-layout { max-width: 1000px; margin: 0 auto; padding: 40px 20px; width: 100%; flex: 1; }
 
-/* --- HERO (Центрирование главной) --- */
 .hero { 
     text-align: center; 
     display: flex; 
