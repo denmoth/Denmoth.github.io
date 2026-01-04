@@ -4,11 +4,15 @@ title: pack.mcmeta Generator
 permalink: /tools/pack-mcmeta/
 ---
 
-<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Generate <code>pack.mcmeta</code> files for Resource Packs and Data Packs.</p></div>
-<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Генератор файла <code>pack.mcmeta</code> для Ресурспаков и Датапаков.</p></div>
+{% lang en %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Generate <code>pack.mcmeta</code> files for Resource Packs and Data Packs.</p>
+{% endlang %}
+{% lang ru %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Генератор файла <code>pack.mcmeta</code> для Ресурспаков и Датапаков.</p>
+{% endlang %}
 
 <div class="form-group">
-    <label class="form-label">Target Version</label>
+<label class="form-label">Target Version</label>
     <select id="mc-version" class="form-select" onchange="updateJson()">
         <option value="46">1.21.4 (Pack Format 46)</option>
         <option value="42">1.21.2 - 1.21.3 (Pack Format 42)</option>
