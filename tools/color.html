@@ -4,11 +4,15 @@ title: Color Converter
 permalink: /tools/color/
 ---
 
-<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Convert between Hex, RGB and Minecraft Decimal formats.</p></div>
-<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Конвертация между Hex, RGB и десятичным форматом Minecraft.</p></div>
+{% lang en %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Convert between Hex, RGB and Minecraft Decimal formats.</p>
+{% endlang %}
+{% lang ru %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Конвертация между Hex, RGB и десятичным форматом Minecraft.</p>
+{% endlang %}
 
 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:25px;">
-    <div class="form-group">
+<div class="form-group">
         <label class="form-label">Input</label>
         <input type="color" id="cp" class="form-input" style="height:60px; padding:5px; cursor:pointer;" oninput="updateC(this.value)">
         <input type="text" id="hi" class="form-input" style="margin-top:15px; text-align:center; font-family:monospace;" placeholder="#FFFFFF" oninput="updateC(this.value)">
