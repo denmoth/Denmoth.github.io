@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Improved Theme & Style Logic
 function initTheme() {
     const themes = ['dark', 'light', 'purple', 'ocean'];
     const btn = document.getElementById('theme-toggle');
@@ -56,7 +55,6 @@ function initSpoiler() {
         modal.style.display = 'flex';
     }
     
-    // Make function global so button can call it
     window.acceptSpoilers = () => {
         localStorage.setItem('cso_spoilers_accepted', 'true');
         modal.style.opacity = '0';
@@ -120,7 +118,7 @@ function initAds() {
         const script = document.createElement('script');
         script.id = 'adsense-script';
         script.async = true;
-        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX";
+        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9900275648830301";
         script.crossOrigin = "anonymous";
         document.head.appendChild(script);
     }
