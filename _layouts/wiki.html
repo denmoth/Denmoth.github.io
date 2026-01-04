@@ -3,40 +3,65 @@
 <head>
     {% include head.html %}
     <style>
-        .wiki-container { display: flex; max-width: 1400px; margin: 0 auto; width: 100%; min-height: calc(100vh - 64px); }
+        /* Стиль для Вики */
+        .wiki-container { display: flex; max-width: 1400px; margin: 0 auto; width: 100%; min-height: calc(100vh - 64px); position: relative; }
         .wiki-sidebar { width: 280px; background: var(--bg-body); border-right: 1px solid var(--border); padding: 20px; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; flex-shrink: 0; }
         .wiki-content { flex: 1; padding: 40px; max-width: 900px; margin: 0 auto; }
         
-        .version-selector { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+        /* Исправление выпадающего списка */
+        .version-selector select { 
+            width: 100%; 
+            background-color: var(--bg-panel); 
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
         .nav-group { margin-bottom: 25px; }
         .nav-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; letter-spacing: 1px; }
         .nav-link { display: block; padding: 8px 12px; color: var(--text-main); text-decoration: none; border-radius: 6px; transition: 0.2s; font-size: 0.95rem; }
         .nav-link:hover { background: var(--bg-panel); color: #58a6ff; }
         .nav-link.active { background: rgba(88, 166, 255, 0.1); color: #58a6ff; font-weight: 500; }
 
+        /* Спойлер алерт */
+        .spoiler-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .spoiler-box { background: var(--bg-panel); border: 1px solid var(--border); padding: 30px; border-radius: 12px; max-width: 500px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeUp 0.3s; }
+        .spoiler-icon { font-size: 3rem; color: #d73a49; margin-bottom: 20px; }
+
         @media (max-width: 1000px) {
-            .wiki-sidebar { display: none; position: fixed; left: 0; z-index: 100; transform: translateX(-100%); transition: 0.3s; }
+            .wiki-sidebar { display: none; position: fixed; left: 0; z-index: 100; transform: translateX(-100%); transition: 0.3s; width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
             .wiki-sidebar.open { display: block; transform: translateX(0); }
-            .wiki-toggle { display: flex; }
         }
-        
-        .loot-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
-        .loot-table th, .loot-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
-        .loot-table th { background: var(--bg-panel); color: var(--text-muted); }
-        .item-rare { color: #d2a8f9; font-weight: bold; } 
-        .item-uncommon { color: #58a6ff; } 
     </style>
 </head>
 <body class="lang-en">
     {% include header.html %}
 
+    <div id="spoiler-modal" class="spoiler-overlay">
+        <div class="spoiler-box">
+            <div class="spoiler-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h2 class="lang-en">Spoiler Alert!</h2>
+            <h2 class="lang-ru">Спойлеры!</h2>
+            <p class="lang-en" style="color:var(--text-muted); margin:15px 0;">This documentation contains detailed information about structures, loot, and secrets.</p>
+            <p class="lang-ru" style="color:var(--text-muted); margin:15px 0;">Эта документация содержит детальную информацию о структурах, луте и секретах.</p>
+            <p class="lang-en" style="margin-bottom:25px;">If you want to preserve the spirit of exploration, turn back now!</p>
+            <p class="lang-ru" style="margin-bottom:25px;">Если вы хотите сохранить дух исследования — вернитесь назад!</p>
+            
+            <div style="display:flex; gap:10px; justify-content: center;">
+                <a href="/" class="btn" style="border-color:#d73a49; color:#d73a49;">Exit</a>
+                <button onclick="acceptSpoilers()" class="btn primary">I understand</button>
+            </div>
+        </div>
+    </div>
+
     <div class="wiki-container">
         <aside class="wiki-sidebar" id="wiki-sidebar">
             <div class="version-selector">
-                <label class="form-label" style="font-size:0.8rem;">Version</label>
-                <select class="form-select" onchange="alert('Only latest version docs available currently.')">
-                    <option value="1.4.0">v1.4.0 (Latest)</option>
-                    <option value="1.3.0">v1.3.0</option>
+                <select>
+                    <option value="1.4.0">CSO v1.4.0 (Latest)</option>
+                    <option value="1.3.0">CSO v1.3.0</option>
                 </select>
             </div>
 
@@ -60,23 +85,31 @@
             <button id="wiki-menu-btn" class="btn" style="display:none; margin-bottom:20px;" onclick="document.getElementById('wiki-sidebar').classList.toggle('open')">
                 <i class="fa-solid fa-bars"></i> Menu
             </button>
-
             {{ content }}
         </main>
     </div>
 
-    <footer class="footer">
-        <div style="margin-top:10px;">© 2026 Denmoth</div>
-    </footer>
+    <footer class="footer"><div style="margin-top:10px;">© 2026 Denmoth</div></footer>
 
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/metrics.js"></script>
     <script>
-        const menuBtn = document.getElementById('wiki-menu-btn');
-        if(window.innerWidth <= 1000) menuBtn.style.display = 'inline-flex';
-        window.addEventListener('resize', () => {
-            if(window.innerWidth <= 1000) menuBtn.style.display = 'inline-flex';
-            else menuBtn.style.display = 'none';
+        // Spoiler Logic
+        function acceptSpoilers() {
+            sessionStorage.setItem('cso_spoilers', 'accepted');
+            document.getElementById('spoiler-modal').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if(!sessionStorage.getItem('cso_spoilers')) {
+                document.getElementById('spoiler-modal').style.display = 'flex';
+            }
+            
+            // Mobile Menu
+            const menuBtn = document.getElementById('wiki-menu-btn');
+            const checkMobile = () => { menuBtn.style.display = window.innerWidth <= 1000 ? 'inline-flex' : 'none'; };
+            window.addEventListener('resize', checkMobile);
+            checkMobile();
         });
     </script>
 </body>
