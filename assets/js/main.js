@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { initTheme(); } catch(e) {}
     try { initLanguage(); } catch(e) {}
     try { initAuth(); } catch(e) {}
+    try { initSpoiler(); } catch(e) {}
     
     initSidebar();
     if(document.getElementById('gradle-output')) initGradleGen();
@@ -15,20 +16,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Improved Theme & Style Logic
 function initTheme() {
+    const themes = ['dark', 'light', 'purple', 'ocean'];
     const btn = document.getElementById('theme-toggle');
-    let stored = localStorage.getItem('theme') || 'dark';
-    if(stored !== 'dark' && stored !== 'light') stored = 'dark';
-    document.documentElement.setAttribute('data-theme', stored);
-    if(btn) btn.textContent = stored === 'dark' ? '☀️' : '🌙';
+    
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+    if (!themes.includes(currentTheme)) currentTheme = 'dark';
+    
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(btn, currentTheme);
 
-    if(btn) btn.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        btn.textContent = next === 'dark' ? '☀️' : '🌙';
-    });
+    if(btn) {
+        btn.onclick = () => {
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            currentTheme = themes[nextIndex];
+            
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeIcon(btn, currentTheme);
+        };
+    }
+}
+
+function updateThemeIcon(btn, theme) {
+    if(!btn) return;
+    const icons = { 'dark': '🌙', 'light': '☀️', 'purple': '🔮', 'ocean': '🌊' };
+    btn.textContent = icons[theme] || '🌙';
+}
+
+function initSpoiler() {
+    const modal = document.getElementById('spoiler-modal');
+    if (!modal) return;
+
+    if (localStorage.getItem('cso_spoilers_accepted') === 'true') {
+        modal.style.display = 'none';
+    } else {
+        modal.style.display = 'flex';
+    }
+    
+    // Make function global so button can call it
+    window.acceptSpoilers = () => {
+        localStorage.setItem('cso_spoilers_accepted', 'true');
+        modal.style.opacity = '0';
+        setTimeout(() => modal.style.display = 'none', 300);
+    };
 }
 
 function initLanguage() {
@@ -87,18 +120,9 @@ function initAds() {
         const script = document.createElement('script');
         script.id = 'adsense-script';
         script.async = true;
-        // REPLACE WITH REAL CLIENT ID
         script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX";
         script.crossOrigin = "anonymous";
         document.head.appendChild(script);
-        
-        setTimeout(() => {
-            document.querySelectorAll('.ad-placeholder').forEach(el => {
-                el.style.backgroundImage = "url('https://placehold.co/160x600/222/444?text=Google+Ad')";
-                el.innerHTML = "";
-                el.style.border = "none";
-            });
-        }, 1000);
     }
 }
 
@@ -114,16 +138,17 @@ function filterTools(query) {
 
 function initSidebar() {
     const btn = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.querySelector('.wiki-sidebar');
     if(btn && sidebar) {
-        btn.addEventListener('click', () => sidebar.classList.toggle('active'));
+        btn.addEventListener('click', () => sidebar.classList.toggle('open'));
     }
 }
 
 function initScrollSpy() {
     const sections = document.querySelectorAll('.doc-section');
-    const navLinks = document.querySelectorAll('.sidebar li a');
+    const navLinks = document.querySelectorAll('.wiki-sidebar .nav-link');
     if(sections.length === 0) return;
+    
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -134,7 +159,7 @@ function initScrollSpy() {
                 });
             }
         });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    }, { rootMargin: '-10% 0px -80% 0px' });
     sections.forEach(section => observer.observe(section));
 }
 
@@ -152,72 +177,36 @@ function initCopy() {
     });
 }
 
-// --- STATS LOGIC UPDATED ---
-
 function initStats() {
     const projects = [
-        { id: 1303344, type: 'structures' }, // CSO
-        { id: 1415948, type: 'cubeui' }      // CubeUI
+        { id: 1303344, type: 'structures' }, 
+        { id: 1415948, type: 'cubeui' }
     ];
-
     projects.forEach(p => fetchStats(p.id, p.type));
 }
 
 function fetchStats(id, type) {
     if(!id) return;
-    
-    // Using cfwidget API
     fetch(`https://api.cfwidget.com/${id}`)
         .then(r => r.json())
         .then(data => {
             const card = document.querySelector(`[data-project="${type}"]`);
             if(!card) return;
-
-            // 1. Downloads
             const dlEl = card.querySelector('.cf-downloads');
-            if(dlEl && data.downloads) {
-                dlEl.textContent = formatNumber(data.downloads.total);
-            }
-
-            // 2. Summary (Description)
-            const sumEl = card.querySelector('.cf-summary');
-            if(sumEl && data.summary) {
-                sumEl.textContent = data.summary;
-            }
-
-            // 3. Version Parsing
+            if(dlEl && data.downloads) dlEl.textContent = formatNumber(data.downloads.total);
             const verEl = card.querySelector('.cf-version');
             if(verEl && data.files && data.files.length > 0) {
-                const latestFile = data.files[0].name; // e.g., "[Forge 1.20.1]CSO 1.4.0 - Nether Update"
-                let version = "Release";
-
-                if (type === 'structures') {
-                    // Ищем паттерн "CSO 1.4.0"
-                    const match = latestFile.match(/CSO\s+([\d\.]+)/i);
-                    if(match && match[1]) version = match[1];
-                    else {
-                        // Фолбэк: ищем просто версию X.X.X, если CSO не найдено
-                        const vMatch = latestFile.match(/(\d+\.\d+\.\d+)/);
-                        if(vMatch) version = vMatch[1];
-                    }
-                } else if (type === 'cubeui') {
-                    // Для CubeUI ищем просто версию
-                    const match = latestFile.match(/(\d+\.\d+\.\d+)/);
-                    if(match) version = match[0];
-                }
-
-                verEl.textContent = version;
+                const latestFile = data.files[0].name;
+                const match = latestFile.match(/(\d+\.\d+\.\d+)/);
+                if(match) verEl.textContent = match[1];
+                else verEl.textContent = "Latest";
             }
         })
         .catch(e => console.error('CF Error:', e));
 }
 
 function formatNumber(num) {
-    return new Intl.NumberFormat('en-US', { 
-        notation: "compact", 
-        compactDisplay: "short",
-        maximumFractionDigits: 1 
-    }).format(num);
+    return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 }).format(num);
 }
 
 function initGradleGen() {
@@ -225,7 +214,6 @@ function initGradleGen() {
     const ver = document.getElementById('mc-version');
     const out = document.getElementById('gradle-output');
     if(!loader || !ver) return;
-
     function update() {
         out.textContent = `dependencies {\n    implementation fg.deobf("curse.maven:cubeui-1415948:YOUR_FILE_ID")\n}`;
     }
