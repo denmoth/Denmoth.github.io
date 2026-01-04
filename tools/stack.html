@@ -4,11 +4,15 @@ title: Stack Calculator
 permalink: /tools/stack/
 ---
 
-<div class="lang-en"><p style="color:var(--text-muted); margin-bottom:20px;">Convert item counts to Shulker Boxes and Stacks.</p></div>
-<div class="lang-ru"><p style="color:var(--text-muted); margin-bottom:20px;">Перевод количества предметов в Шалкеры и Стаки.</p></div>
+{% lang en %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Convert item counts to Shulker Boxes and Stacks.</p>
+{% endlang %}
+{% lang ru %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Перевод количества предметов в Шалкеры и Стаки.</p>
+{% endlang %}
 
 <div class="form-group">
-    <label class="form-label">Total Items</label>
+<label class="form-label">Total Items</label>
     <input type="number" id="total-items" class="form-input" placeholder="e.g. 10000" oninput="calculate()">
 </div>
 
