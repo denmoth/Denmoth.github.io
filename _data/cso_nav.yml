@@ -1,0 +1,26 @@
+- title_en: General
+  title_ru: Общее
+  items:
+    - title_en: Introduction
+      title_ru: Введение
+      url: /cso/
+    - title_en: Installation
+      title_ru: Установка
+      url: /cso/install/
+
+- title_en: World Generation
+  title_ru: Генерация
+  items:
+    - title_en: Structures & Loot
+      title_ru: Структуры и Лут
+      url: /cso/structures/
+    - title_en: Configs
+      title_ru: Конфигурация
+      url: /cso/config/
+
+- title_en: Developers
+  title_ru: Разработчикам
+  items:
+    - title_en: Integration (API)
+      title_ru: Интеграция (API)
+      url: /cso/integration/
