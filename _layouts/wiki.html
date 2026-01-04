@@ -3,68 +3,118 @@
 <head>
     {% include head.html %}
     <style>
-        /* GitBook Style Layout */
-        body { overflow-y: scroll; }
-        .wiki-wrapper { display: flex; min-height: calc(100vh - 64px); max-width: 1600px; margin: 0 auto; position: relative; }
-        
-        /* Сайдбар */
-        .wiki-sidebar { 
-            width: 280px; 
-            flex-shrink: 0; 
-            border-right: 1px solid var(--border); 
-            background: var(--bg-body); 
-            position: sticky; 
-            top: 64px; 
-            height: calc(100vh - 64px); 
-            overflow-y: auto; 
-            padding: 20px;
+        /* Основная раскладка страницы: Сайдбар + Контент */
+        body {
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .wiki-wrapper {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Сайдбар */
+        .wiki-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border);
+            position: sticky;
+            top: 64px; /* Высота хедера */
+            height: calc(100vh - 64px);
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--bg-body);
         }
 
         /* Контент */
-        .wiki-content { 
-            flex-grow: 1; 
-            padding: 40px 60px; 
-            min-width: 0; /* Важно для предотвращения переполнения flex */
-            max-width: 1000px;
+        .wiki-content {
+            flex-grow: 1;
+            padding: 40px;
+            min-width: 0; /* Предотвращает переполнение flex-контейнера */
+        }
+
+        .wiki-inner {
+            max-width: 850px; /* Ограничение ширины текста как в GitBook */
             margin: 0 auto;
         }
 
         /* Поиск */
-        .search-container { position: relative; margin-bottom: 20px; }
-        .search-input { 
-            width: 100%; 
-            padding: 8px 12px 8px 35px; 
-            border-radius: 6px; 
-            border: 1px solid var(--border); 
-            background: var(--bg-panel); 
-            color: var(--text-main); 
-            font-size: 0.9rem; 
+        .search-box-wiki {
+            position: relative;
+            margin-bottom: 20px;
         }
-        .search-input:focus { outline: 2px solid #58a6ff; border-color: transparent; }
-        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem; }
+        .search-box-wiki input {
+            width: 100%;
+            padding: 10px 35px 10px 15px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-main);
+        }
+        .search-box-wiki i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
 
         /* Навигация */
         .nav-group { margin-bottom: 25px; }
-        .nav-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; padding-left: 10px; }
-        .nav-link { 
-            display: block; 
-            padding: 6px 10px; 
-            color: var(--text-main); 
-            text-decoration: none; 
-            border-radius: 6px; 
-            font-size: 0.95rem; 
-            margin-bottom: 2px;
-            border-left: 3px solid transparent;
+        .nav-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+            padding-left: 10px;
+            letter-spacing: 0.5px;
         }
-        .nav-link:hover { background: var(--bg-panel); }
-        .nav-link.active { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border-left-color: #58a6ff; font-weight: 500; }
+        .nav-link {
+            display: block;
+            padding: 6px 10px;
+            color: var(--text-main);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            text-decoration: none;
+            border-left: 2px solid transparent;
+        }
+        .nav-link:hover { background: var(--bg-panel); color: #58a6ff; }
+        .nav-link.active {
+            background: rgba(88, 166, 255, 0.1);
+            color: #58a6ff;
+            border-left-color: #58a6ff;
+            font-weight: 500;
+        }
 
-        /* Мобильная адаптация */
+        /* Спойлер алерт */
+        .spoiler-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .spoiler-box {
+            background: var(--bg-panel); border: 1px solid var(--border);
+            padding: 40px; border-radius: 12px; max-width: 500px;
+            text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* Адаптив */
         @media (max-width: 1000px) {
-            .wiki-sidebar { position: fixed; left: 0; z-index: 1000; transform: translateX(-100%); transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
-            .wiki-sidebar.open { transform: translateX(0); }
+            .wiki-sidebar {
+                display: none;
+                position: fixed; left: 0; z-index: 1000;
+                transform: translateX(-100%); transition: 0.3s;
+                width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            }
+            .wiki-sidebar.open { display: block; transform: translateX(0); }
             .wiki-content { padding: 20px; }
         }
     </style>
@@ -72,11 +122,27 @@
 <body class="lang-en">
     {% include header.html %}
 
+    <div id="spoiler-modal" class="spoiler-overlay">
+        <div class="spoiler-box">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:3rem; color:#d73a49; margin-bottom:20px;"></i>
+            <h2 class="lang-en">Spoiler Alert!</h2>
+            <h2 class="lang-ru">Осторожно, Спойлеры!</h2>
+            <p style="color:var(--text-muted); margin:15px 0;">
+                <span class="lang-en">This wiki reveals secrets, loot tables, and hidden mechanics. If you want to explore the world yourself, turn back now.</span>
+                <span class="lang-ru">Эта вики раскрывает секреты, таблицы лута и скрытые механики. Если хотите сохранить дух исследования — не читайте дальше.</span>
+            </p>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:25px;">
+                <a href="/" class="btn" style="border-color:#d73a49; color:#d73a49;">Exit</a>
+                <button onclick="acceptSpoilers()" class="btn primary">I Understand</button>
+            </div>
+        </div>
+    </div>
+
     <div class="wiki-wrapper">
         <aside class="wiki-sidebar" id="wiki-sidebar">
-            <div class="search-container">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="wiki-search" class="search-input" placeholder="Search..." onkeyup="filterMenu()">
+            <div class="search-box-wiki">
+                <input type="text" id="wiki-search" placeholder="Search..." onkeyup="filterMenu()">
+                <i class="fa-solid fa-magnifying-glass"></i>
             </div>
 
             <div id="nav-list">
@@ -101,15 +167,30 @@
             <button id="wiki-menu-btn" class="btn" style="display:none; margin-bottom:20px;" onclick="document.getElementById('wiki-sidebar').classList.toggle('open')">
                 <i class="fa-solid fa-bars"></i> Menu
             </button>
-            {{ content }}
+            
+            <div class="wiki-inner">
+                {{ content }}
+            </div>
         </main>
     </div>
 
-    <footer class="footer"><div style="margin-top:10px;">© 2026 Denmoth</div></footer>
+    <footer class="footer">
+        <div style="margin-top:10px;">© 2026 Denmoth</div>
+    </footer>
 
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/metrics.js"></script>
     <script>
+        // Спойлер логика
+        function acceptSpoilers() {
+            sessionStorage.setItem('cso_spoilers', 'true');
+            document.getElementById('spoiler-modal').style.display = 'none';
+        }
+        if (!sessionStorage.getItem('cso_spoilers')) {
+            document.getElementById('spoiler-modal').style.display = 'flex';
+        }
+
+        // Поиск по меню
         function filterMenu() {
             const input = document.getElementById('wiki-search');
             const filter = input.value.toLowerCase();
@@ -117,22 +198,21 @@
             const groups = document.querySelectorAll('.nav-group');
 
             links.forEach(link => {
-                const text = link.textContent || link.innerText;
-                if (text.toLowerCase().indexOf(filter) > -1) {
+                const text = link.innerText;
+                if (text.toLowerCase().includes(filter)) {
                     link.style.display = "";
                 } else {
                     link.style.display = "none";
                 }
             });
 
-            // Скрываем пустые группы
             groups.forEach(group => {
-                const visibleLinks = group.querySelectorAll('.nav-link:not([style*="display: none"])');
-                group.style.display = visibleLinks.length > 0 ? "" : "none";
+                const visible = group.querySelectorAll('.nav-link:not([style*="display: none"])');
+                group.style.display = visible.length > 0 ? "" : "none";
             });
         }
 
-        // Mobile Menu Logic
+        // Мобильное меню
         const menuBtn = document.getElementById('wiki-menu-btn');
         const checkMobile = () => { menuBtn.style.display = window.innerWidth <= 1000 ? 'inline-flex' : 'none'; };
         window.addEventListener('resize', checkMobile);
