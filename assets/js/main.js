@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initTheme() {
-    const themes = ['dark', 'light', 'purple', 'ocean'];
+    const themes = ['dark', 'light'];
     const btn = document.getElementById('theme-toggle');
     
     let currentTheme = localStorage.getItem('theme') || 'dark';
@@ -41,7 +41,7 @@ function initTheme() {
 
 function updateThemeIcon(btn, theme) {
     if(!btn) return;
-    const icons = { 'dark': '🌙', 'light': '☀️', 'purple': '🔮', 'ocean': '🌊' };
+    const icons = { 'dark': '🌙', 'light': '☀️' };
     btn.textContent = icons[theme] || '🌙';
 }
 
