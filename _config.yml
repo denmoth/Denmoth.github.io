@@ -4,6 +4,7 @@ description: >-
   Minecraft Mods & Tools
 baseurl: ""
 url: "https://denmoth.pp.ua"
+future: true
 permalink: pretty
 markdown: kramdown
 theme: jekyll-theme-primer
