@@ -3,117 +3,47 @@
 <head>
     {% include head.html %}
     <style>
-        /* Основная раскладка страницы: Сайдбар + Контент */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+        /* Layout */
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        .wiki-wrapper { display: flex; flex: 1; width: 100%; max-width: 1400px; margin: 0 auto; position: relative; }
+        .wiki-sidebar { width: 300px; flex-shrink: 0; border-right: 1px solid var(--border); position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; padding: 20px; background: var(--bg-body); }
+        .wiki-content { flex-grow: 1; padding: 40px; min-width: 0; }
+        .wiki-inner { max-width: 850px; margin: 0 auto; }
 
-        .wiki-wrapper {
-            display: flex;
-            flex: 1;
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-        }
+        /* Search */
+        .search-box-wiki { position: relative; margin-bottom: 20px; }
+        .search-box-wiki input { width: 100%; padding: 10px 35px 10px 15px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); }
+        .search-box-wiki i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        /* Сайдбар */
-        .wiki-sidebar {
-            width: 300px;
-            flex-shrink: 0;
-            border-right: 1px solid var(--border);
-            position: sticky;
-            top: 64px; /* Высота хедера */
-            height: calc(100vh - 64px);
-            overflow-y: auto;
-            padding: 20px;
-            background: var(--bg-body);
-        }
-
-        /* Контент */
-        .wiki-content {
-            flex-grow: 1;
-            padding: 40px;
-            min-width: 0; /* Предотвращает переполнение flex-контейнера */
-        }
-
-        .wiki-inner {
-            max-width: 850px; /* Ограничение ширины текста как в GitBook */
-            margin: 0 auto;
-        }
-
-        /* Поиск */
-        .search-box-wiki {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .search-box-wiki input {
-            width: 100%;
-            padding: 10px 35px 10px 15px;
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-main);
-        }
-        .search-box-wiki i {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        /* Навигация */
+        /* Nav */
         .nav-group { margin-bottom: 25px; }
-        .nav-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 8px;
-            padding-left: 10px;
-            letter-spacing: 0.5px;
-        }
-        .nav-link {
-            display: block;
-            padding: 6px 10px;
-            color: var(--text-main);
-            border-radius: 4px;
-            font-size: 0.95rem;
-            text-decoration: none;
-            border-left: 2px solid transparent;
-        }
+        .nav-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; padding-left: 10px; letter-spacing: 0.5px; }
+        .nav-link { display: block; padding: 6px 10px; color: var(--text-main); border-radius: 4px; font-size: 0.95rem; text-decoration: none; border-left: 2px solid transparent; }
         .nav-link:hover { background: var(--bg-panel); color: #58a6ff; }
-        .nav-link.active {
-            background: rgba(88, 166, 255, 0.1);
-            color: #58a6ff;
-            border-left-color: #58a6ff;
-            font-weight: 500;
-        }
+        .nav-link.active { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border-left-color: #58a6ff; font-weight: 500; }
 
-        /* Спойлер алерт */
+        /* Spoiler Overlay Fixed */
         .spoiler-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 9999;
+            background: rgba(0,0,0,0.6); /* Полупрозрачный черный */
+            backdrop-filter: blur(10px); /* Сильный блюр */
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 9999;
             display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
+            animation: fadeIn 0.4s ease-out;
         }
         .spoiler-box {
             background: var(--bg-panel); border: 1px solid var(--border);
             padding: 40px; border-radius: 12px; max-width: 500px;
-            text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            transform: scale(0.95); animation: scaleUp 0.3s forwards 0.1s; opacity: 0;
         }
 
-        /* Адаптив */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         @media (max-width: 1000px) {
-            .wiki-sidebar {
-                display: none;
-                position: fixed; left: 0; z-index: 1000;
-                transform: translateX(-100%); transition: 0.3s;
-                width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-            }
+            .wiki-sidebar { display: none; position: fixed; left: 0; z-index: 1000; transform: translateX(-100%); transition: 0.3s; width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
             .wiki-sidebar.open { display: block; transform: translateX(0); }
             .wiki-content { padding: 20px; }
         }
@@ -127,7 +57,7 @@
             <i class="fa-solid fa-triangle-exclamation" style="font-size:3rem; color:#d73a49; margin-bottom:20px;"></i>
             <h2 class="lang-en">Spoiler Alert!</h2>
             <h2 class="lang-ru">Осторожно, Спойлеры!</h2>
-            <p style="color:var(--text-muted); margin:15px 0;">
+            <p style="color:var(--text-muted); margin:15px 0; line-height: 1.6;">
                 <span class="lang-en">This wiki reveals secrets, loot tables, and hidden mechanics. If you want to explore the world yourself, turn back now.</span>
                 <span class="lang-ru">Эта вики раскрывает секреты, таблицы лута и скрытые механики. Если хотите сохранить дух исследования — не читайте дальше.</span>
             </p>
@@ -144,7 +74,6 @@
                 <input type="text" id="wiki-search" placeholder="Search..." onkeyup="filterMenu()">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-
             <div id="nav-list">
                 {% for group in site.data.cso_nav %}
                 <div class="nav-group">
@@ -167,10 +96,7 @@
             <button id="wiki-menu-btn" class="btn" style="display:none; margin-bottom:20px;" onclick="document.getElementById('wiki-sidebar').classList.toggle('open')">
                 <i class="fa-solid fa-bars"></i> Menu
             </button>
-            
-            <div class="wiki-inner">
-                {{ content }}
-            </div>
+            <div class="wiki-inner">{{ content }}</div>
         </main>
     </div>
 
@@ -179,40 +105,31 @@
     </footer>
 
     <script src="/assets/js/main.js"></script>
-    <script src="/assets/js/metrics.js"></script>
+    <script src="/assets/js/analytics.js"></script>
     <script>
-        // Спойлер логика
         function acceptSpoilers() {
-            sessionStorage.setItem('cso_spoilers', 'true');
+            localStorage.setItem('cso_spoilers_accepted', 'true');
             document.getElementById('spoiler-modal').style.display = 'none';
         }
-        if (!sessionStorage.getItem('cso_spoilers')) {
+        // Проверяем localStorage (постоянное хранилище)
+        if (!localStorage.getItem('cso_spoilers_accepted')) {
             document.getElementById('spoiler-modal').style.display = 'flex';
         }
 
-        // Поиск по меню
         function filterMenu() {
             const input = document.getElementById('wiki-search');
             const filter = input.value.toLowerCase();
             const links = document.querySelectorAll('.nav-link');
             const groups = document.querySelectorAll('.nav-group');
-
             links.forEach(link => {
                 const text = link.innerText;
-                if (text.toLowerCase().includes(filter)) {
-                    link.style.display = "";
-                } else {
-                    link.style.display = "none";
-                }
+                link.style.display = text.toLowerCase().includes(filter) ? "" : "none";
             });
-
             groups.forEach(group => {
                 const visible = group.querySelectorAll('.nav-link:not([style*="display: none"])');
                 group.style.display = visible.length > 0 ? "" : "none";
             });
         }
-
-        // Мобильное меню
         const menuBtn = document.getElementById('wiki-menu-btn');
         const checkMobile = () => { menuBtn.style.display = window.innerWidth <= 1000 ? 'inline-flex' : 'none'; };
         window.addEventListener('resize', checkMobile);
