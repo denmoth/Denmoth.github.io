@@ -62,21 +62,32 @@ function initSpoiler() {
     };
 }
 
+// Новая логика: редирект на /ru/ или обратно
 function initLanguage() {
     const sel = document.getElementById('lang-select');
-    let stored = localStorage.getItem('lang') || 'en';
-    if(stored !== 'en' && stored !== 'ru') stored = 'en';
-    document.body.classList.remove('lang-en', 'lang-ru');
-    document.body.classList.add('lang-' + stored);
-    if(sel) {
-        sel.value = stored;
-        sel.addEventListener('change', (e) => {
-            const val = e.target.value;
-            localStorage.setItem('lang', val);
-            document.body.classList.remove('lang-en', 'lang-ru');
-            document.body.classList.add('lang-' + val);
-        });
-    }
+    if(!sel) return;
+
+    // Определяем текущий язык по URL
+    const currentPath = window.location.pathname;
+    const isRu = currentPath.startsWith('/ru/');
+    sel.value = isRu ? 'ru' : 'en';
+
+    sel.addEventListener('change', (e) => {
+        const targetLang = e.target.value;
+        let newPath = currentPath;
+
+        if (targetLang === 'ru' && !isRu) {
+            // Переход на RU: добавляем префикс
+            newPath = '/ru' + currentPath;
+        } else if (targetLang === 'en' && isRu) {
+            // Переход на EN: убираем префикс
+            newPath = currentPath.replace('/ru', '') || '/';
+        }
+
+        if (newPath !== currentPath) {
+            window.location.href = newPath;
+        }
+    });
 }
 
 function initAuth() {
@@ -114,6 +125,7 @@ function initAuth() {
 }
 
 function initAds() {
+    // Исправлен ID на тот, что в head.html
     if(!document.getElementById('adsense-script')) {
         const script = document.createElement('script');
         script.id = 'adsense-script';
