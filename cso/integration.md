@@ -1,31 +1,33 @@
 ---
 layout: wiki
-title: Integration
+title: BOP Integration
 permalink: /cso/integration/
 ---
 
 <div class="lang-en">
-    <h1>Developer Integration</h1>
-    <p>Learn how to add Create: Structures Overhaul as a dependency to your mod.</p>
+    <h1>Biomes O' Plenty Integration</h1>
+    <p>Create: Structures Overhaul fully supports Biomes O' Plenty via an addon mod.</p>
     
-    <div class="code-container">
-        <div class="code-head">build.gradle <button class="copy-btn">Copy</button></div>
-<pre>dependencies {
-    // Replace ${cso_version} with the latest version
-    implementation fg.deobf("curse.maven:create-structures-overhaul-PROJECTID:${cso_version}")
-}</pre>
-    </div>
+    <h3>Features</h3>
+    <ul>
+        <li>Adds biome-specific variants of Windmills (e.g. Fir, Redwood, Willow).</li>
+        <li>Tweaks generation to fit BOP terrain.</li>
+    </ul>
+
+    <h3>Download</h3>
+    <a href="https://www.curseforge.com/minecraft/mc-mods/create-structures-overhaul-bop-integration" class="btn primary">Download Addon</a>
 </div>
 
 <div class="lang-ru">
-    <h1>Интеграция для разработчиков</h1>
-    <p>Как добавить Create: Structures Overhaul в зависимости вашего мода.</p>
+    <h1>Интеграция с Biomes O' Plenty</h1>
+    <p>Мод полностью поддерживает Biomes O' Plenty через отдельный аддон.</p>
 
-    <div class="code-container">
-        <div class="code-head">build.gradle <button class="copy-btn">Copy</button></div>
-<pre>dependencies {
-    // Замените ${cso_version} на актуальную версию
-    implementation fg.deobf("curse.maven:create-structures-overhaul-PROJECTID:${cso_version}")
-}</pre>
-    </div>
+    <h3>Особенности</h3>
+    <ul>
+        <li>Добавляет варианты Мельниц из дерева BOP (Пихта, Ива, Редвуд и др.).</li>
+        <li>Адаптирует генерацию под ландшафт BOP.</li>
+    </ul>
+
+    <h3>Скачать</h3>
+    <a href="https://www.curseforge.com/minecraft/mc-mods/create-structures-overhaul-bop-integration" class="btn primary">Скачать Аддон</a>
 </div>
