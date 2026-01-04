@@ -8,6 +8,13 @@ future: true
 permalink: pretty
 markdown: kramdown
 theme: jekyll-theme-primer
+
+languages: ["en", "ru"]
+default_lang: "en"
+exclude_from_localization: ["javascript", "images", "css", "assets"]
+parallel_localization: true
+
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
+  - jekyll-polyglot
