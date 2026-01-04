@@ -1,7 +1,7 @@
 :root {
     --bg-body: #0d1117;
     --bg-panel: #161b22;
-    --bg-header: #010409; /* Вернул плоский цвет */
+    --bg-header: #010409; 
     --text-main: #c9d1d9;
     --text-muted: #8b949e;
     --accent: #238636;
@@ -45,13 +45,9 @@ body {
 a { color: #58a6ff; text-decoration: none; transition: 0.2s; }
 a:hover { text-decoration: underline; }
 
-/* --- ИСПРАВЛЕННАЯ ЛОГИКА ЯЗЫКОВ --- */
-/* Скрываем ненужный язык, но НЕ форсируем display:block для нужного */
 body:not(.lang-ru) .lang-ru { display: none !important; }
 body.lang-ru .lang-en { display: none !important; }
-/* Это позволяет span оставаться span (inline), а div — div (block) */
 
-/* HEADER */
 header { 
     background: var(--bg-header); 
     border-bottom: 1px solid var(--border); 
