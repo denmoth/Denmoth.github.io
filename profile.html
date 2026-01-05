@@ -1,0 +1,58 @@
+---
+layout: default
+title: Profile
+permalink: /profile/
+---
+
+<div class="hub-layout" style="max-width:600px;">
+    <div id="profile-loading" style="text-align:center; padding:50px;">
+        <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+    </div>
+
+    <div id="profile-content" style="display:none;">
+        <div style="text-align:center; margin-bottom:30px;">
+            <img id="p-avatar" src="" style="width:100px; height:100px; border-radius:50%; border:4px solid var(--bg-panel); box-shadow:0 10px 30px rgba(0,0,0,0.3); margin-bottom:15px;">
+            <h1 id="p-name" style="margin-bottom:5px;">User</h1>
+            <p id="p-email" style="color:var(--text-muted);">email@example.com</p>
+        </div>
+
+        <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+            <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                <span>Account Status</span>
+                <span class="badge" style="background:#238636; color:white; border:none;">Active</span>
+            </div>
+            <div style="padding:20px;">
+                <p style="margin-bottom:20px;">Welcome back to your profile. Here you can manage your settings.</p>
+                <button onclick="supabase.auth.signOut().then(() => window.location.href = '/')" class="btn" style="width:100%; border-color:#d73a49; color:#d73a49;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="guest-view" style="display:none; text-align:center; padding:50px;">
+        <h2>You are not logged in</h2>
+        <p style="margin-bottom:20px;">Please log in to view your profile.</p>
+        <button onclick="openAuthModal()" class="btn primary">Log In</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Wait for main.js to init supabase
+        setTimeout(async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            document.getElementById('profile-loading').style.display = 'none';
+            
+            if(session) {
+                document.getElementById('profile-content').style.display = 'block';
+                const user = session.user;
+                document.getElementById('p-avatar').src = user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
+                document.getElementById('p-name').textContent = user.user_metadata.full_name || 'User';
+                document.getElementById('p-email').textContent = user.email;
+            } else {
+                document.getElementById('guest-view').style.display = 'block';
+            }
+        }, 500);
+    });
+</script>
