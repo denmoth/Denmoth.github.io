@@ -62,12 +62,11 @@ function initSpoiler() {
     };
 }
 
-// Новая логика: редирект на /ru/ или обратно
 function initLanguage() {
     const sel = document.getElementById('lang-select');
     if(!sel) return;
 
-    // Определяем текущий язык по URL
+    // Устанавливаем значение селектора без авто-редиректа
     const currentPath = window.location.pathname;
     const isRu = currentPath.startsWith('/ru/');
     sel.value = isRu ? 'ru' : 'en';
@@ -77,10 +76,10 @@ function initLanguage() {
         let newPath = currentPath;
 
         if (targetLang === 'ru' && !isRu) {
-            // Переход на RU: добавляем префикс
+            // Переход на RU
             newPath = '/ru' + currentPath;
         } else if (targetLang === 'en' && isRu) {
-            // Переход на EN: убираем префикс
+            // Переход на EN
             newPath = currentPath.replace('/ru', '') || '/';
         }
 
@@ -125,7 +124,6 @@ function initAuth() {
 }
 
 function initAds() {
-    // Исправлен ID на тот, что в head.html
     if(!document.getElementById('adsense-script')) {
         const script = document.createElement('script');
         script.id = 'adsense-script';
