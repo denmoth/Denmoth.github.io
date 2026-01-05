@@ -27,28 +27,24 @@ permalink: /tools/uuid/
     <input type="text" id="uuid-out" class="form-input" readonly value="Loading..." style="text-align:center; font-size:1.4rem; letter-spacing:1px; font-family:monospace; height:60px;">
 </div>
 
-<div class="guide-section">
+<div class="seo-section">
     {% lang en %}
-    <div>
-        <h2>Usage Guide</h2>
-        <p>This tool generates a Version 4 (Random) UUID.</p>
-        <ul>
-            <li><strong>Entities:</strong> Assign specific UUIDs to mobs in summon commands to target them later.</li>
-            <li><strong>Attribute Modifiers:</strong> Items with custom attributes require unique UUIDs for each modifier.</li>
-            <li><strong>Map Making:</strong> Use fixed UUIDs for boss bars or persistent entities.</li>
-        </ul>
-    </div>
+    <h2>What is a Minecraft UUID?</h2>
+    <p>A UUID (Universally Unique Identifier) is a 128-bit label used to uniquely identify objects. In Minecraft, they are used for:</p>
+    <ul>
+        <li><strong>Entities:</strong> Persistent mobs that map makers can target with commands (e.g., boss bars).</li>
+        <li><strong>Attributes:</strong> Items with custom modifiers (damage, speed) need unique UUIDs to stack correctly.</li>
+        <li><strong>Player Data:</strong> While online players use Mojang UUIDs, offline players or NPCs use random ones generated here.</li>
+    </ul>
     {% endlang %}
     {% lang ru %}
-    <div>
-        <h2>Гайд</h2>
-        <p>Этот инструмент создает UUID Версии 4 (Случайный).</p>
-        <ul>
-            <li><strong>Сущности:</strong> Используйте для призыва мобов с фиксированным ID, чтобы потом находить их командами.</li>
-            <li><strong>Атрибуты:</strong> Для предметов с кастомными атрибутами нужны уникальные UUID для каждого модификатора.</li>
-            <li><strong>Картостроение:</strong> Фиксированные UUID нужны для боссбаров и постоянных NPC.</li>
-        </ul>
-    </div>
+    <h2>Что такое UUID в Minecraft?</h2>
+    <p>UUID (Универсальный Уникальный Идентификатор) — это 128-битная метка. В Майнкрафте они используются для:</p>
+    <ul>
+        <li><strong>Сущностей:</strong> Постоянные мобы, которых картоделы могут находить командами (например, для боссбаров).</li>
+        <li><strong>Атрибутов:</strong> Предметы с кастомными модификаторами (урон, скорость) требуют уникальные UUID, чтобы корректно стакаться.</li>
+        <li><strong>Игроков:</strong> Оффлайн игроки или NPC используют случайные UUID, которые генерирует этот инструмент.</li>
+    </ul>
     {% endlang %}
 </div>
 
