@@ -1,76 +1,103 @@
 ---
-layout: null
+layout: wiki
+title: CubeUI Documentation
 permalink: /cubeui/
 ---
-<!DOCTYPE html>
-<html lang="{{ site.active_lang }}">
-<head>
-    {% include head.html %}
-    <title>CubeUI Documentation</title>
-</head>
-<body class="lang-{{ site.active_lang }}">
-    {% include header.html %}
 
-    <div class="docs-layout">
-        <aside class="docs-sidebar">
-            {% lang en %}<h4>Getting Started</h4>{% endlang %}{% lang ru %}<h4>Начало</h4>{% endlang %}
-            <ul>
-                <li><a href="#install" class="active">Installation</a></li>
-                <li><a href="#theme">Theming</a></li>
-            </ul>
-            
-            {% lang en %}<h4>Widgets</h4>{% endlang %}{% lang ru %}<h4>Виджеты</h4>{% endlang %}
-            <ul>
-                <li><a href="#w-common">Common Props</a></li>
-                <li><a href="#w-button">CuiButton</a></li>
-                <li><a href="#w-input">CuiTextField</a></li>
-                <li><a href="#w-panel">CuiPanel</a></li>
-            </ul>
+<div id="cubeui-docs">
+    <section id="install" class="doc-section">
+        {% lang en %}<h1>Installation</h1>{% endlang %}
+        {% lang ru %}<h1>Установка</h1>{% endlang %}
+        
+        {% lang en %}<p>Add the library to your development environment.</p>{% endlang %}
+        {% lang ru %}<p>Добавьте библиотеку в среду разработки.</p>{% endlang %}
+        
+        <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:6px; margin-bottom:30px;">
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <select id="mod-version-select" class="form-select" onchange="updateGradle()">
+                    <option value="latest">Latest Release (Auto)</option>
+                    <option value="0.5.2">v0.5.2 (1.20.1)</option>
+                    <option value="0.4.1">v0.4.1 (1.19.2)</option>
+                    <option value="0.3.0">v0.3.0 (1.18.2)</option>
+                </select>
+                <select id="loader-select" class="form-select" style="width:150px;">
+                    <option value="forge">Forge</option>
+                    <option value="fabric">Fabric</option>
+                </select>
+            </div>
+            <div class="code-container" style="margin:0;">
+                <div class="code-head">build.gradle <button class="copy-btn">Copy</button></div>
+                <pre id="gradle-output">Loading...</pre>
+            </div>
+        </div>
+    </section>
 
-            {% lang en %}<h4>Screens</h4>{% endlang %}{% lang ru %}<h4>Экраны</h4>{% endlang %}
-            <ul>
-                <li><a href="#s-base">CuiScreen</a></li>
-                <li><a href="#s-cont">CuiContainerScreen</a></li>
-            </ul>
-        </aside>
+    <section id="theme" class="doc-section">
+        {% lang en %}<h1>Theming</h1>{% endlang %}
+        {% lang ru %}<h1>Темизация</h1>{% endlang %}
+        {% lang en %}<p>CubeUI uses <code>ThemeManager</code> to handle rendering styles. The default theme is Vanilla-like dark.</p>{% endlang %}
+        {% lang ru %}<p>CubeUI использует <code>ThemeManager</code> для стилизации. Стандартная тема — темная ванильная.</p>{% endlang %}
 
-        <main class="docs-content">
-            <section id="install" class="doc-section">
-                {% lang en %}<h1>Installation</h1>{% endlang %}
-                {% lang ru %}<h1>Установка</h1>{% endlang %}
-                
-                {% lang en %}<p>Select your Minecraft version to generate dependency code.</p>{% endlang %}
-                {% lang ru %}<p>Выберите версию Minecraft для генерации кода зависимостей.</p>{% endlang %}
-                
-                <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:8px; margin-bottom:30px;">
-                    <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
-                        <label class="form-label" style="margin:0;">MC Version:</label>
-                        <select id="cui-mc-version" class="form-select" style="width:auto;">
-                            <option value="1.20.1">1.20.1</option>
-                            <option value="1.19.2">1.19.2</option>
-                            <option value="1.18.2">1.18.2</option>
-                        </select>
-                        <span id="cui-loading" style="color:var(--text-muted); font-size:0.8rem; display:none;"><i class="fa-solid fa-circle-notch fa-spin"></i> Fetching latest...</span>
-                    </div>
+        {% lang en %}<h3>Creating a Theme</h3>{% endlang %}{% lang ru %}<h3>Создание темы</h3>{% endlang %}
+        <div class="code-container">
+            <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+            <pre>public class MyTheme implements ICuiTheme {
+    @Override
+    public ResourceLocation getAtlasTexture() {
+        return new ResourceLocation("mymod", "textures/gui/atlas.png");
+    }
+    
+    // Implement UV getters...
+}</pre>
+        </div>
+    </section>
 
-                    <div class="code-container" style="margin:0;">
-                        <div class="code-head">build.gradle <button class="copy-btn">Copy</button></div>
-                        <div class="code-content" id="gradle-output">Loading...</div>
-                    </div>
-                </div>
-            </section>
+    <section id="widgets" class="doc-section">
+        {% lang en %}<h1>Widgets</h1>{% endlang %}
+        {% lang ru %}<h1>Виджеты</h1>{% endlang %}
 
-            <section id="theme" class="doc-section">
-                {% lang en %}<h1>Theming</h1>{% endlang %}{% lang ru %}<h1>Темизация</h1>{% endlang %}
-                <p>CubeUI uses <code>ThemeManager</code>. Default is Dark Vanilla.</p>
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <div class="code-content">public class MyTheme implements ICuiTheme { ... }</div>
-                </div>
-            </section>
-            
-            </main>
-    </div>
-    <script src="/assets/js/main.js"></script>
-</body>
-</html>
+        <h3 id="w-common">Common Properties</h3>
+        {% lang en %}<p>All widgets extend <code>CuiWidget</code>.</p>{% endlang %}
+        {% lang ru %}<p>Все виджеты наследуют <code>CuiWidget</code>.</p>{% endlang %}
+        <table class="api-table" style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+            <tr style="background:var(--bg-panel); text-align:left;"><th style="padding:10px;">Method</th><th>Description</th></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid var(--border);"><code>setPosition(x, y)</code></td><td style="padding:8px; border-bottom:1px solid var(--border);">Updates widget position</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid var(--border);"><code>setFocused(bool)</code></td><td style="padding:8px; border-bottom:1px solid var(--border);">Updates focus state</td></tr>
+            <tr><td style="padding:8px; border-bottom:1px solid var(--border);"><code>visible</code></td><td style="padding:8px; border-bottom:1px solid var(--border);">Controls rendering</td></tr>
+        </table>
+
+        <h2 id="w-button">CuiButton</h2>
+        {% lang en %}<p>Resizable button with 3-slice rendering (Left, Center, Right).</p>{% endlang %}
+        {% lang ru %}<p>Растягиваемая кнопка с 3-slice рендером.</p>{% endlang %}
+        <div class="code-container">
+            <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+            <pre>this.addRenderableWidget(new CuiButton(x, y, 100, 20, Component.literal("Save"), btn -> {
+    System.out.println("Clicked");
+}));</pre>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Smart Gradle Generator
+    const VERSIONS_MAP = {
+        "0.5.2": "5671234",
+        "0.4.1": "4567890",
+        "0.3.0": "3456789",
+        "latest": "5671234" // Latest ID
+    };
+
+    function updateGradle() {
+        const ver = document.getElementById('mod-version-select').value;
+        const loader = document.getElementById('loader-select').value;
+        const fileId = VERSIONS_MAP[ver] || "UNKNOWN";
+        const out = document.getElementById('gradle-output');
+
+        if (loader === 'forge') {
+            out.textContent = `dependencies {\n    implementation fg.deobf("curse.maven:cubeui-1415948:${fileId}")\n}`;
+        } else {
+            out.textContent = `dependencies {\n    modImplementation "curse.maven:cubeui-1415948:${fileId}"\n}`;
+        }
+    }
+    document.addEventListener('DOMContentLoaded', updateGradle);
+</script>
