@@ -4,14 +4,14 @@ title: Structures & Loot
 permalink: /cso/structures/
 ---
 
-<div class="lang-en">
-    <h1>Structures & Loot</h1>
-    <p class="lead">Complete database with calculated probabilities based on game files (v1.4.0).</p>
-</div>
-<div class="lang-ru">
-    <h1>Структуры и Лут</h1>
-    <p class="lead">Полная база данных с рассчитанными вероятностями на основе файлов игры (v1.4.0).</p>
-</div>
+{% lang en %}
+<h1>Structures & Loot</h1>
+<p class="lead">Complete database with calculated probabilities based on game files (v1.4.0).</p>
+{% endlang %}
+{% lang ru %}
+<h1>Структуры и Лут</h1>
+<p class="lead">Полная база данных с рассчитанными вероятностями на основе файлов игры (v1.4.0).</p>
+{% endlang %}
 
 <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
 
@@ -20,13 +20,6 @@ permalink: /cso/structures/
     .struct-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
     .struct-title { margin: 0; font-size: 1.6rem; display: flex; align-items: center; gap: 12px; font-weight: 700; }
     .biome-tag { font-size: 0.75rem; background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); color: var(--text-muted); display: inline-block; margin: 0 4px 4px 0; font-family: var(--font-mono); }
-    
-    .screenshot-placeholder {
-        width: 100%; height: 220px; background: #0d1117; border: 2px dashed #30363d; border-radius: 8px;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        color: #8b949e; margin: 25px 0; text-align: center; padding: 20px; transition: 0.2s;
-    }
-    .screenshot-placeholder:hover { border-color: var(--text-muted); }
     
     .loot-details { margin-top: 20px; }
     .loot-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; border-radius: 8px; overflow: hidden; }
@@ -45,7 +38,7 @@ permalink: /cso/structures/
 
 <div class="struct-card">
     <div class="struct-header">
-        <h3 class="struct-title"><i class="fa-solid fa-tower-observation"></i> <span class="lang-en">Tower</span><span class="lang-ru">Башня</span></h3>
+        <h3 class="struct-title"><i class="fa-solid fa-tower-observation"></i> {% lang en %}Tower{% endlang %}{% lang ru %}Башня{% endlang %}</h3>
     </div>
     
     <div style="margin-bottom: 15px;">
@@ -55,8 +48,8 @@ permalink: /cso/structures/
         <span class="biome-tag">Flower Forest</span>
     </div>
 
-    <p class="lang-ru">Высокая наблюдательная вышка. Генерируется в густых лесах и болотах.</p>
-    <p class="lang-en">Tall observation tower found in dense forests and swamps.</p>
+    {% lang ru %}<p>Высокая наблюдательная вышка. Генерируется в густых лесах и болотах.</p>{% endlang %}
+    {% lang en %}<p>Tall observation tower found in dense forests and swamps.</p>{% endlang %}
 
     <details class="loot-details">
         <summary class="btn" style="width:100%; text-align:left;">Loot Table (Exact)</summary>
@@ -75,11 +68,12 @@ permalink: /cso/structures/
 
 <div class="struct-card">
     <div class="struct-header">
-        <h3 class="struct-title"><i class="fa-solid fa-campground"></i> <span class="lang-en">Camp</span><span class="lang-ru">Лагерь</span></h3>
+        <h3 class="struct-title"><i class="fa-solid fa-campground"></i> {% lang en %}Camp{% endlang %}{% lang ru %}Лагерь{% endlang %}</h3>
     </div>
     <div style="margin-bottom: 15px;"><span class="biome-tag">Plains</span></div>
 
-    <p class="lang-ru">Небольшая стоянка путешественников.</p>
+    {% lang ru %}<p>Небольшая стоянка путешественников.</p>{% endlang %}
+    {% lang en %}<p>Small travelers' campsite.</p>{% endlang %}
 
     <details class="loot-details">
         <summary class="btn" style="width:100%; text-align:left;">Loot Table</summary>
@@ -97,7 +91,7 @@ permalink: /cso/structures/
 
 <div class="struct-card">
     <div class="struct-header">
-        <h3 class="struct-title"><i class="fa-solid fa-fan"></i> <span class="lang-en">Windmills</span><span class="lang-ru">Мельницы</span></h3>
+        <h3 class="struct-title"><i class="fa-solid fa-fan"></i> {% lang en %}Windmills{% endlang %}{% lang ru %}Мельницы{% endlang %}</h3>
     </div>
     <div style="margin-bottom: 15px;">
         <span class="biome-tag">Oak</span> <span class="biome-tag">Birch</span>
@@ -105,7 +99,8 @@ permalink: /cso/structures/
         <span class="biome-tag">Cherry</span>
     </div>
 
-    <p class="lang-ru">Основной источник кинетических компонентов. Содержит сундук под лестницей.</p>
+    {% lang ru %}<p>Основной источник кинетических компонентов. Содержит сундук под лестницей.</p>{% endlang %}
+    {% lang en %}<p>Main source of kinetic components. Contains a chest under the stairs.</p>{% endlang %}
     
     <details class="loot-details">
         <summary class="btn" style="width:100%; text-align:left;">Loot Table (Spruce Variant)</summary>
@@ -124,13 +119,14 @@ permalink: /cso/structures/
 
 <div class="struct-card">
     <div class="struct-header">
-        <h3 class="struct-title"><i class="fa-solid fa-bolt"></i> <span class="lang-en">Lightning Tower</span><span class="lang-ru">Громоотвод</span></h3>
+        <h3 class="struct-title"><i class="fa-solid fa-bolt"></i> {% lang en %}Lightning Tower{% endlang %}{% lang ru %}Громоотвод{% endlang %}</h3>
     </div>
     <div style="margin-bottom: 15px;">
         <span class="biome-tag">All Common Biomes</span> <span class="biome-tag">Windswept Hills</span>
     </div>
 
-    <p class="lang-ru">Башня с большим медным шпилем. Хороший источник меди и сплавов.</p>
+    {% lang ru %}<p>Башня с большим медным шпилем. Хороший источник меди и сплавов.</p>{% endlang %}
+    {% lang en %}<p>Tower with a large copper spire. Good source of copper and alloys.</p>{% endlang %}
 
     <details class="loot-details">
         <summary class="btn" style="width:100%; text-align:left;">Loot Table</summary>
@@ -149,13 +145,14 @@ permalink: /cso/structures/
 
 <div class="struct-card">
     <div class="struct-header">
-        <h3 class="struct-title"><i class="fa-solid fa-ghost"></i> <span class="lang-en">Spooky House</span><span class="lang-ru">Жуткий дом</span></h3>
+        <h3 class="struct-title"><i class="fa-solid fa-ghost"></i> {% lang en %}Spooky House{% endlang %}{% lang ru %}Жуткий дом{% endlang %}</h3>
     </div>
     <div style="margin-bottom: 15px;">
         <span class="biome-tag">Dark Forest</span> <span class="biome-tag">Taiga</span>
     </div>
 
-    <p class="lang-ru">Заброшенный дом. Охраняется монстрами.</p>
+    {% lang ru %}<p>Заброшенный дом. Охраняется монстрами.</p>{% endlang %}
+    {% lang en %}<p>Abandoned house guarded by monsters.</p>{% endlang %}
 
     <details class="loot-details">
         <summary class="btn" style="width:100%; text-align:left;">Loot Table (Var 1)</summary>
@@ -171,13 +168,14 @@ permalink: /cso/structures/
 
 <div class="struct-card">
     <div class="struct-header">
-        <h3 class="struct-title"><i class="fa-solid fa-skull"></i> <span class="lang-en">Graveyard</span><span class="lang-ru">Кладбище</span></h3>
+        <h3 class="struct-title"><i class="fa-solid fa-skull"></i> {% lang en %}Graveyard{% endlang %}{% lang ru %}Кладбище{% endlang %}</h3>
     </div>
     <div style="margin-bottom: 15px;">
         <span class="biome-tag">Swamp</span> <span class="biome-tag">Dark Forest</span>
     </div>
 
-    <p class="lang-ru">Место упокоения. Содержит структуру Graveyard Down (склеп) с ценным лутом.</p>
+    {% lang ru %}<p>Место упокоения. Содержит структуру Graveyard Down (склеп) с ценным лутом.</p>{% endlang %}
+    {% lang en %}<p>Resting place. Contains Graveyard Down structure (crypt) with valuable loot.</p>{% endlang %}
 
     <details class="loot-details">
         <summary class="btn" style="width:100%; text-align:left;">Loot Table</summary>
