@@ -35,9 +35,9 @@
 
             <div class="divider-v"></div>
             
-            <select id="lang-select">
-                <option value="en">EN</option>
-                <option value="ru">RU</option>
+            <select id="lang-select" data-active="{{ site.active_lang }}">
+                <option value="en" {% if site.active_lang == "en" %}selected{% endif %}>EN</option>
+                <option value="ru" {% if site.active_lang == "ru" %}selected{% endif %}>RU</option>
             </select>
             <button id="theme-toggle">🌙</button>
             <button id="login-btn" class="btn-login"><i class="fa-brands fa-github"></i> 
