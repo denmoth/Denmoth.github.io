@@ -21,7 +21,6 @@
         .search-box-wiki input:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88,166,255,0.1); }
         .search-box-wiki i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); opacity: 0.7; }
 
-        /* Version Switcher */
         .version-box { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
         .version-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px; }
         .version-select { width: 100%; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; }
@@ -31,26 +30,6 @@
         .nav-link { display: block; padding: 6px 12px; color: var(--text-main); border-radius: 6px; font-size: 0.95rem; text-decoration: none; margin-bottom: 2px; transition: 0.1s; border-left: 3px solid transparent; }
         .nav-link:hover { background: var(--bg-panel); color: var(--accent); }
         .nav-link.active { background: rgba(56, 139, 253, 0.1); color: #58a6ff; border-left-color: #58a6ff; font-weight: 600; }
-
-        /* Spoiler Overlay */
-        .spoiler-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            z-index: 9999;
-            display: none; align-items: center; justify-content: center;
-            animation: fadeIn 0.4s ease-out;
-            padding: 20px;
-        }
-        .spoiler-box {
-            background: var(--bg-panel); border: 1px solid var(--border);
-            padding: 40px; border-radius: 16px; max-width: 480px; width: 100%;
-            text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.5);
-            transform: scale(0.95); animation: scaleUp 0.3s forwards 0.1s; opacity: 0;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         @media (max-width: 1000px) {
             .wiki-sidebar { display: none; position: fixed; left: 0; z-index: 2000; transform: translateX(-100%); transition: 0.3s; width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
@@ -62,53 +41,45 @@
 <body class="lang-{{ site.active_lang }}">
     {% include header.html %}
 
-    <div id="spoiler-modal" class="spoiler-overlay">
-        <div class="spoiler-box">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size:3.5rem; color:#d73a49; margin-bottom:20px;"></i>
-            <h2 class="lang-en" style="margin-bottom:10px;">Spoiler Alert!</h2>
-            <h2 class="lang-ru" style="margin-bottom:10px;">Спойлеры!</h2>
-            <p style="color:var(--text-muted); margin:0 0 25px; line-height: 1.6; font-size:1.05rem;">
-                <span class="lang-en">This wiki reveals secrets and loot tables. To preserve the sense of exploration, we recommend playing without it first.</span>
-                <span class="lang-ru">Эта вики раскрывает все секреты и таблицы лута. Чтобы сохранить дух исследования, рекомендуем сначала поиграть без неё.</span>
-            </p>
-            <div style="display:flex; gap:12px; justify-content:center;">
-                <a href="/" class="btn" style="border-color:#d73a49; color:#d73a49;">Exit</a>
-                <button onclick="acceptSpoilers()" class="btn primary">I Understand</button>
-            </div>
-        </div>
-    </div>
-
     <div class="wiki-wrapper">
         <aside class="wiki-sidebar">
             <div class="search-box-wiki">
-                <input type="text" id="wiki-search" placeholder="Filter..." onkeyup="filterMenu()">
+                <input type="text" id="wiki-search" placeholder="Search docs..." onkeyup="filterMenu()">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             
             <div class="version-box">
                 <div class="version-label"><span class="lang-en">Mod Version</span><span class="lang-ru">Версия Мода</span></div>
                 <select class="version-select">
-                    <option value="1.4.0">v1.4.0 (1.20.1)</option>
-                    <option value="1.3.0">v1.3.0 (1.19.2)</option>
-                    <option value="legacy">Legacy Versions</option>
+                    <option value="latest">v1.4.0 (Latest)</option>
+                    <option value="legacy">v1.3.0</option>
                 </select>
             </div>
 
             <div id="nav-list">
-                {% for group in site.data.cso_nav %}
-                <div class="nav-group">
-                    <div class="nav-title">
-                        <span class="lang-en">{{ group.title_en }}</span>
-                        <span class="lang-ru">{{ group.title_ru }}</span>
+                {% if page.url contains 'cubeui' %}
+                    <div class="nav-group">
+                        <div class="nav-title">CubeUI</div>
+                        <a href="#install" class="nav-link">Installation</a>
+                        <a href="#theme" class="nav-link">Theming</a>
+                        <a href="#widgets" class="nav-link">Widgets</a>
                     </div>
-                    {% for item in group.items %}
-                    <a href="{{ item.url }}" class="nav-link {% if page.url == item.url %}active{% endif %}">
-                        <span class="lang-en">{{ item.title_en }}</span>
-                        <span class="lang-ru">{{ item.title_ru }}</span>
-                    </a>
+                {% else %}
+                    {% for group in site.data.cso_nav %}
+                    <div class="nav-group">
+                        <div class="nav-title">
+                            <span class="lang-en">{{ group.title_en }}</span>
+                            <span class="lang-ru">{{ group.title_ru }}</span>
+                        </div>
+                        {% for item in group.items %}
+                        <a href="{{ item.url }}" class="nav-link {% if page.url == item.url %}active{% endif %}">
+                            <span class="lang-en">{{ item.title_en }}</span>
+                            <span class="lang-ru">{{ item.title_ru }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
                     {% endfor %}
-                </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </aside>
 
@@ -125,28 +96,44 @@
     </footer>
 
     <script src="/assets/js/main.js"></script>
-    <script src="/assets/js/analytics.js"></script>
     <script>
         function filterMenu() {
             const input = document.getElementById('wiki-search');
             const filter = input.value.toLowerCase();
             const links = document.querySelectorAll('.nav-link');
-            const groups = document.querySelectorAll('.nav-group');
+            
             links.forEach(link => {
                 const text = link.innerText;
-                link.style.display = text.toLowerCase().includes(filter) ? "" : "none";
-            });
-            groups.forEach(group => {
-                const visible = group.querySelectorAll('.nav-link:not([style*="display: none"])');
-                group.style.display = visible.length > 0 ? "" : "none";
+                if (text.toLowerCase().includes(filter)) {
+                    link.style.display = "";
+                } else {
+                    link.style.display = "none";
+                }
             });
         }
-        const toggleBtn = document.getElementById('sidebar-toggle');
-        const checkMobile = () => { 
-            toggleBtn.style.display = window.innerWidth <= 1000 ? 'inline-flex' : 'none'; 
-        };
-        window.addEventListener('resize', checkMobile);
-        checkMobile();
+        
+        // CubeUI ScrollSpy fallback
+        if(window.location.pathname.includes('cubeui')) {
+            window.addEventListener('scroll', () => {
+                const sections = document.querySelectorAll('.doc-section');
+                const links = document.querySelectorAll('.nav-link');
+                
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= sectionTop - 150) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                links.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        }
     </script>
 </body>
 </html>
