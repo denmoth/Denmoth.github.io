@@ -8,24 +8,42 @@
 
     <div id="auth-modal" class="auth-modal" onclick="if(event.target === this) closeAuthModal()">
         <div class="auth-box">
-            <h2 style="margin-bottom:20px;">Log In / Register</h2>
-            <button class="btn auth-btn" onclick="loginWith('github')"><i class="fa-brands fa-github"></i> GitHub</button>
-            <button class="btn auth-btn" onclick="loginWith('google')"><i class="fa-brands fa-google"></i> Google</button>
-            <button class="btn auth-btn" onclick="loginWith('discord')"><i class="fa-brands fa-discord"></i> Discord</button>
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Log in to manage your profile and settings.</p>
+            </div>
             
-            <div class="auth-divider">OR</div>
+            <div class="auth-providers">
+                <button class="auth-provider-btn github" onclick="loginWith('github')">
+                    <i class="fa-brands fa-github"></i> <span>GitHub</span>
+                </button>
+                <button class="auth-provider-btn discord" onclick="loginWith('discord')">
+                    <i class="fa-brands fa-discord"></i> <span>Discord</span>
+                </button>
+                <button class="auth-provider-btn google" onclick="loginWith('google')">
+                    <i class="fa-brands fa-google"></i> <span>Google</span>
+                </button>
+            </div>
             
-            <input type="email" placeholder="Email" class="form-input" style="margin-bottom:10px;">
-            <input type="password" placeholder="Password" class="form-input" style="margin-bottom:10px;">
-            <button class="btn primary auth-btn">Continue with Email</button>
+            <div class="auth-divider"><span>OR</span></div>
             
-            <button onclick="closeAuthModal()" class="btn" style="margin-top:15px; width:100%;">Close</button>
+            <form onsubmit="event.preventDefault(); alert('Email auth coming soon');">
+                <div class="form-group">
+                    <input type="email" placeholder="Email Address" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Password" class="form-input" required>
+                </div>
+                <button type="submit" class="btn primary auth-submit">Log In</button>
+            </form>
+            
+            <button onclick="closeAuthModal()" class="btn auth-close">Close</button>
         </div>
     </div>
 
     <div class="tool-wrapper" id="tool-wrapper">
         <aside class="ad-sidebar left">
-            <div class="ad-placeholder">Ad</div>
+            <div class="ad-placeholder">Ad Space</div>
         </aside>
 
         <main class="tool-content">
@@ -39,7 +57,7 @@
             </div>
             
             <div class="fullscreen-ad-banner" style="display:none; width:100%; height:90px; background:var(--bg-panel); border:1px solid var(--border); margin-bottom:20px; align-items:center; justify-content:center; border-radius:8px; color:var(--text-muted);">
-                Fullscreen Ad
+                Fullscreen Ad Banner
             </div>
 
             <div class="tool-card" id="tool-card-container">
@@ -51,19 +69,19 @@
                 
                 <div class="form-group" style="position:relative;">
                     <div id="guest-input-area" style="margin-bottom:10px; display:none;">
-                        <input type="text" id="guest-name" class="form-input" placeholder="Your Name (Guest)" style="max-width:300px;">
+                        <input type="text" id="guest-name" class="form-input" placeholder="Name (Guest)" style="max-width:300px;">
                     </div>
-                    <textarea id="comment-input" class="form-area" placeholder="Write a comment..." style="min-height:80px;"></textarea>
+                    <textarea id="comment-input" class="form-area" placeholder="Write a comment..." style="min-height:100px;"></textarea>
                     <div style="display:flex; justify-content:space-between; margin-top:10px; align-items:center;">
-                        <div style="font-size:0.8rem; color:var(--text-muted);">
-                            Markdown supported.
-                        </div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">Markdown supported</div>
                         <button id="send-comment" class="btn primary">Post Comment</button>
                     </div>
                 </div>
 
                 <div id="comments-list">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i> Loading comments...
+                    <div style="text-align:center; padding:20px; color:var(--text-muted);">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading...
+                    </div>
                 </div>
             </div>
 
@@ -73,13 +91,12 @@
         </main>
 
         <aside class="ad-sidebar right">
-            <div class="ad-placeholder">Ad</div>
+            <div class="ad-placeholder">Ad Space</div>
         </aside>
     </div>
 
     <script src="/assets/js/main.js"></script>
     <script>
-        // Fullscreen Logic
         const fsBtn = document.getElementById('fullscreen-btn');
         const wrapper = document.getElementById('tool-wrapper');
         const fsAd = document.querySelector('.fullscreen-ad-banner');
@@ -88,19 +105,27 @@
             fsBtn.addEventListener('click', () => {
                 wrapper.classList.toggle('maximized');
                 const isMax = wrapper.classList.contains('maximized');
-                fsBtn.querySelector('i').classList.replace(isMax ? 'fa-expand' : 'fa-compress', isMax ? 'fa-compress' : 'fa-expand');
-                if(fsAd) fsAd.style.display = isMax ? 'flex' : 'none';
+                const icon = fsBtn.querySelector('i');
+                
+                if (isMax) {
+                    icon.classList.remove('fa-expand');
+                    icon.classList.add('fa-compress');
+                    if(fsAd) fsAd.style.display = 'flex';
+                } else {
+                    icon.classList.remove('fa-compress');
+                    icon.classList.add('fa-expand');
+                    if(fsAd) fsAd.style.display = 'none';
+                }
             });
         }
 
-        // Show guest name input if not logged in
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                // currentUser is defined in main.js
                 if(!window.currentUser) {
-                    document.getElementById('guest-input-area').style.display = 'block';
+                    const ga = document.getElementById('guest-input-area');
+                    if(ga) ga.style.display = 'block';
                 }
-            }, 500); // Small delay to wait for auth check
+            }, 800);
         });
     </script>
 </body>
