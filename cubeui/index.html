@@ -9,25 +9,23 @@ permalink: /cubeui/
         {% lang en %}<h1>Installation</h1>{% endlang %}
         {% lang ru %}<h1>Установка</h1>{% endlang %}
         
-        {% lang en %}<p>Add the library to your development environment.</p>{% endlang %}
-        {% lang ru %}<p>Добавьте библиотеку в среду разработки.</p>{% endlang %}
+        {% lang en %}<p>Add the library to your development environment. Versions are fetched automatically from CurseForge.</p>{% endlang %}
+        {% lang ru %}<p>Добавьте библиотеку в среду разработки. Версии подгружаются автоматически с CurseForge.</p>{% endlang %}
         
         <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:6px; margin-bottom:30px;">
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <select id="mod-version-select" class="form-select" onchange="updateGradle()">
-                    <option value="latest">Latest Release (Auto)</option>
-                    <option value="0.5.2">v0.5.2 (1.20.1)</option>
-                    <option value="0.4.1">v0.4.1 (1.19.2)</option>
-                    <option value="0.3.0">v0.3.0 (1.18.2)</option>
+            <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+                <select id="loader-select" class="form-select" style="width:150px;" onchange="fetchLatestVersion()">
+                    <option value="Forge">Forge</option>
+                    <option value="Fabric">Fabric</option>
+                    <option value="NeoForge">NeoForge</option>
                 </select>
-                <select id="loader-select" class="form-select" style="width:150px;">
-                    <option value="forge">Forge</option>
-                    <option value="fabric">Fabric</option>
-                </select>
+                <div id="version-status" style="display:flex; align-items:center; font-size:0.9rem; color:var(--text-muted);">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="margin-right:8px;"></i> Checking API...
+                </div>
             </div>
             <div class="code-container" style="margin:0;">
                 <div class="code-head">build.gradle <button class="copy-btn">Copy</button></div>
-                <pre id="gradle-output">Loading...</pre>
+                <pre id="gradle-output">// Waiting for API...</pre>
             </div>
         </div>
     </section>
@@ -35,8 +33,9 @@ permalink: /cubeui/
     <section id="theme" class="doc-section">
         {% lang en %}<h1>Theming</h1>{% endlang %}
         {% lang ru %}<h1>Темизация</h1>{% endlang %}
-        {% lang en %}<p>CubeUI uses <code>ThemeManager</code> to handle rendering styles. The default theme is Vanilla-like dark.</p>{% endlang %}
-        {% lang ru %}<p>CubeUI использует <code>ThemeManager</code> для стилизации. Стандартная тема — темная ванильная.</p>{% endlang %}
+        
+        {% lang en %}<p>CubeUI uses <code>ThemeManager</code> to handle rendering styles. The default theme is <strong>Perfectly Vanilla</strong>.</p>{% endlang %}
+        {% lang ru %}<p>CubeUI использует <code>ThemeManager</code> для стилизации. Стандартная тема — <strong>Идеально Ванильная</strong>.</p>{% endlang %}
 
         {% lang en %}<h3>Creating a Theme</h3>{% endlang %}{% lang ru %}<h3>Создание темы</h3>{% endlang %}
         <div class="code-container">
@@ -46,7 +45,6 @@ permalink: /cubeui/
     public ResourceLocation getAtlasTexture() {
         return new ResourceLocation("mymod", "textures/gui/atlas.png");
     }
-    
     // Implement UV getters...
 }</pre>
         </div>
@@ -59,45 +57,97 @@ permalink: /cubeui/
         <h3 id="w-common">Common Properties</h3>
         {% lang en %}<p>All widgets extend <code>CuiWidget</code>.</p>{% endlang %}
         {% lang ru %}<p>Все виджеты наследуют <code>CuiWidget</code>.</p>{% endlang %}
-        <table class="api-table" style="width:100%; border-collapse:collapse; margin-bottom:20px;">
-            <tr style="background:var(--bg-panel); text-align:left;"><th style="padding:10px;">Method</th><th>Description</th></tr>
+        <table class="api-table" style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:0.95rem;">
+            <tr style="background:var(--bg-panel); text-align:left;"><th style="padding:10px; border-bottom:1px solid var(--border);">Method</th><th style="padding:10px; border-bottom:1px solid var(--border);">Description</th></tr>
             <tr><td style="padding:8px; border-bottom:1px solid var(--border);"><code>setPosition(x, y)</code></td><td style="padding:8px; border-bottom:1px solid var(--border);">Updates widget position</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid var(--border);"><code>setFocused(bool)</code></td><td style="padding:8px; border-bottom:1px solid var(--border);">Updates focus state</td></tr>
             <tr><td style="padding:8px; border-bottom:1px solid var(--border);"><code>visible</code></td><td style="padding:8px; border-bottom:1px solid var(--border);">Controls rendering</td></tr>
         </table>
 
         <h2 id="w-button">CuiButton</h2>
-        {% lang en %}<p>Resizable button with 3-slice rendering (Left, Center, Right).</p>{% endlang %}
-        {% lang ru %}<p>Растягиваемая кнопка с 3-slice рендером.</p>{% endlang %}
+        {% lang en %}<p>Resizable button with 3-slice rendering (Left, Center, Right). Supports hover and disabled states.</p>{% endlang %}
+        {% lang ru %}<p>Растягиваемая кнопка с 3-slice рендером. Поддерживает наведение и выключенное состояние.</p>{% endlang %}
         <div class="code-container">
             <div class="code-head">Java <button class="copy-btn">Copy</button></div>
             <pre>this.addRenderableWidget(new CuiButton(x, y, 100, 20, Component.literal("Save"), btn -> {
     System.out.println("Clicked");
 }));</pre>
         </div>
+
+        <h2 id="w-input">CuiTextField</h2>
+        {% lang en %}<p>Replacement for vanilla EditBox. Supports custom background from Atlas and placeholder text.</p>{% endlang %}
+        {% lang ru %}<p>Замена ванильному EditBox. Поддерживает фон из Атласа и плейсхолдер.</p>{% endlang %}
+        <div class="code-container">
+            <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+            <pre>CuiTextField input = new CuiTextField(font, x, y, 150, 20, Component.empty());
+input.setPlaceholder(Component.literal("Search..."));
+this.addRenderableWidget(input);</pre>
+        </div>
+
+        <h2 id="w-panel">CuiPanel</h2>
+        {% lang en %}<p>9-slice background panel for GUIs.</p>{% endlang %}
+        {% lang ru %}<p>9-slice панель для фона интерфейсов.</p>{% endlang %}
+        <div class="code-container">
+            <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+            <pre>this.addRenderableWidget(new CuiPanel(x, y, 200, 100));</pre>
+        </div>
+    </section>
+
+    <section id="screens" class="doc-section">
+        {% lang en %}<h1>Screens</h1>{% endlang %}
+        {% lang ru %}<h1>Экраны</h1>{% endlang %}
+
+        <h3 id="s-cont">Container Screen</h3>
+        {% lang en %}<p>Extends <code>AbstractContainerScreen</code>. Auto-renders slots and highlights using <code>CuiRenderHelper</code>.</p>{% endlang %}
+        {% lang ru %}<p>Наследует <code>AbstractContainerScreen</code>. Автоматически рендерит слоты и подсветку через <code>CuiRenderHelper</code>.</p>{% endlang %}
+        <div class="code-container">
+            <div class="code-head">Java <button class="copy-btn">Copy</button></div>
+            <pre>public class MyGui extends CuiContainerScreen<MyMenu> {
+    public MyGui(MyMenu menu, Inventory inv, Component title) {
+        super(menu, inv, title);
+    }
+}</pre>
+        </div>
     </section>
 </div>
 
 <script>
-    // Smart Gradle Generator
-    const VERSIONS_MAP = {
-        "0.5.2": "5671234",
-        "0.4.1": "4567890",
-        "0.3.0": "3456789",
-        "latest": "5671234" // Latest ID
-    };
+    // AUTOMATIC VERSION FETCHING FROM CURSEFORGE (via cfwidget API)
+    const PROJECT_ID = 1415948; // CubeUI ID
+    let cachedFiles = [];
 
-    function updateGradle() {
-        const ver = document.getElementById('mod-version-select').value;
+    async function fetchLatestVersion() {
         const loader = document.getElementById('loader-select').value;
-        const fileId = VERSIONS_MAP[ver] || "UNKNOWN";
+        const status = document.getElementById('version-status');
         const out = document.getElementById('gradle-output');
 
-        if (loader === 'forge') {
-            out.textContent = `dependencies {\n    implementation fg.deobf("curse.maven:cubeui-1415948:${fileId}")\n}`;
+        if(cachedFiles.length === 0) {
+            try {
+                const req = await fetch(`https://api.cfwidget.com/${PROJECT_ID}`);
+                const data = await req.json();
+                cachedFiles = data.files;
+            } catch(e) {
+                status.innerHTML = `<span style="color:#d73a49">Error fetching API</span>`;
+                return;
+            }
+        }
+
+        // Find latest file for selected loader
+        const file = cachedFiles.find(f => f.versions.includes(loader));
+        
+        if(file) {
+            status.innerHTML = `<span style="color:#238636"><i class="fa-solid fa-check"></i> Found v${file.display_name}</span>`;
+            
+            if(loader === 'Forge' || loader === 'NeoForge') {
+                out.textContent = `dependencies {\n    implementation fg.deobf("curse.maven:cubeui-${PROJECT_ID}:${file.id}")\n}`;
+            } else {
+                out.textContent = `dependencies {\n    modImplementation "curse.maven:cubeui-${PROJECT_ID}:${file.id}"\n}`;
+            }
         } else {
-            out.textContent = `dependencies {\n    modImplementation "curse.maven:cubeui-1415948:${fileId}"\n}`;
+            status.innerHTML = `No file found for ${loader}`;
+            out.textContent = `// No recent file found on CurseForge for ${loader}`;
         }
     }
-    document.addEventListener('DOMContentLoaded', updateGradle);
+
+    document.addEventListener('DOMContentLoaded', fetchLatestVersion);
 </script>
