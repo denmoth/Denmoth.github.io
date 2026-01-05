@@ -8,14 +8,19 @@ excerpt: "Unlocking the hidden potential of Minecraft's chat UI framework."
 <div class="hub-layout">
     <div class="article-content">
         
+        {% lang en %}
         <div class="lang-en">
             <h1 style="font-size: 2.5rem; margin-bottom: 10px;">JSON Text: The Magic of Tellraw</h1>
             <p class="lead" style="color:var(--text-muted);">Why chat is not just strings, but a full UI framework.</p>
         </div>
+        {% endlang %}
+        
+        {% lang ru %}
         <div class="lang-ru">
             <h1 style="font-size: 2.5rem; margin-bottom: 10px;">JSON Text: Магия Tellraw, о которой молчит Wiki</h1>
             <p class="lead" style="color:var(--text-muted);">Почему чат — это не просто текст, а мощный UI фреймворк.</p>
         </div>
+        {% endlang %}
 
         <div style="color:var(--text-muted); margin-bottom:30px; font-size:0.9rem; border-bottom:1px solid var(--border); padding-bottom:20px;">
             <i class="fa-regular fa-calendar"></i> 06.01.2026 &nbsp;•&nbsp; <i class="fa-regular fa-user"></i> Denmoth
