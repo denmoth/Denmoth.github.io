@@ -3,40 +3,17 @@ layout: null
 permalink: /cubeui/
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ site.active_lang }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CubeUI Docs</title>
-    <meta name="description" content="Documentation for CubeUI - A modular UI Library for Minecraft.">
-    
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-<script src="/assets/js/analytics.js"></script>
-    
+    {% include head.html %}
+    <title>CubeUI Documentation</title>
 </head>
 <body class="lang-{{ site.active_lang }}">
-    <header>
-        <div class="header-inner">
-            <div class="brand">
-                <a href="/" style="color:var(--text-main); display:flex; gap:10px; align-items:center;">
-                    <i class="fa-solid fa-arrow-left"></i> CubeUI
-                </a>
-            </div>
-            <div class="controls">
-                <select id="lang-select">
-                    <option value="en">EN</option>
-                    <option value="ru">RU</option>
-                </select>
-                <button id="theme-toggle">🌙</button>
-            </div>
-        </div>
-    </header>
+    {% include header.html %}
 
     <div class="docs-layout">
-        <aside class="sidebar">
-            {% lang en %}<h4>General</h4>{% endlang %}{% lang ru %}<h4>Общее</h4>{% endlang %}
+        <aside class="docs-sidebar">
+            {% lang en %}<h4>Getting Started</h4>{% endlang %}{% lang ru %}<h4>Начало</h4>{% endlang %}
             <ul>
                 <li><a href="#install" class="active">Installation</a></li>
                 <li><a href="#theme">Theming</a></li>
@@ -48,8 +25,6 @@ permalink: /cubeui/
                 <li><a href="#w-button">CuiButton</a></li>
                 <li><a href="#w-input">CuiTextField</a></li>
                 <li><a href="#w-panel">CuiPanel</a></li>
-                <li><a href="#w-slot">CuiSlot</a></li>
-                <li><a href="#w-arrow">CuiArrow</a></li>
             </ul>
 
             {% lang en %}<h4>Screens</h4>{% endlang %}{% lang ru %}<h4>Экраны</h4>{% endlang %}
@@ -59,143 +34,42 @@ permalink: /cubeui/
             </ul>
         </aside>
 
-        <main class="content">
-            <button id="sidebar-toggle" class="sidebar-toggle"><i class="fa-solid fa-bars"></i></button>
-
+        <main class="docs-content">
             <section id="install" class="doc-section">
                 {% lang en %}<h1>Installation</h1>{% endlang %}
                 {% lang ru %}<h1>Установка</h1>{% endlang %}
                 
-                {% lang en %}<p>Add the library to your development environment.</p>{% endlang %}
-                {% lang ru %}<p>Добавьте библиотеку в среду разработки.</p>{% endlang %}
+                {% lang en %}<p>Select your Minecraft version to generate dependency code.</p>{% endlang %}
+                {% lang ru %}<p>Выберите версию Minecraft для генерации кода зависимостей.</p>{% endlang %}
                 
-                <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:6px; margin-bottom:30px;">
-                    <div style="display:flex; gap:10px; margin-bottom:10px;">
-                        <select id="mc-version"><option value="1.20.1">1.20.1</option></select>
-                        <select id="loader-select"><option value="forge">Forge</option></select>
+                <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:8px; margin-bottom:30px;">
+                    <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
+                        <label class="form-label" style="margin:0;">MC Version:</label>
+                        <select id="cui-mc-version" class="form-select" style="width:auto;">
+                            <option value="1.20.1">1.20.1</option>
+                            <option value="1.19.2">1.19.2</option>
+                            <option value="1.18.2">1.18.2</option>
+                        </select>
+                        <span id="cui-loading" style="color:var(--text-muted); font-size:0.8rem; display:none;"><i class="fa-solid fa-circle-notch fa-spin"></i> Fetching latest...</span>
                     </div>
+
                     <div class="code-container" style="margin:0;">
                         <div class="code-head">build.gradle <button class="copy-btn">Copy</button></div>
-                        <pre id="gradle-output">Loading...</pre>
+                        <div class="code-content" id="gradle-output">Loading...</div>
                     </div>
                 </div>
             </section>
 
             <section id="theme" class="doc-section">
-                {% lang en %}<h1>Theming</h1>{% endlang %}
-                {% lang ru %}<h1>Темизация</h1>{% endlang %}
-                {% lang en %}<p>CubeUI uses <code>ThemeManager</code> to handle rendering styles. The default theme is Vanilla-like dark.</p>{% endlang %}
-                {% lang ru %}<p>CubeUI использует <code>ThemeManager</code> для стилизации. Стандартная тема — темная ванильная.</p>{% endlang %}
-
-                {% lang en %}<h3>Creating a Theme</h3>{% endlang %}{% lang ru %}<h3>Создание темы</h3>{% endlang %}
+                {% lang en %}<h1>Theming</h1>{% endlang %}{% lang ru %}<h1>Темизация</h1>{% endlang %}
+                <p>CubeUI uses <code>ThemeManager</code>. Default is Dark Vanilla.</p>
                 <div class="code-container">
                     <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>public class MyTheme implements ICuiTheme {
-    @Override
-    public ResourceLocation getAtlasTexture() {
-        return new ResourceLocation("mymod", "textures/gui/atlas.png");
-    }
-    
-    // Implement UV getters...
-}</pre>
+                    <div class="code-content">public class MyTheme implements ICuiTheme { ... }</div>
                 </div>
             </section>
-
-            <section id="widgets" class="doc-section">
-                {% lang en %}<h1>Widgets</h1>{% endlang %}
-                {% lang ru %}<h1>Виджеты</h1>{% endlang %}
-
-                <h3 id="w-common">Common Properties</h3>
-                {% lang en %}<p>All widgets extend <code>CuiWidget</code>.</p>{% endlang %}
-                {% lang ru %}<p>Все виджеты наследуют <code>CuiWidget</code>.</p>{% endlang %}
-                <table class="api-table">
-                    <tr><th>Method</th><th>Description</th></tr>
-                    <tr><td><code>setPosition(x, y)</code></td><td>Updates widget position</td></tr>
-                    <tr><td><code>setFocused(bool)</code></td><td>Updates focus state</td></tr>
-                    <tr><td><code>visible</code></td><td>Controls rendering</td></tr>
-                </table>
-
-                <hr style="border:0; border-top:1px solid var(--border); margin:40px 0;">
-
-                <h2 id="w-button">CuiButton</h2>
-                {% lang en %}<p>Resizable button with 3-slice rendering (Left, Center, Right). Supports hover and disabled states.</p>{% endlang %}
-                {% lang ru %}<p>Растягиваемая кнопка с 3-slice рендером. Поддерживает наведение и выключенное состояние.</p>{% endlang %}
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>this.addRenderableWidget(new CuiButton(x, y, 100, 20, Component.literal("Save"), btn -> {
-    System.out.println("Clicked");
-}));</pre>
-                </div>
-
-                <h2 id="w-input">CuiTextField</h2>
-                {% lang en %}<p>Replacement for vanilla EditBox. Supports custom background from Atlas and placeholder text.</p>{% endlang %}
-                {% lang ru %}<p>Замена ванильному EditBox. Поддерживает фон из Атласа и плейсхолдер.</p>{% endlang %}
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>CuiTextField input = new CuiTextField(font, x, y, 150, 20, Component.empty());
-input.setPlaceholder(Component.literal("Search..."));
-this.addRenderableWidget(input);</pre>
-                </div>
-
-                <h2 id="w-panel">CuiPanel</h2>
-                {% lang en %}<p>9-slice background panel for GUIs.</p>{% endlang %}
-                {% lang ru %}<p>9-slice панель для фона интерфейсов.</p>{% endlang %}
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>this.addRenderableWidget(new CuiPanel(x, y, 200, 100));</pre>
-                </div>
-
-                <h2 id="w-slot">CuiSlot</h2>
-                {% lang en %}<p>Visual item slot. Does not interact with Container Menu.</p>{% endlang %}
-                {% lang ru %}<p>Визуальный слот предмета. Не взаимодействует с контейнером.</p>{% endlang %}
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>CuiSlot slot = new CuiSlot(x, y);
-slot.setItem(new ItemStack(Items.DIAMOND));
-this.addRenderableWidget(slot);</pre>
-                </div>
-
-                <h2 id="w-arrow">CuiArrow</h2>
-                {% lang en %}<p>Progress arrow widget.</p>{% endlang %}
-                {% lang ru %}<p>Виджет стрелки прогресса.</p>{% endlang %}
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>CuiArrow arrow = new CuiArrow(x, y);
-arrow.setProgress(0.5f); // 0.0 to 1.0
-this.addRenderableWidget(arrow);</pre>
-                </div>
-            </section>
-
-            <section id="screens" class="doc-section">
-                {% lang en %}<h1>Screens</h1>{% endlang %}
-                {% lang ru %}<h1>Экраны</h1>{% endlang %}
-
-                <h3 id="s-base">Base Screen</h3>
-                {% lang en %}<p>For simple GUIs without inventory.</p>{% endlang %}
-                {% lang ru %}<p>Для простых интерфейсов без инвентаря.</p>{% endlang %}
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>public class MyScreen extends Screen {
-    @Override
-    protected void init() {
-        this.addRenderableWidget(new CuiPanel(x, y, w, h));
-    }
-}</pre>
-                </div>
-
-                <h3 id="s-cont">Container Screen</h3>
-                {% lang en %}<p>Extends <code>AbstractContainerScreen</code>. Auto-renders slots and highlights using <code>CuiRenderHelper</code>.</p>{% endlang %}
-                {% lang ru %}<p>Наследует <code>AbstractContainerScreen</code>. Автоматически рендерит слоты и подсветку через <code>CuiRenderHelper</code>.</p>{% endlang %}
-                <div class="code-container">
-                    <div class="code-head">Java <button class="copy-btn">Copy</button></div>
-                    <pre>public class MyGui extends CuiContainerScreen<MyMenu> {
-    public MyGui(MyMenu menu, Inventory inv, Component title) {
-        super(menu, inv, title);
-    }
-}</pre>
-                </div>
-            </section>
-        </main>
+            
+            </main>
     </div>
     <script src="/assets/js/main.js"></script>
 </body>
