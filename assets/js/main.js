@@ -1,231 +1,200 @@
-document.addEventListener('DOMContentLoaded', () => {
-    try { initTheme(); } catch(e) {}
-    try { initLanguage(); } catch(e) {}
-    try { initAuth(); } catch(e) {}
-    try { initSpoiler(); } catch(e) {}
-    
-    initSidebar();
-    if(document.getElementById('gradle-output')) initGradleGen();
-    initCopy();
-    initStats();
-    try { initScrollSpy(); } catch(e) {}
-    
-    const searchInput = document.getElementById('tool-search');
-    if(searchInput) {
-        searchInput.addEventListener('input', (e) => filterTools(e.target.value));
+// --- SUPABASE CONFIG ---
+// Убедись, что URL и KEY правильные (из твоего контекста)
+const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
+
+let supabase;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const { createClient } = window.supabase;
+        supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        await initAuth();
+        initComments();
+        initProfile(); // Если мы на странице профиля
+    } catch(e) {
+        console.error("Supabase init failed:", e);
     }
+    
+    initTheme();
+    initCopyButtons();
 });
 
-function initTheme() {
-    const themes = ['dark', 'light'];
-    const btn = document.getElementById('theme-toggle');
-    
-    let currentTheme = localStorage.getItem('theme') || 'dark';
-    if (!themes.includes(currentTheme)) currentTheme = 'dark';
-    
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    updateThemeIcon(btn, currentTheme);
+// --- AUTH SYSTEM ---
+let currentUser = null;
 
-    if(btn) {
-        btn.onclick = () => {
-            const currentIndex = themes.indexOf(currentTheme);
-            const nextIndex = (currentIndex + 1) % themes.length;
-            currentTheme = themes[nextIndex];
-            
-            document.documentElement.setAttribute('data-theme', currentTheme);
-            localStorage.setItem('theme', currentTheme);
-            updateThemeIcon(btn, currentTheme);
+async function initAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    updateUserUI(session?.user);
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+        updateUserUI(session?.user);
+    });
+
+    // Login Modal Triggers
+    const loginBtn = document.getElementById('login-btn');
+    if(loginBtn) {
+        loginBtn.onclick = (e) => {
+            e.preventDefault();
+            if(currentUser) {
+                // Если уже вошел - переходим в профиль
+                window.location.href = '/profile/'; 
+            } else {
+                openAuthModal();
+            }
         };
     }
 }
 
-function updateThemeIcon(btn, theme) {
-    if(!btn) return;
-    const icons = { 'dark': '🌙', 'light': '☀️' };
-    btn.textContent = icons[theme] || '🌙';
-}
-
-function initSpoiler() {
-    const modal = document.getElementById('spoiler-modal');
-    if (!modal) return;
-
-    if (localStorage.getItem('cso_spoilers_accepted') === 'true') {
-        modal.style.display = 'none';
-    } else {
-        modal.style.display = 'flex';
-    }
-    
-    window.acceptSpoilers = () => {
-        localStorage.setItem('cso_spoilers_accepted', 'true');
-        modal.style.opacity = '0';
-        setTimeout(() => modal.style.display = 'none', 300);
-    };
-}
-
-function initLanguage() {
-    const sel = document.getElementById('lang-select');
-    if(!sel) return;
-
-    // Устанавливаем значение селектора без авто-редиректа
-    const currentPath = window.location.pathname;
-    const isRu = currentPath.startsWith('/ru/');
-    sel.value = isRu ? 'ru' : 'en';
-
-    sel.addEventListener('change', (e) => {
-        const targetLang = e.target.value;
-        let newPath = currentPath;
-
-        if (targetLang === 'ru' && !isRu) {
-            // Переход на RU
-            newPath = '/ru' + currentPath;
-        } else if (targetLang === 'en' && isRu) {
-            // Переход на EN
-            newPath = currentPath.replace('/ru', '') || '/';
-        }
-
-        if (newPath !== currentPath) {
-            window.location.href = newPath;
-        }
-    });
-}
-
-function initAuth() {
+function updateUserUI(user) {
+    currentUser = user;
     const loginBtn = document.getElementById('login-btn');
-    if(!loginBtn || typeof supabase === 'undefined') return;
+    if(!loginBtn) return;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-        handleSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((event, session) => {
-        handleSession(session);
-    });
-
-    function handleSession(session) {
-        if(session) {
-            document.body.classList.add('premium-user');
-            loginBtn.innerHTML = `<img src="${session.user.user_metadata.avatar_url || 'https://github.com/identicons/user.png'}" style="width:20px;border-radius:50%">`;
-            loginBtn.title = "Log Out";
-            loginBtn.onclick = async () => {
-                if(confirm("Log out?")) {
-                    await supabase.auth.signOut();
-                    window.location.reload();
-                }
-            };
-        } else {
-            document.body.classList.remove('premium-user');
-            initAds();
-            loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> Log In`;
-            loginBtn.onclick = async () => {
-                await supabase.auth.signInWithOAuth({ provider: 'github' });
-            };
-        }
+    if (user) {
+        const avatar = user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
+        loginBtn.innerHTML = `<img src="${avatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:5px;"> ${user.user_metadata.full_name || user.email.split('@')[0]}`;
+        loginBtn.href = "/profile/";
+    } else {
+        loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> Log In`;
     }
 }
 
-function initAds() {
-    if(!document.getElementById('adsense-script')) {
-        const script = document.createElement('script');
-        script.id = 'adsense-script';
-        script.async = true;
-        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9900275648830301";
-        script.crossOrigin = "anonymous";
-        document.head.appendChild(script);
+// --- COMMENTS SYSTEM (CUSTOM) ---
+async function initComments() {
+    const container = document.getElementById('comments-container');
+    if (!container) return;
+
+    const pageSlug = window.location.pathname;
+
+    // Load Comments
+    const { data: comments, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('page_slug', pageSlug)
+        .order('created_at', { ascending: false });
+
+    if(error) console.error(error);
+    renderComments(comments || []);
+
+    // Post Comment Logic
+    const sendBtn = document.getElementById('send-comment');
+    if(sendBtn) {
+        sendBtn.onclick = async () => {
+            const input = document.getElementById('comment-input');
+            const content = input.value.trim();
+            if(!content) return;
+
+            const guestNameInput = document.getElementById('guest-name');
+            let authorName = "Guest";
+            let authorAvatar = null;
+            let userId = null;
+            let isGuest = true;
+
+            if(currentUser) {
+                authorName = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
+                authorAvatar = currentUser.user_metadata.avatar_url;
+                userId = currentUser.id;
+                isGuest = false;
+            } else if (guestNameInput) {
+                authorName = guestNameInput.value.trim() || "Guest";
+            }
+
+            const { error: postError } = await supabase.from('comments').insert({
+                page_slug: pageSlug,
+                content: content,
+                author_name: authorName,
+                author_avatar: authorAvatar,
+                user_id: userId,
+                is_guest: isGuest
+            });
+
+            if(!postError) {
+                input.value = '';
+                // Reload comments (simple way)
+                initComments();
+            } else {
+                alert("Error posting comment. Check console.");
+                console.error(postError);
+            }
+        };
     }
 }
 
-function filterTools(query) {
-    const cards = document.querySelectorAll('.card-grid .card');
-    const q = query.toLowerCase();
-    cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        if(text.includes(q)) card.classList.remove('hidden');
-        else card.classList.add('hidden');
-    });
-}
-
-function initSidebar() {
-    const btn = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.wiki-sidebar');
-    if(btn && sidebar) {
-        btn.addEventListener('click', () => sidebar.classList.toggle('open'));
-    }
-}
-
-function initScrollSpy() {
-    const sections = document.querySelectorAll('.doc-section');
-    const navLinks = document.querySelectorAll('.wiki-sidebar .nav-link');
-    if(sections.length === 0) return;
+function renderComments(comments) {
+    const list = document.getElementById('comments-list');
+    if(!list) return;
     
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const id = entry.target.getAttribute('id');
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${id}`) link.classList.add('active');
-                });
-            }
-        });
-    }, { rootMargin: '-10% 0px -80% 0px' });
-    sections.forEach(section => observer.observe(section));
+    if(comments.length === 0) {
+        list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;">No comments yet. Be the first!</div>`;
+        return;
+    }
+
+    list.innerHTML = comments.map(c => `
+        <div class="comment-box">
+            <div class="comment-header">
+                <img src="${c.author_avatar || 'https://www.gravatar.com/avatar/?d=mp'}" class="comment-avatar">
+                <span class="comment-author">${escapeHtml(c.author_name)}</span>
+                ${c.is_guest ? '<span class="guest-tag">Guest</span>' : ''}
+                <span class="comment-date" style="margin-left:auto;">${new Date(c.created_at).toLocaleDateString()}</span>
+            </div>
+            <div class="comment-body">${escapeHtml(c.content)}</div>
+        </div>
+    `).join('');
 }
 
-function initCopy() {
-    document.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const container = btn.closest('.code-container');
-            if(!container) return;
-            const code = container.querySelector('pre').textContent;
-            navigator.clipboard.writeText(code);
-            const oldText = btn.textContent;
-            btn.textContent = "✓";
-            setTimeout(() => btn.textContent = oldText, 2000);
-        });
+// --- UTILS ---
+function initTheme() {
+    const themes = ['dark', 'light'];
+    const btn = document.getElementById('theme-toggle');
+    let current = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', current);
+    
+    if(btn) {
+        btn.textContent = current === 'dark' ? '🌙' : '☀️';
+        btn.onclick = () => {
+            current = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', current);
+            localStorage.setItem('theme', current);
+            btn.textContent = current === 'dark' ? '🌙' : '☀️';
+        };
+    }
+}
+
+function initCopyButtons() {
+    // Finds any input/textarea inside a .result-group and adds a copy button if missing
+    document.querySelectorAll('.result-group').forEach(group => {
+        if(group.querySelector('.copy-icon-btn')) return;
+        
+        const target = group.querySelector('input, textarea');
+        if(!target) return;
+
+        const btn = document.createElement('button');
+        btn.className = 'copy-icon-btn';
+        btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+        btn.onclick = () => {
+            navigator.clipboard.writeText(target.value || target.textContent);
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1500);
+        };
+        group.appendChild(btn);
     });
 }
 
-function initStats() {
-    const projects = [
-        { id: 1303344, type: 'structures' }, 
-        { id: 1415948, type: 'cubeui' }
-    ];
-    projects.forEach(p => fetchStats(p.id, p.type));
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-function fetchStats(id, type) {
-    if(!id) return;
-    fetch(`https://api.cfwidget.com/${id}`)
-        .then(r => r.json())
-        .then(data => {
-            const card = document.querySelector(`[data-project="${type}"]`);
-            if(!card) return;
-            const dlEl = card.querySelector('.cf-downloads');
-            if(dlEl && data.downloads) dlEl.textContent = formatNumber(data.downloads.total);
-            const verEl = card.querySelector('.cf-version');
-            if(verEl && data.files && data.files.length > 0) {
-                const latestFile = data.files[0].name;
-                const match = latestFile.match(/(\d+\.\d+\.\d+)/);
-                if(match) verEl.textContent = match[1];
-                else verEl.textContent = "Latest";
-            }
-        })
-        .catch(e => console.error('CF Error:', e));
-}
-
-function formatNumber(num) {
-    return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 }).format(num);
-}
-
-function initGradleGen() {
-    const loader = document.getElementById('loader-select');
-    const ver = document.getElementById('mc-version');
-    const out = document.getElementById('gradle-output');
-    if(!loader || !ver) return;
-    function update() {
-        out.textContent = `dependencies {\n    implementation fg.deobf("curse.maven:cubeui-1415948:YOUR_FILE_ID")\n}`;
-    }
-    loader.addEventListener('change', update);
-    ver.addEventListener('change', update);
-    update();
-}
+// Auth Modal UI
+window.openAuthModal = () => {
+    const modal = document.getElementById('auth-modal');
+    if(modal) modal.style.display = 'flex';
+};
+window.closeAuthModal = () => {
+    const modal = document.getElementById('auth-modal');
+    if(modal) modal.style.display = 'none';
+};
+window.loginWith = async (provider) => {
+    await supabase.auth.signInWithOAuth({ provider: provider });
+};
