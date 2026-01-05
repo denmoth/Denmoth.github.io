@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ site.active_lang }}">
 <head>
     {% include head.html %}
     <style>
@@ -17,13 +17,14 @@
         .wiki-inner { max-width: 900px; margin: 0 auto; }
 
         .search-box-wiki { position: relative; margin-bottom: 20px; }
-        .search-box-wiki input { width: 100%; padding: 8px 35px 8px 12px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-size: 0.9rem; }
-        .search-box-wiki i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); opacity: 0.7; }
+        .search-box-wiki input { width: 100%; padding: 10px 40px 10px 15px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 0.95rem; transition: 0.2s; }
+        .search-box-wiki input:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88,166,255,0.1); }
+        .search-box-wiki i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); opacity: 0.7; }
 
         /* Version Switcher */
         .version-box { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
         .version-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px; }
-        .version-select { width: 100%; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border); padding: 6px; border-radius: 6px; cursor: pointer; }
+        .version-select { width: 100%; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; }
 
         .nav-group { margin-bottom: 25px; }
         .nav-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; padding-left: 8px; letter-spacing: 0.5px; opacity: 0.8; }
@@ -58,7 +59,7 @@
         }
     </style>
 </head>
-<body class="lang-en">
+<body class="lang-{{ site.active_lang }}">
     {% include header.html %}
 
     <div id="spoiler-modal" class="spoiler-overlay">
@@ -80,15 +81,16 @@
     <div class="wiki-wrapper">
         <aside class="wiki-sidebar">
             <div class="search-box-wiki">
-                <input type="text" id="wiki-search" placeholder="Search docs..." onkeyup="filterMenu()">
+                <input type="text" id="wiki-search" placeholder="Filter..." onkeyup="filterMenu()">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             
             <div class="version-box">
-                <div class="version-label"><span class="lang-en">Game Version</span><span class="lang-ru">Версия Игры</span></div>
+                <div class="version-label"><span class="lang-en">Mod Version</span><span class="lang-ru">Версия Мода</span></div>
                 <select class="version-select">
-                    <option value="1.20.1">Minecraft 1.20.1 (Current)</option>
-                    <option value="1.19.2">Minecraft 1.19.2 (Legacy)</option>
+                    <option value="1.4.0">v1.4.0 (1.20.1)</option>
+                    <option value="1.3.0">v1.3.0 (1.19.2)</option>
+                    <option value="legacy">Legacy Versions</option>
                 </select>
             </div>
 
