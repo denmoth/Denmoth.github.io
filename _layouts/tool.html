@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ site.active_lang }}">
 <head>
     {% include head.html %}
 </head>
-<body class="lang-en tool-body">
+<body class="lang-{{ site.active_lang }} tool-body">
     {% include header.html %}
 
     <div class="tool-wrapper" id="tool-wrapper">
@@ -21,40 +21,22 @@
                 </div>
             </div>
             
-            <div class="fullscreen-ad-banner" style="display:none; width:100%; max-width:900px; height:90px; background:var(--bg-panel); border:1px solid var(--border); margin-bottom:15px; align-items:center; justify-content:center; border-radius:8px; color:var(--text-muted); font-size:0.8rem;">
-                Fullscreen Ad Banner
+            <div class="fullscreen-ad-banner" style="display:none; width:100%; height:90px; background:var(--bg-panel); border:1px solid var(--border); margin-bottom:20px; align-items:center; justify-content:center; border-radius:8px; color:var(--text-muted);">
+                Advertisement (Fullscreen Only)
             </div>
 
             <div class="tool-card" id="tool-card-container">
                 {{ content }}
             </div>
 
-            <div class="giscus-container" style="width:100%; max-width:900px; margin-top:40px;">
-                <script src="https://giscus.app/client.js"
-                        data-repo="denmoth/Denmoth.github.io"
-                        data-repo-id="R_kgDOQv18wg"
-                        data-category="Ideas"
-                        data-category-id="DIC_kwDOQv18ws4C0XuK"
-                        data-mapping="pathname"
-                        data-strict="0"
-                        data-reactions-enabled="1"
-                        data-emit-metadata="0"
-                        data-input-position="bottom"
-                        data-theme="preferred_color_scheme"
-                        data-lang="en"
-                        crossorigin="anonymous"
-                        async>
-                </script>
+            <div class="giscus-container" style="width:100%; margin-top:40px;">
+                <div style="text-align:center; color:var(--text-muted);">Comments Section</div>
             </div>
 
             <footer class="footer" style="margin-top:40px; width:100%; border:none; background:transparent;">
                 <div class="socials">
                     <a href="https://github.com/Denmoth"><i class="fa-brands fa-github"></i></a>
                     <a href="https://discord.gg/BCXqNfPnSh"><i class="fa-brands fa-discord"></i></a>
-                </div>
-                <div style="font-size:0.8rem; margin-top:10px;">
-                    <a href="/privacy/" style="color:var(--text-muted); margin:0 10px;">Privacy Policy</a>
-                    <a href="/terms/" style="color:var(--text-muted); margin:0 10px;">Terms of Use</a>
                 </div>
                 <div style="margin-top:10px;">© 2026 Denmoth</div>
             </footer>
@@ -76,8 +58,17 @@
                 wrapper.classList.toggle('maximized');
                 const icon = fsBtn.querySelector('i');
                 const isMax = wrapper.classList.contains('maximized');
-                icon.classList.replace(isMax ? 'fa-expand' : 'fa-compress', isMax ? 'fa-compress' : 'fa-expand');
-                if(fsAd) fsAd.style.display = isMax ? 'flex' : 'none';
+                
+                // Toggle Icon
+                if (isMax) {
+                    icon.classList.remove('fa-expand');
+                    icon.classList.add('fa-compress');
+                    if(fsAd) fsAd.style.display = 'flex';
+                } else {
+                    icon.classList.remove('fa-compress');
+                    icon.classList.add('fa-expand');
+                    if(fsAd) fsAd.style.display = 'none';
+                }
             });
         }
     </script>
