@@ -8,8 +8,8 @@ permalink: /
     <div class="hero">
         <img src="/assets/img/logo.png" style="width:80px; height:80px; border-radius:12px; margin-bottom:20px;" alt="Logo">
         <h1>Denmoth</h1>
-        <p class="lang-en">Minecraft Mods, Libraries & Developer Tools</p>
-        <p class="lang-ru">Моды, библиотеки и инструменты для Minecraft</p>
+        {% lang en %}<p>Minecraft Mods, Libraries & Developer Tools</p>{% endlang %}
+        {% lang ru %}<p>Моды, библиотеки и инструменты для Minecraft</p>{% endlang %}
     </div>
 
     <div class="card-grid">
@@ -18,8 +18,8 @@ permalink: /
                 <h3>Create: Structures Overhaul</h3>
                 <span class="badge cf-version">---</span> 
             </div>
-            <p class="lang-en cf-summary">Enhancing world generation with handcrafted aesthetic structures for Create mod.</p>
-            <p class="lang-ru">Масштабное улучшение генерации мира с проработанными структурами для Create mod.</p>
+            {% lang en %}<p class="cf-summary">Enhancing world generation with handcrafted aesthetic structures for Create mod.</p>{% endlang %}
+            {% lang ru %}<p>Масштабное улучшение генерации мира с проработанными структурами для Create mod.</p>{% endlang %}
             <div class="stat-row">
                 <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
             </div>
@@ -35,13 +35,14 @@ permalink: /
                 <h3>CubeUI</h3>
                 <span class="badge cf-version">---</span> 
             </div>
-            <p class="lang-en cf-summary">Modular UI library for Minecraft. 9-slice rendering and custom widgets.</p>
-            <p class="lang-ru">Модульная UI библиотека. 9-slice рендеринг и кастомные виджеты для ваших модов.</p>
+            {% lang en %}<p class="cf-summary">Modular UI library for Minecraft. 9-slice rendering and custom widgets.</p>{% endlang %}
+            {% lang ru %}<p>Модульная UI библиотека. 9-slice рендеринг и кастомные виджеты для ваших модов.</p>{% endlang %}
             <div class="stat-row">
                 <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
             </div>
             <div class="btn-group">
-                <a href="/cubeui/" class="btn primary"><span class="lang-en">Docs</span><span class="lang-ru">Доки</span></a>
+                {% lang en %}<a href="/cubeui/" class="btn primary">Docs</a>{% endlang %}
+                {% lang ru %}<a href="/cubeui/" class="btn primary">Доки</a>{% endlang %}
                 <a href="https://www.curseforge.com/minecraft/mc-mods/cubeui" class="btn">CurseForge</a>
                 <a href="https://modrinth.com/mod/cubeui" class="btn">Modrinth</a>
             </div>
@@ -52,10 +53,12 @@ permalink: /
                 <h3>Uncanny</h3>
                 <span class="badge">WIP</span>
             </div>
-            <p class="lang-en">Atmospheric horror expansion designed to unsettle and terrify.</p>
-            <p class="lang-ru">Атмосферный хоррор мод, созданный для полного погружения в ужас.</p>
+            {% lang en %}<p>Atmospheric horror expansion designed to unsettle and terrify.</p>{% endlang %}
+            {% lang ru %}<p>Атмосферный хоррор мод, созданный для полного погружения в ужас.</p>{% endlang %}
             <div style="margin-top:auto; color:var(--text-muted); font-size:0.9rem;">
-                <i class="fa-solid fa-clock"></i> <span class="lang-en">In Development</span><span class="lang-ru">В разработке</span>
+                <i class="fa-solid fa-clock"></i> 
+                {% lang en %}<span>In Development</span>{% endlang %}
+                {% lang ru %}<span>В разработке</span>{% endlang %}
             </div>
         </div>
     </div>
