@@ -2,11 +2,11 @@
     <div class="header-inner">
         <div class="brand">
             <a href="/" style="color:var(--text-main); display:flex; gap:10px; align-items:center; text-decoration:none;">
-                <img src="/assets/img/logo.png" alt="Denmoth" style="width:24px; height:24px; border-radius:4px;"> Denmoth
+                <img src="/assets/img/logo.png" alt="Denmoth" style="width:28px; height:28px; border-radius:6px;"> Denmoth
             </a>
         </div>
         <div class="controls">
-            <a href="/articles/" class="nav-btn-link" title="Knowledge Base">
+            <a href="/articles/" class="nav-btn-link">
                 <i class="fa-solid fa-file-lines"></i>
                 {% lang en %}<span>Articles</span>{% endlang %}
                 {% lang ru %}<span>Статьи</span>{% endlang %}
@@ -15,21 +15,21 @@
             <div class="divider-v"></div>
 
             <div class="dropdown">
-                <div class="nav-btn-link dropdown-btn">
+                <a href="/tools/" class="dropdown-trigger" style="text-decoration:none;">
                     <i class="fa-solid fa-toolbox"></i> 
                     {% lang en %}<span>Tools</span>{% endlang %}
                     {% lang ru %}<span>Тулзы</span>{% endlang %}
-                    <i class="fa-solid fa-chevron-down" style="font-size:0.7em; margin-left:6px; opacity:0.7;"></i>
-                </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:0.7em; margin-left:4px; opacity:0.6;"></i>
+                </a>
                 <div class="dropdown-content">
                     <a href="/tools/uuid/">UUID Generator</a>
-                    <a href="/tools/json-text/">JSON Text Builder</a>
+                    <a href="/tools/json-text/">JSON Text</a>
                     <a href="/tools/gradient/">RGB Gradient</a>
                     <a href="/tools/color/">Color Converter</a>
-                    <a href="/tools/loot-table/">Loot Table Gen</a>
-                    <a href="/tools/recipe/">Recipe Generator</a>
-                    <a href="/tools/pack-mcmeta/">Pack.mcmeta</a>
-                    <a href="/tools/stack/">Stack Calculator</a>
+                    <a href="/tools/loot-table/">Loot Table</a>
+                    <a href="/tools/recipe/">Recipe Gen</a>
+                    <a href="/tools/pack-mcmeta/">pack.mcmeta</a>
+                    <a href="/tools/stack/">Stack Calc</a>
                 </div>
             </div>
 
@@ -40,10 +40,7 @@
                 <option value="ru" {% if site.active_lang == "ru" %}selected{% endif %}>RU</option>
             </select>
             <button id="theme-toggle">🌙</button>
-            <button id="login-btn" class="btn-login"><i class="fa-brands fa-github"></i> 
-                {% lang en %}<span>Log In</span>{% endlang %}
-                {% lang ru %}<span>Войти</span>{% endlang %}
-            </button>
+            <button id="login-btn" class="btn-login"><i class="fa-brands fa-github"></i></button>
         </div>
     </div>
 </header>
