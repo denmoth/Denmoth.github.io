@@ -1,55 +1,47 @@
 // --- SUPABASE CONFIG ---
-// Конфигурация и инициализация клиента теперь происходит в head.html
-// Мы используем уже готовый глобальный объект window.supabase
-
-let supabase;
+// Мы не объявляем переменную supabase через let/const, чтобы избежать конфликтов.
+// Используем глобальный объект window.supabase, который инициализируется в head.html.
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Проверяем, инициализирован ли клиент в head.html
+        // Проверяем наличие клиента
         if (window.supabase && typeof window.supabase.auth !== 'undefined') {
-            supabase = window.supabase;
-        } else {
-            console.error("Supabase client not initialized in head.html");
-        }
-        
-        if (supabase) {
             await initAuth();
             initComments();
-            // Безопасный вызов initProfile, если функция существует
             if (typeof initProfile === 'function') {
                 initProfile(); 
             }
+        } else {
+            console.warn("Supabase client not found in window.supabase");
         }
     } catch(e) {
         console.error("Supabase logic error:", e);
     }
     
+    // Инициализация темы и кнопок запускается в любом случае
     initTheme();
     initCopyButtons();
 });
 
 // --- AUTH SYSTEM ---
-let currentUser = null;
+// Используем var, так как он безопасен при повторном объявлении (в отличие от let/const)
+var currentUser = null;
 
 async function initAuth() {
-    // Используем глобальную переменную supabase
-    if (!supabase) return;
+    if (!window.supabase) return;
     
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await window.supabase.auth.getSession();
     updateUserUI(session?.user);
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    window.supabase.auth.onAuthStateChange((_event, session) => {
         updateUserUI(session?.user);
     });
 
-    // Login Modal Triggers
     const loginBtn = document.getElementById('login-btn');
     if(loginBtn) {
         loginBtn.onclick = (e) => {
             e.preventDefault();
             if(currentUser) {
-                // Если уже вошел - переходим в профиль
                 window.location.href = '/profile/'; 
             } else {
                 openAuthModal();
@@ -74,15 +66,14 @@ function updateUserUI(user) {
 
 // --- COMMENTS SYSTEM (CUSTOM) ---
 async function initComments() {
-    if (!supabase) return;
+    if (!window.supabase) return;
 
     const container = document.getElementById('comments-container');
     if (!container) return;
 
     const pageSlug = window.location.pathname;
 
-    // Load Comments
-    const { data: comments, error } = await supabase
+    const { data: comments, error } = await window.supabase
         .from('comments')
         .select('*')
         .eq('page_slug', pageSlug)
@@ -91,7 +82,6 @@ async function initComments() {
     if(error) console.error(error);
     renderComments(comments || []);
 
-    // Post Comment Logic
     const sendBtn = document.getElementById('send-comment');
     if(sendBtn) {
         sendBtn.onclick = async () => {
@@ -114,7 +104,7 @@ async function initComments() {
                 authorName = guestNameInput.value.trim() || "Guest";
             }
 
-            const { error: postError } = await supabase.from('comments').insert({
+            const { error: postError } = await window.supabase.from('comments').insert({
                 page_slug: pageSlug,
                 content: content,
                 author_name: authorName,
@@ -125,7 +115,6 @@ async function initComments() {
 
             if(!postError) {
                 input.value = '';
-                // Reload comments (simple way)
                 initComments();
             } else {
                 alert("Error posting comment. Check console.");
@@ -159,7 +148,6 @@ function renderComments(comments) {
 
 // --- UTILS ---
 function initTheme() {
-    const themes = ['dark', 'light'];
     const btn = document.getElementById('theme-toggle');
     let current = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', current);
@@ -176,7 +164,6 @@ function initTheme() {
 }
 
 function initCopyButtons() {
-    // Finds any input/textarea inside a .result-group and adds a copy button if missing
     document.querySelectorAll('.result-group').forEach(group => {
         if(group.querySelector('.copy-icon-btn')) return;
         
@@ -199,7 +186,6 @@ function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-// Auth Modal UI
 window.openAuthModal = () => {
     const modal = document.getElementById('auth-modal');
     if(modal) modal.style.display = 'flex';
@@ -209,9 +195,7 @@ window.closeAuthModal = () => {
     if(modal) modal.style.display = 'none';
 };
 window.loginWith = async (provider) => {
-    if(supabase) {
-        await supabase.auth.signInWithOAuth({ provider: provider });
-    } else {
-        console.error("Supabase not initialized");
+    if(window.supabase) {
+        await window.supabase.auth.signInWithOAuth({ provider: provider });
     }
 };
