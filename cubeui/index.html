@@ -4,108 +4,37 @@ title: CubeUI Documentation
 permalink: /cubeui/
 ---
 
-<p class="lead">
-    {% lang en %}Modular UI library for Minecraft. 9-slice rendering, custom widgets, and full control over your interface.{% endlang %}
-    {% lang ru %}Модульная UI библиотека для Minecraft. 9-slice рендеринг, кастомные виджеты и полный контроль над интерфейсом.{% endlang %}
-</p>
-
-<div class="callout info">
-    <span class="callout-title">Compatibility</span>
-    {% lang en %}CubeUI supports Minecraft 1.16.5 - 1.21.4 (Forge, Fabric, NeoForge).{% endlang %}
-    {% lang ru %}CubeUI поддерживает Minecraft 1.16.5 - 1.21.4 (Forge, Fabric, NeoForge).{% endlang %}
-</div>
-
-<hr style="border:0; border-top:1px solid var(--border); margin: 30px 0;">
-
 <div id="cubeui-docs">
-
-    <section id="install">
-        {% lang en %}<h2>Installation</h2>{% endlang %}
-        {% lang ru %}<h2>Установка</h2>{% endlang %}
+    <section id="install" class="doc-section">
+        {% lang en %}<h1>Installation</h1>{% endlang %}
+        {% lang ru %}<h1>Установка</h1>{% endlang %}
         
-        <p>
-            {% lang en %}Add the dependency to your <code>build.gradle</code>. The version is fetched automatically below.{% endlang %}
-            {% lang ru %}Добавьте зависимость в ваш <code>build.gradle</code>. Версия определяется автоматически ниже.{% endlang %}
-        </p>
-
-        <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:8px; margin-bottom:24px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <label style="font-weight:600; color:var(--text-muted);">Select Loader:</label>
-                <select id="loader-select" class="form-select" style="width:160px;" onchange="fetchLatestVersion()">
+        {% lang en %}<p>Latest version is detected automatically from CurseForge.</p>{% endlang %}
+        {% lang ru %}<p>Последняя версия определяется автоматически с CurseForge.</p>{% endlang %}
+        
+        <div style="background:var(--bg-panel); padding:20px; border:1px solid var(--border); border-radius:6px; margin-bottom:30px;">
+            <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+                <select id="loader-select" class="form-select" style="width:150px;" onchange="fetchLatestVersion()">
                     <option value="Forge">Forge</option>
                     <option value="Fabric">Fabric</option>
                     <option value="NeoForge">NeoForge</option>
                 </select>
-            </div>
-            
-            <div class="code-container result-group" style="margin:0;">
-                <div class="code-head">
-                    <span>build.gradle</span>
-                    <div id="version-status" style="font-size:0.8rem; font-weight:normal;">Checking...</div>
+                <div id="version-status" style="display:flex; align-items:center; font-size:0.9rem; color:var(--text-muted);">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="margin-right:8px;"></i> Checking API...
                 </div>
-                <pre id="gradle-output" style="color:#a5d6ff;">// Waiting for API...</pre>
+            </div>
+            <div class="code-container result-group" style="margin:0;">
+                <div class="code-head">build.gradle</div>
+                <pre id="gradle-output">// Waiting for API...</pre>
             </div>
         </div>
-
-        <div class="callout warning">
-            <span class="callout-title">Important</span>
-            {% lang en %}Do not shade CubeUI! Use <code>implementation</code> (Forge) or <code>modImplementation</code> (Fabric).{% endlang %}
-            {% lang ru %}Не вшивайте (shade) CubeUI! Используйте <code>implementation</code> (Forge) или <code>modImplementation</code> (Fabric).{% endlang %}
-        </div>
     </section>
 
-    <section id="usage">
-        {% lang en %}<h2>Basic Usage</h2>{% endlang %}
-        {% lang ru %}<h2>Использование</h2>{% endlang %}
-
-        <p>
-            {% lang en %}To create a simple UI, extend the <code>CubeScreen</code> class.{% endlang %}
-            {% lang ru %}Чтобы создать простой интерфейс, унаследуйте класс <code>CubeScreen</code>.{% endlang %}
-        </p>
-
-        <div class="code-container">
-            <div class="code-head">MyScreen.java</div>
-            <pre><code class="language-java">public class MyScreen extends CubeScreen {
-    @Override
-    protected void init() {
-        super.init();
-        
-        // x, y, width, height, label
-        CButton btn = new CButton(10, 10, 100, 20, "Click Me");
-        btn.setOnClick(() -> {
-            System.out.println("Hello World!");
-        });
-        
-        this.add(btn);
-    }
-}</code></pre>
-        </div>
+    <section id="theme" class="doc-section">
+        {% lang en %}<h1>Theming</h1>{% endlang %}
+        {% lang ru %}<h1>Темизация</h1>{% endlang %}
+        <p>CubeUI uses <code>ThemeManager</code>. Default theme: <strong>Perfectly Vanilla</strong>.</p>
     </section>
-
-    <section id="theming">
-        {% lang en %}<h2>Theming</h2>{% endlang %}
-        {% lang ru %}<h2>Темизация</h2>{% endlang %}
-
-        <p>
-            {% lang en %}CubeUI uses a global <code>ThemeManager</code> to handle textures and colors.{% endlang %}
-            {% lang ru %}CubeUI использует глобальный <code>ThemeManager</code> для управления текстурами и цветами.{% endlang %}
-        </p>
-
-        {% lang en %}<h3>Default Theme</h3>{% endlang %}
-        {% lang ru %}<h3>Стандартная Тема</h3>{% endlang %}
-        <p>
-            {% lang en %}By default, the library uses <strong>Perfectly Vanilla</strong> theme which mimics vanilla UI.{% endlang %}
-            {% lang ru %}По умолчанию используется тема <strong>Perfectly Vanilla</strong>, имитирующая ванильный интерфейс.{% endlang %}
-        </p>
-
-        {% lang en %}<h3>Custom Textures</h3>{% endlang %}
-        {% lang ru %}<h3>Свои Текстуры</h3>{% endlang %}
-        <p>
-            {% lang en %}You can register custom sprite sheets via <code>TextureRegistry</code>.{% endlang %}
-            {% lang ru %}Вы можете регистрировать свои спрайт-листы через <code>TextureRegistry</code>.{% endlang %}
-        </p>
-    </section>
-
 </div>
 
 <script>
@@ -119,6 +48,7 @@ permalink: /cubeui/
 
         if(cachedFiles.length === 0) {
             try {
+                // Используем прокси, так как напрямую CurseForge API блочит CORS
                 const req = await fetch(`https://api.cfwidget.com/${PROJECT_ID}`);
                 const data = await req.json();
                 cachedFiles = data.files;
@@ -128,18 +58,20 @@ permalink: /cubeui/
             }
         }
 
+        // Умный поиск: ищем файл, у которого в версиях есть название лоадера
         const file = cachedFiles.find(f => f.versions.some(v => v.toLowerCase().includes(loader.toLowerCase())));
         
         if(file) {
             status.innerHTML = `<span style="color:#238636"><i class="fa-solid fa-check"></i> Found: ${file.display_name}</span>`;
+            
             if(loader === 'Forge' || loader === 'NeoForge') {
                 out.textContent = `dependencies {\n    implementation fg.deobf("curse.maven:cubeui-${PROJECT_ID}:${file.id}")\n}`;
             } else {
                 out.textContent = `dependencies {\n    modImplementation "curse.maven:cubeui-${PROJECT_ID}:${file.id}"\n}`;
             }
         } else {
-            status.innerHTML = `<span style="color:#d9a51d">Not found</span>`;
-            out.textContent = `// No specific file found for ${loader}`;
+            status.innerHTML = `<span style="color:#d9a51d">No file found for ${loader}</span>`;
+            out.textContent = `// No specific file found for ${loader} in recent uploads`;
         }
     }
     document.addEventListener('DOMContentLoaded', fetchLatestVersion);
