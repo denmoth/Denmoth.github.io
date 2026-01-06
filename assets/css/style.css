@@ -257,3 +257,239 @@ pre { padding: 15px; overflow-x: auto; margin: 0; }
     .tool-wrapper { padding: 0 10px; }
     .article-h1 { font-size: 2rem; }
 }
+
+
+/* ========================================= */
+/* WIKI EXPO STYLE              */
+/* ========================================= */
+
+/* Основная сетка: 3 колонки (Сайдбар | Контент | Оглавление) */
+.wiki-wrapper {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr) 240px;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    position: relative;
+    gap: 40px;
+    align-items: start; /* Важно, чтобы сайдбары не растягивались на всю высоту страницы */
+}
+
+/* Левый сайдбар */
+.wiki-sidebar {
+    position: sticky;
+    top: 64px; /* Высота хедера */
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    padding: 25px 0 25px 20px;
+    border-right: 1px solid var(--border);
+    scrollbar-width: thin;
+}
+
+/* Навигация в левом сайдбаре */
+.nav-group { margin-bottom: 30px; }
+.nav-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-main);
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    letter-spacing: 0.5px;
+}
+.nav-link {
+    display: block;
+    padding: 8px 10px;
+    color: var(--text-muted);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    margin-bottom: 2px;
+    transition: 0.15s;
+}
+.nav-link:hover {
+    color: var(--text-main);
+    background: var(--bg-panel);
+    text-decoration: none;
+}
+.nav-link.active {
+    background: rgba(56, 139, 253, 0.1); 
+    color: #58a6ff; 
+    font-weight: 500;
+}
+
+/* Центральная часть (Контент) */
+.wiki-content {
+    padding: 40px 0;
+    min-width: 0; /* Фикс для Grid, чтобы код-блоки не ломали ширину */
+}
+
+.wiki-article-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.wiki-inner {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-main);
+}
+
+.wiki-inner h2 {
+    margin-top: 2em;
+    margin-bottom: 1em;
+    font-size: 1.75rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+}
+
+.wiki-inner h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.wiki-inner p {
+    margin-bottom: 1.5em;
+}
+
+/* Код внутри текста */
+.wiki-inner code {
+    background: rgba(110, 118, 129, 0.2);
+    padding: 0.2em 0.4em;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-family: var(--font-mono);
+}
+
+.wiki-footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Правый сайдбар (Оглавление) */
+.wiki-toc {
+    display: block;
+    padding: 40px 20px 40px 0;
+}
+
+.toc-sticky {
+    position: sticky;
+    top: 100px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.toc-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+#toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-left: 1px solid var(--border);
+}
+
+#toc-list li { margin: 0; }
+
+#toc-list a {
+    display: block;
+    padding: 6px 0 6px 20px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+    transition: 0.2s;
+    line-height: 1.4;
+}
+
+#toc-list a:hover {
+    color: var(--text-main);
+    border-left-color: var(--text-muted);
+}
+
+#toc-list a.active {
+    color: #58a6ff;
+    border-left-color: #58a6ff;
+    font-weight: 500;
+}
+
+/* Вложенность для H3 в оглавлении */
+#toc-list li.h3 a {
+    padding-left: 35px;
+    font-size: 0.8rem;
+}
+
+/* Callouts / Admonitions (Expo style) */
+.callout {
+    padding: 20px;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    background: var(--bg-panel);
+    font-size: 0.95rem;
+}
+
+.callout.info {
+    border-color: #58a6ff;
+    background: rgba(56, 139, 253, 0.1);
+}
+
+.callout.warning {
+    border-color: #d29922;
+    background: rgba(210, 153, 34, 0.1);
+}
+
+.callout-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Адаптивность */
+@media (max-width: 1250px) {
+    /* Скрываем правое оглавление на средних экранах */
+    .wiki-wrapper {
+        grid-template-columns: 260px 1fr;
+        padding-right: 20px;
+    }
+    .wiki-toc { display: none; }
+}
+
+@media (max-width: 900px) {
+    /* Мобильный вид: одна колонка */
+    .wiki-wrapper {
+        display: block;
+    }
+    .wiki-sidebar {
+        display: none;
+        position: fixed;
+        left: 0; top: 64px;
+        background: var(--bg-body);
+        width: 80%;
+        max-width: 300px;
+        z-index: 2000;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        border-right: 1px solid var(--border);
+    }
+    .wiki-sidebar.open { display: block; }
+    .wiki-content { padding: 30px 20px; }
+}
