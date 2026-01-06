@@ -1,20 +1,28 @@
 // --- SUPABASE CONFIG ---
-// Убедись, что URL и KEY правильные (из твоего контекста)
-const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
+// Конфигурация и инициализация клиента теперь происходит в head.html
+// Мы используем уже готовый глобальный объект window.supabase
 
 let supabase;
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const { createClient } = window.supabase;
-        supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Проверяем, инициализирован ли клиент в head.html
+        if (window.supabase && typeof window.supabase.auth !== 'undefined') {
+            supabase = window.supabase;
+        } else {
+            console.error("Supabase client not initialized in head.html");
+        }
         
-        await initAuth();
-        initComments();
-        initProfile(); // Если мы на странице профиля
+        if (supabase) {
+            await initAuth();
+            initComments();
+            // Безопасный вызов initProfile, если функция существует
+            if (typeof initProfile === 'function') {
+                initProfile(); 
+            }
+        }
     } catch(e) {
-        console.error("Supabase init failed:", e);
+        console.error("Supabase logic error:", e);
     }
     
     initTheme();
@@ -25,6 +33,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 let currentUser = null;
 
 async function initAuth() {
+    // Используем глобальную переменную supabase
+    if (!supabase) return;
+    
     const { data: { session } } = await supabase.auth.getSession();
     updateUserUI(session?.user);
 
@@ -63,6 +74,8 @@ function updateUserUI(user) {
 
 // --- COMMENTS SYSTEM (CUSTOM) ---
 async function initComments() {
+    if (!supabase) return;
+
     const container = document.getElementById('comments-container');
     if (!container) return;
 
@@ -196,5 +209,9 @@ window.closeAuthModal = () => {
     if(modal) modal.style.display = 'none';
 };
 window.loginWith = async (provider) => {
-    await supabase.auth.signInWithOAuth({ provider: provider });
+    if(supabase) {
+        await supabase.auth.signInWithOAuth({ provider: provider });
+    } else {
+        console.error("Supabase not initialized");
+    }
 };
