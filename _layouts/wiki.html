@@ -1,146 +1,79 @@
-<!DOCTYPE html>
-<html lang="{{ site.active_lang }}">
-<head>
-    {% include head.html %}
-    <style>
-        body { display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
-        .wiki-wrapper { display: flex; flex: 1; width: 100%; max-width: 1400px; margin: 0 auto; position: relative; }
-        
-        .wiki-sidebar { 
-            width: 280px; flex-shrink: 0; border-right: 1px solid var(--border); 
-            position: sticky; top: 64px; height: calc(100vh - 64px); 
-            overflow-y: auto; padding: 20px; background: var(--bg-body); 
-            scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-        }
-        
-        .wiki-content { flex-grow: 1; padding: 40px 60px; min-width: 0; }
-        .wiki-inner { max-width: 900px; margin: 0 auto; }
-
-        .search-box-wiki { position: relative; margin-bottom: 20px; }
-        .search-box-wiki input { width: 100%; padding: 10px 40px 10px 15px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 0.95rem; transition: 0.2s; }
-        .search-box-wiki input:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88,166,255,0.1); }
-        .search-box-wiki i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); opacity: 0.7; }
-
-        .nav-group { margin-bottom: 25px; }
-        .nav-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; padding-left: 8px; letter-spacing: 0.5px; opacity: 0.8; }
-        .nav-link { display: block; padding: 6px 12px; color: var(--text-main); border-radius: 6px; font-size: 0.95rem; text-decoration: none; margin-bottom: 2px; transition: 0.1s; border-left: 3px solid transparent; }
-        .nav-link:hover { background: var(--bg-panel); color: var(--accent); }
-        .nav-link.active { background: rgba(56, 139, 253, 0.1); color: #58a6ff; border-left-color: #58a6ff; font-weight: 600; }
-
-        @media (max-width: 1000px) {
-            .wiki-sidebar { display: none; position: fixed; left: 0; z-index: 2000; transform: translateX(-100%); transition: 0.3s; width: 280px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
-            .wiki-sidebar.open { display: block; transform: translateX(0); }
-            .wiki-content { padding: 30px 20px; }
-        }
-    </style>
-</head>
-<body class="lang-{{ site.active_lang }}">
-    {% include header.html %}
-
-    <div class="wiki-wrapper">
-        <aside class="wiki-sidebar">
-            <div class="search-box-wiki">
-                <input type="text" id="wiki-search" placeholder="Search..." onkeyup="filterMenu()">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            
-            <div id="nav-list">
-                {% if page.url contains 'cubeui' %}
-                    <div class="nav-group">
-                        <div class="nav-title">General</div>
-                        <a href="#install" class="nav-link">Installation</a>
-                        <a href="#theme" class="nav-link">Theming</a>
-                    </div>
-                    <div class="nav-group">
-                        <div class="nav-title">Components</div>
-                        <a href="#widgets" class="nav-link">Widgets</a>
-                        <a href="#screens" class="nav-link">Screens</a>
-                    </div>
+<div class="wiki-wrapper">
+    <aside class="wiki-sidebar">
+        <div class="search-box-wiki">
+            <input type="text" id="wiki-search" placeholder="Search..." onkeyup="filterMenu()">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div id="nav-list">
+             {% if page.url contains 'cubeui' %}
                 {% else %}
-                    <div style="margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-                        <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:5px; font-weight:700;">VERSION</div>
-                        <select style="width:100%; background:var(--bg-panel); color:var(--text-main); border:1px solid var(--border); padding:6px; border-radius:4px;">
-                            <option>1.4.0 (1.20.1)</option>
-                            <option>1.3.0 (1.19.2)</option>
-                        </select>
-                    </div>
-
-                    {% for group in site.data.cso_nav %}
-                    <div class="nav-group">
-                        <div class="nav-title">
-                            <span class="lang-en">{{ group.title_en }}</span>
-                            <span class="lang-ru">{{ group.title_ru }}</span>
-                        </div>
-                        {% for item in group.items %}
-                        <a href="{{ item.url }}" class="nav-link {% if page.url == item.url %}active{% endif %}">
-                            <span class="lang-en">{{ item.title_en }}</span>
-                            <span class="lang-ru">{{ item.title_ru }}</span>
-                        </a>
-                        {% endfor %}
-                    </div>
-                    {% endfor %}
                 {% endif %}
-            </div>
-        </aside>
+        </div>
+    </aside>
 
-        <main class="wiki-content">
-            <button id="sidebar-toggle" class="btn" style="display:none; margin-bottom:20px; width:auto;">
-                <i class="fa-solid fa-bars"></i> Menu
-            </button>
-            <div class="wiki-inner">{{ content }}</div>
-        </main>
-    </div>
-
-    <footer class="footer">
-        <div style="margin-top:10px;">© 2026 Denmoth</div>
-    </footer>
-
-    <script src="/assets/js/main.js"></script>
-    <script>
-        function filterMenu() {
-            const input = document.getElementById('wiki-search');
-            const filter = input.value.toLowerCase();
-            const links = document.querySelectorAll('.nav-link');
-            
-            links.forEach(link => {
-                const text = link.innerText;
-                if (text.toLowerCase().includes(filter)) {
-                    link.style.display = "";
-                } else {
-                    link.style.display = "none";
-                }
-            });
-        }
+    <main class="wiki-content">
+        <button id="sidebar-toggle" class="btn" style="display:none; margin-bottom:20px; width:auto;">
+            <i class="fa-solid fa-bars"></i> Menu
+        </button>
         
-        // Simple ScrollSpy
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('.doc-section');
-            const links = document.querySelectorAll('.nav-link');
+        <div class="wiki-article-header">
+            <h1>{{ page.title }}</h1>
+            </div>
+
+        <div class="wiki-inner">
+            {{ content }}
+        </div>
+
+        <footer class="wiki-footer">
+            <div style="margin-top:40px; padding-top:20px; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.9rem;">
+                Last updated: {{ page.date | date: "%d.%m.%Y" }} • <a href="https://github.com/Denmoth/Denmoth.github.io/edit/main/{{ page.path }}">Edit this page</a>
+            </div>
+        </footer>
+    </main>
+
+    <aside class="wiki-toc">
+        <div class="toc-sticky">
+            <div class="toc-header">ON THIS PAGE</div>
+            <ul id="toc-list"></ul>
+        </div>
+    </aside>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tocList = document.getElementById('toc-list');
+        const headers = document.querySelectorAll('.wiki-inner h2, .wiki-inner h3');
+        
+        headers.forEach(header => {
+            if(!header.id) header.id = header.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             
+            const li = document.createElement('li');
+            li.className = header.tagName.toLowerCase();
+            
+            const a = document.createElement('a');
+            a.href = '#' + header.id;
+            a.innerText = header.innerText;
+            
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // ScrollSpy (подсветка активного пункта)
+        window.addEventListener('scroll', () => {
             let current = '';
-            sections.forEach(section => {
+            headers.forEach(section => {
                 const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 150) {
+                if (scrollY >= sectionTop - 100) {
                     current = section.getAttribute('id');
                 }
             });
             
-            if(current) {
-                links.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').includes(current)) {
-                        link.classList.add('active');
-                    }
-                });
-            }
+            document.querySelectorAll('#toc-list a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href').includes(current)) {
+                    a.classList.add('active');
+                }
+            });
         });
-        
-        const toggleBtn = document.getElementById('sidebar-toggle');
-        const checkMobile = () => { 
-            toggleBtn.style.display = window.innerWidth <= 1000 ? 'inline-flex' : 'none'; 
-        };
-        window.addEventListener('resize', checkMobile);
-        checkMobile();
-    </script>
-</body>
-</html>
+    });
+</script>
