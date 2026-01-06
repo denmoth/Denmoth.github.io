@@ -10,6 +10,8 @@
 <meta name="keywords" content="Minecraft, Mods, Tools, CubeUI, Create Mod, Generator, UUID, JSON, Loot Table">
 <meta name="author" content="Denmoth">
 
+<link rel="icon" type="image/png" href="/assets/img/logo.png">
+
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://denmoth.pp.ua/">
 <meta property="og:title" content="Denmoth - Minecraft Mods & Tools">
@@ -28,11 +30,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Global Supabase Configuration
   const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
   
   try {
       const { createClient } = window.supabase;
+      // Initialize client globally
       window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
   } catch(e) {
       console.log("Supabase init error");
