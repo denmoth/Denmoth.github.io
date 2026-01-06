@@ -30,13 +30,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Global Supabase Configuration
+  // Global Supabase Config
   const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
   
   try {
       const { createClient } = window.supabase;
-      // Initialize client globally
+      // Инициализируем глобально, чтобы main.js мог использовать это
       window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
   } catch(e) {
       console.log("Supabase init error");
