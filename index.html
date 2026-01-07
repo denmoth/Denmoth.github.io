@@ -13,7 +13,7 @@ permalink: /
     </div>
 
     <div class="card-grid">
-        <div class="card" data-project="structures">
+        <div class="card" data-cf-id="1303344">
             <div class="card-header">
                 <h3>Create: Structures Overhaul</h3>
                 <span class="badge cf-version">---</span> 
@@ -24,13 +24,13 @@ permalink: /
                 <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
             </div>
             <div class="btn-group">
-                <a href="https://www.curseforge.com/minecraft/mc-mods/create-structures-overhaul" class="btn primary">CurseForge</a>
+                <a href="#" class="btn primary cf-link">CurseForge</a>
                 <a href="https://modrinth.com/mod/create-structures-overhaul" class="btn">Modrinth</a>
                 <a href="/cso/" class="btn">Wiki</a>
             </div>
         </div>
 
-        <div class="card" data-project="cubeui">
+        <div class="card" data-cf-id="1415948">
             <div class="card-header">
                 <h3>CubeUI</h3>
                 <span class="badge cf-version">---</span> 
@@ -43,23 +43,65 @@ permalink: /
             <div class="btn-group">
                 {% lang en %}<a href="/cubeui/" class="btn primary">Docs</a>{% endlang %}
                 {% lang ru %}<a href="/cubeui/" class="btn primary">Доки</a>{% endlang %}
-                <a href="https://www.curseforge.com/minecraft/mc-mods/cubeui" class="btn">CurseForge</a>
+                <a href="#" class="btn cf-link">CurseForge</a>
                 <a href="https://modrinth.com/mod/cubeui" class="btn">Modrinth</a>
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" data-cf-id="1423100">
             <div class="card-header">
                 <h3>Uncanny</h3>
-                <span class="badge">WIP</span>
+                <span class="badge cf-version">---</span>
             </div>
             {% lang en %}<p>Atmospheric horror expansion designed to unsettle and terrify.</p>{% endlang %}
             {% lang ru %}<p>Атмосферный хоррор мод, созданный для полного погружения в ужас.</p>{% endlang %}
-            <div style="margin-top:auto; color:var(--text-muted); font-size:0.9rem;">
-                <i class="fa-solid fa-clock"></i> 
-                {% lang en %}<span>In Development</span>{% endlang %}
-                {% lang ru %}<span>В разработке</span>{% endlang %}
+            <div class="stat-row">
+                <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
+            </div>
+            <div class="btn-group">
+                <a href="#" class="btn primary cf-link">CurseForge</a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const cards = document.querySelectorAll('.card[data-cf-id]');
+        
+        cards.forEach(card => {
+            const id = card.getAttribute('data-cf-id');
+            const versionSpan = card.querySelector('.cf-version');
+            const dlSpan = card.querySelector('.cf-downloads');
+            const linkBtn = card.querySelector('.cf-link');
+
+            fetch(`https://api.cfwidget.com/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.files && data.files.length > 0) {
+                        const ver = data.files[0].display_name
+                            .replace('.jar', '')
+                            .replace(/\[.*?\]/g, '')
+                            .trim();
+                        versionSpan.textContent = ver.substring(0, 15);
+                    }
+                    
+                    if (data.downloads && data.downloads.total) {
+                        dlSpan.textContent = new Intl.NumberFormat('en-US', { 
+                            notation: "compact", 
+                            maximumFractionDigits: 1 
+                        }).format(data.downloads.total);
+                    }
+
+                    if (data.urls && data.urls.curseforge && linkBtn) {
+                        linkBtn.href = data.urls.curseforge;
+                    }
+                })
+                .catch(err => {
+                    console.error(`Failed to load data for ${id}`, err);
+                });
+        });
+    });
+</script>
+
+}
