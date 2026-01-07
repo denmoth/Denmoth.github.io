@@ -1,70 +1,51 @@
 // ==========================================
 // CONFIGURATION
 // ==========================================
-// URL проекта Supabase.
 const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
-// Публичный (anon) ключ. 
-// ВАЖНО: Убедись, что в Supabase включен RLS (Row Level Security), 
-// иначе любой сможет редактировать данные, имея этот ключ.
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
 
-let supabase; // Глобальный клиент Supabase
+let supabase; 
+let currentUser = null;
 
-// ==========================================
-// INITIALIZATION
-// ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Инициализация клиента Supabase
         const { createClient } = window.supabase;
         supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        // Последовательный запуск модулей
-        await initAuth();      // Аутентификация
-        initComments();        // Система комментариев
-        initProfile();         // Профиль пользователя (если есть на странице)
+        await initAuth();
+        initComments();
+        initProfile(); 
     } catch(e) {
         console.error("Supabase init failed:", e);
     }
     
-    // UI инициализация (не зависит от бэкенда)
-    initTheme();           // Темная/светлая тема
-    initLangSwitcher();    // Переключатель языка (FIX)
-    initCopyButtons();     // Кнопки "Копировать"
+    initTheme();
+    initLangSwitcher();
+    initCopyButtons();
 });
-
-let currentUser = null; // Текущий залогиненный юзер
 
 // ==========================================
 // AUTHENTICATION MODULE
 // ==========================================
 async function initAuth() {
-    // Проверка текущей сессии при загрузке
     const { data: { session } } = await supabase.auth.getSession();
     updateUserUI(session?.user);
 
-    // Слушатель изменений состояния (вход/выход)
     supabase.auth.onAuthStateChange((_event, session) => {
         updateUserUI(session?.user);
     });
 
-    // Обработчик кнопки входа в хедере
     const loginBtn = document.getElementById('login-btn');
     if(loginBtn) {
         loginBtn.onclick = (e) => {
+            // Если уже вошли - это ссылка на профиль или дропдаун, не перехватываем
+            if(currentUser) return; 
             e.preventDefault();
-            if(currentUser) {
-                // Если уже вошел -> идем в профиль
-                window.location.href = '/profile/'; 
-            } else {
-                // Если нет -> открываем модалку
-                openAuthModal();
-            }
+            openAuthModal();
         };
     }
 }
 
-// Обновление кнопки входа (Аватар + Имя или "Log In")
 function updateUserUI(user) {
     currentUser = user;
     const loginBtn = document.getElementById('login-btn');
@@ -72,36 +53,62 @@ function updateUserUI(user) {
 
     if (user) {
         const avatar = user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
-        // Показываем аватар и имя
-        loginBtn.innerHTML = `<img src="${avatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:5px;"> ${user.user_metadata.full_name || user.email.split('@')[0]}`;
+        const name = user.user_metadata.full_name || user.email.split('@')[0];
+        
+        // Меняем кнопку на профиль с выпадающим меню (если нужно) или просто ссылка
+        loginBtn.innerHTML = `
+            <img src="${avatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:8px; border:1px solid var(--border);">
+            <span>${name}</span>
+        `;
         loginBtn.href = "/profile/";
+        loginBtn.onclick = null; // Удаляем обработчик модалки
+        
+        // Для страницы профиля - заполняем данные
+        if(window.location.pathname === '/profile/') {
+            const pName = document.getElementById('p-name');
+            if(pName) pName.textContent = name;
+            const pEmail = document.getElementById('p-email');
+            if(pEmail) pEmail.textContent = user.email;
+            const pAv = document.getElementById('p-avatar');
+            if(pAv) pAv.src = avatar;
+        }
     } else {
-        // Показываем кнопку входа
-        loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> Log In`;
+        loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> <span>Log In</span>`;
+        loginBtn.href = "#";
+        loginBtn.onclick = (e) => { e.preventDefault(); openAuthModal(); };
     }
 }
 
 // ==========================================
-// COMMENTS MODULE
+// COMMENTS MODULE (FIXED INFINITE LOADING)
 // ==========================================
 async function initComments() {
     const container = document.getElementById('comments-container');
-    if (!container) return; // Если на странице нет блока комментов, выходим
+    const list = document.getElementById('comments-list');
+    
+    if (!container || !list) return;
 
-    // Используем путь страницы как идентификатор треда
     const pageSlug = window.location.pathname;
 
-    // Загрузка комментариев из БД
-    const { data: comments, error } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('page_slug', pageSlug)
-        .order('created_at', { ascending: false });
+    try {
+        const { data: comments, error } = await supabase
+            .from('comments') // Убедись, что таблица существует!
+            .select('*')
+            .eq('page_slug', pageSlug)
+            .order('created_at', { ascending: false });
 
-    if(error) console.error(error);
-    renderComments(comments || []);
+        if(error) throw error;
+        renderComments(comments || []);
+    } catch (e) {
+        console.error("Comments error:", e);
+        list.innerHTML = `
+            <div style="text-align:center; padding:20px; color:#d73a49;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Error loading comments.<br>
+                <span style="font-size:0.8rem; color:var(--text-muted);">Ensure 'comments' table exists in Supabase.</span>
+            </div>
+        `;
+    }
 
-    // Обработка отправки нового комментария
     const sendBtn = document.getElementById('send-comment');
     if(sendBtn) {
         sendBtn.onclick = async () => {
@@ -109,7 +116,10 @@ async function initComments() {
             const content = input.value.trim();
             if(!content) return;
 
-            // Логика определения автора (Авторизованный или Гость)
+            // Блокируем кнопку
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
             const guestNameInput = document.getElementById('guest-name');
             let authorName = "Guest";
             let authorAvatar = null;
@@ -125,7 +135,6 @@ async function initComments() {
                 authorName = guestNameInput.value.trim() || "Guest";
             }
 
-            // Отправка в БД
             const { error: postError } = await supabase.from('comments').insert({
                 page_slug: pageSlug,
                 content: content,
@@ -135,12 +144,14 @@ async function initComments() {
                 is_guest: isGuest
             });
 
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = 'Post';
+
             if(!postError) {
-                input.value = ''; // Очистка поля
-                initComments();   // Перезагрузка списка (можно оптимизировать через добавление в DOM)
+                input.value = '';
+                initComments(); // Refresh list
             } else {
-                alert("Error posting comment. Check console.");
-                console.error(postError);
+                alert("Failed to post: " + postError.message);
             }
         };
     }
@@ -155,7 +166,6 @@ function renderComments(comments) {
         return;
     }
 
-    // Генерация HTML списка комментариев
     list.innerHTML = comments.map(c => `
         <div class="comment-box">
             <div class="comment-header">
@@ -170,14 +180,11 @@ function renderComments(comments) {
 }
 
 // ==========================================
-// UI & THEME UTILS
+// UTILS
 // ==========================================
-
-// Переключение темы (Dark/Light) с сохранением в LocalStorage
 function initTheme() {
-    const themes = ['dark', 'light'];
     const btn = document.getElementById('theme-toggle');
-    let current = localStorage.getItem('theme') || 'dark'; // По дефолту темная
+    let current = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', current);
     
     if(btn) {
@@ -191,103 +198,55 @@ function initTheme() {
     }
 }
 
-// [FIX] Исправленная логика переключения языка
-// Ранее переключатель не работал, так как не было слушателя событий.
 function initLangSwitcher() {
     const select = document.getElementById('lang-select');
     if(!select) return;
-
     select.addEventListener('change', (e) => {
-        const targetLang = e.target.value;
-        const currentPath = window.location.pathname;
-        let newPath = currentPath;
-
-        // Логика URL для Jekyll Polyglot:
-        // RU версия: /ru/some-page/
-        // EN версия: /some-page/ (дефолтная)
-        
-        if (targetLang === 'ru' && !currentPath.startsWith('/ru')) {
-            // Переход EN -> RU
-            newPath = '/ru' + currentPath;
-        } else if (targetLang === 'en' && currentPath.startsWith('/ru')) {
-            // Переход RU -> EN (убираем префикс)
-            newPath = currentPath.replace('/ru', '') || '/';
-        }
-
-        if (newPath !== currentPath) {
-            window.location.href = newPath;
-        }
+        const target = e.target.value;
+        const path = window.location.pathname;
+        if (target === 'ru' && !path.startsWith('/ru')) window.location.href = '/ru' + path;
+        else if (target === 'en' && path.startsWith('/ru')) window.location.href = path.replace('/ru', '') || '/';
     });
 }
 
-// Инициализация кнопок копирования для блоков кода и инпутов
 function initCopyButtons() {
     document.querySelectorAll('.result-group, .code-container').forEach(group => {
-        // Проверка, чтобы не дублировать кнопки
         if(group.querySelector('.copy-icon-btn, .copy-btn')) return;
-        
-        let target = group.querySelector('input, textarea');
-        let textToCopy = "";
-
-        // Если это блок кода (pre/code)
-        if (!target) {
-            target = group.querySelector('pre, code');
-            if (target) textToCopy = target.innerText;
-        }
-
         const btn = document.createElement('button');
         
-        // Стилизация кнопки в зависимости от типа контейнера
         if (group.classList.contains('code-container')) {
             btn.className = 'copy-btn btn';
             btn.innerHTML = 'Copy';
             btn.style.cssText = 'position:absolute; right:10px; top:8px;';
             const head = group.querySelector('.code-head');
-            if(head) {
-                head.style.position = 'relative';
-                head.appendChild(btn);
-            } else {
-                group.style.position = 'relative';
-                group.appendChild(btn);
-            }
+            (head || group).style.position = 'relative';
+            (head || group).appendChild(btn);
         } else {
-            // Маленькая иконка для простых полей
             btn.className = 'copy-icon-btn';
             btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
             group.appendChild(btn);
         }
 
-        // Обработчик клика (Copy to Clipboard)
         btn.onclick = () => {
-            const txt = target && (target.value || target.innerText) || textToCopy;
-            navigator.clipboard.writeText(txt);
-            
-            // Визуальная обратная связь
-            if (group.classList.contains('code-container')) {
-                btn.innerText = 'Copied!';
-                setTimeout(() => btn.innerText = 'Copy', 1500);
-            } else {
-                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-                setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1500);
+            let target = group.querySelector('input, textarea') || group.querySelector('pre, code');
+            if(target) {
+                navigator.clipboard.writeText(target.value || target.innerText);
+                const old = btn.innerHTML;
+                btn.innerHTML = group.classList.contains('code-container') ? 'Copied!' : '<i class="fa-solid fa-check"></i>';
+                setTimeout(() => btn.innerHTML = old, 1500);
             }
         };
     });
 }
 
-// Безопасность: Экранирование HTML тегов для защиты от XSS в комментариях
-function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
+function escapeHtml(text) { return text ? text.replace(/</g, "&lt;").replace(/>/g, "&gt;") : ''; }
 
-// Экспорт функций для вызова из HTML (onclick)
-window.openAuthModal = () => {
-    const modal = document.getElementById('auth-modal');
-    if(modal) modal.style.display = 'flex';
-};
-window.closeAuthModal = () => {
-    const modal = document.getElementById('auth-modal');
-    if(modal) modal.style.display = 'none';
-};
+// EXPORTS
+window.openAuthModal = () => document.getElementById('auth-modal').style.display = 'flex';
+window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
 window.loginWith = async (provider) => {
-    await supabase.auth.signInWithOAuth({ provider: provider });
+    await supabase.auth.signInWithOAuth({ 
+        provider: provider,
+        options: { redirectTo: window.location.origin + '/profile/' } // Redirect back
+    });
 };
