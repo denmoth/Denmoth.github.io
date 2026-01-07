@@ -83,15 +83,29 @@ permalink: /
                     return response.json();
                 })
                 .then(data => {
+                    // 1. Обработка Версии (Умный фильтр)
                     if (data.files && data.files.length > 0) {
                         const file = data.files[0];
-                        const name = file.display_name || file.name || "";
-                        let ver = name.replace('.jar', '')
-                            .replace(/\[.*?\]/g, '')
-                            .trim();
-                        if (versionSpan) versionSpan.textContent = ver.substring(0, 15);
+                        let name = file.display_name || file.name || "";
+                        
+                        // Ищем паттерны вида X.X.X (цифры с точками)
+                        // Флаг 'g' находит ВСЕ совпадения (и 1.20.1, и 0.2.0)
+                        let versionMatches = name.match(/(\d+\.\d+(\.\d+)?)/g);
+                        
+                        let cleanVer = "---";
+                        if (versionMatches && versionMatches.length > 0) {
+                            // Берем ПОСЛЕДНЕЕ совпадение. 
+                            // В названии "ModName-1.20.1-0.2.0.jar" последним будет 0.2.0
+                            cleanVer = versionMatches[versionMatches.length - 1];
+                        } else {
+                            // Фоллбек: если цифр нет, просто убираем .jar и скобки
+                            cleanVer = name.replace('.jar', '').replace(/\[.*?\]/g, '').trim();
+                        }
+                        
+                        if (versionSpan) versionSpan.textContent = cleanVer;
                     }
                     
+                    // 2. Обработка Скачиваний
                     if (data.downloads && data.downloads.total !== undefined) {
                         const count = new Intl.NumberFormat('en-US', { 
                             notation: "compact", 
@@ -100,9 +114,11 @@ permalink: /
                         if (dlSpan) dlSpan.textContent = count;
                     }
 
+                    // 3. Ссылка на CurseForge (кнопка)
                     if (data.urls && data.urls.curseforge && linkBtn) {
                         linkBtn.href = data.urls.curseforge;
                     }
+                    // Summary НЕ трогаем, чтобы сохранить русский язык из HTML
                 })
                 .catch(err => {
                     console.error(`Failed to load data for project ${id}:`, err);
