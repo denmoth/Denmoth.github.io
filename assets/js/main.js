@@ -1,5 +1,3 @@
-// --- SUPABASE CONFIG ---
-// Убедись, что URL и KEY правильные (из твоего контекста)
 const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
 
@@ -12,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         await initAuth();
         initComments();
-        initProfile(); // Если мы на странице профиля
+        initProfile(); 
     } catch(e) {
         console.error("Supabase init failed:", e);
     }
@@ -21,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCopyButtons();
 });
 
-// --- AUTH SYSTEM ---
 let currentUser = null;
 
 async function initAuth() {
@@ -32,13 +29,11 @@ async function initAuth() {
         updateUserUI(session?.user);
     });
 
-    // Login Modal Triggers
     const loginBtn = document.getElementById('login-btn');
     if(loginBtn) {
         loginBtn.onclick = (e) => {
             e.preventDefault();
             if(currentUser) {
-                // Если уже вошел - переходим в профиль
                 window.location.href = '/profile/'; 
             } else {
                 openAuthModal();
@@ -61,14 +56,12 @@ function updateUserUI(user) {
     }
 }
 
-// --- COMMENTS SYSTEM (CUSTOM) ---
 async function initComments() {
     const container = document.getElementById('comments-container');
     if (!container) return;
 
     const pageSlug = window.location.pathname;
 
-    // Load Comments
     const { data: comments, error } = await supabase
         .from('comments')
         .select('*')
@@ -78,7 +71,6 @@ async function initComments() {
     if(error) console.error(error);
     renderComments(comments || []);
 
-    // Post Comment Logic
     const sendBtn = document.getElementById('send-comment');
     if(sendBtn) {
         sendBtn.onclick = async () => {
@@ -112,7 +104,6 @@ async function initComments() {
 
             if(!postError) {
                 input.value = '';
-                // Reload comments (simple way)
                 initComments();
             } else {
                 alert("Error posting comment. Check console.");
@@ -144,7 +135,6 @@ function renderComments(comments) {
     `).join('');
 }
 
-// --- UTILS ---
 function initTheme() {
     const themes = ['dark', 'light'];
     const btn = document.getElementById('theme-toggle');
@@ -163,22 +153,48 @@ function initTheme() {
 }
 
 function initCopyButtons() {
-    // Finds any input/textarea inside a .result-group and adds a copy button if missing
-    document.querySelectorAll('.result-group').forEach(group => {
-        if(group.querySelector('.copy-icon-btn')) return;
+    document.querySelectorAll('.result-group, .code-container').forEach(group => {
+        if(group.querySelector('.copy-icon-btn, .copy-btn')) return;
         
-        const target = group.querySelector('input, textarea');
-        if(!target) return;
+        let target = group.querySelector('input, textarea');
+        let textToCopy = "";
+
+        if (!target) {
+            target = group.querySelector('pre, code');
+            if (target) textToCopy = target.innerText;
+        }
 
         const btn = document.createElement('button');
-        btn.className = 'copy-icon-btn';
-        btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+        if (group.classList.contains('code-container')) {
+            btn.className = 'copy-btn btn';
+            btn.innerHTML = 'Copy';
+            btn.style.cssText = 'position:absolute; right:10px; top:8px;';
+            const head = group.querySelector('.code-head');
+            if(head) {
+                head.style.position = 'relative';
+                head.appendChild(btn);
+            } else {
+                group.style.position = 'relative';
+                group.appendChild(btn);
+            }
+        } else {
+            btn.className = 'copy-icon-btn';
+            btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            group.appendChild(btn);
+        }
+
         btn.onclick = () => {
-            navigator.clipboard.writeText(target.value || target.textContent);
-            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-            setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1500);
+            const txt = target && (target.value || target.innerText) || textToCopy;
+            navigator.clipboard.writeText(txt);
+            
+            if (group.classList.contains('code-container')) {
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy', 1500);
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1500);
+            }
         };
-        group.appendChild(btn);
     });
 }
 
@@ -186,7 +202,6 @@ function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-// Auth Modal UI
 window.openAuthModal = () => {
     const modal = document.getElementById('auth-modal');
     if(modal) modal.style.display = 'flex';
