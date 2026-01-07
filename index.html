@@ -84,8 +84,9 @@ permalink: /
                 })
                 .then(data => {
                     if (data.files && data.files.length > 0) {
-                        let ver = data.files[0].display_name
-                            .replace('.jar', '')
+                        const file = data.files[0];
+                        const name = file.display_name || file.name || "";
+                        let ver = name.replace('.jar', '')
                             .replace(/\[.*?\]/g, '')
                             .trim();
                         if (versionSpan) versionSpan.textContent = ver.substring(0, 15);
