@@ -12,15 +12,17 @@ permalink: /tools/recipe/
 {% endlang %}
 
 <div style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap; margin-bottom:30px;">
-<div>
+    <div>
         <h3 style="text-align:center; margin-bottom:10px;">Crafting Table</h3>
         <div style="display:grid; grid-template-columns:repeat(3, 60px); gap:4px; background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555;">
             {% for i in (0..8) %}
-            <div id="s{{i}}" class="craft-slot" onclick="openPicker({{i}})"></div>
+            <div id="s{{i}}" class="craft-slot" onclick="openPicker({{i}})" title="Empty"></div>
             {% endfor %}
         </div>
     </div>
-    <div style="display:flex; flex-direction:column; justify-content:center;"><i class="fa-solid fa-arrow-right" style="font-size:2rem; color:var(--text-muted);"></i></div>
+    <div style="display:flex; flex-direction:column; justify-content:center;">
+        <i class="fa-solid fa-arrow-right" style="font-size:2rem; color:var(--text-muted);"></i>
+    </div>
     <div>
         <h3 style="text-align:center; margin-bottom:10px;">Result</h3>
         <div style="background:#c6c6c6; padding:10px; border-radius:4px; border:2px solid #555; width:84px; height:84px; display:flex; align-items:center; justify-content:center;">
@@ -36,11 +38,12 @@ permalink: /tools/recipe/
 
 <div id="picker-modal" class="item-picker-modal" onclick="if(event.target === this) closePicker()">
     <div class="item-picker-content">
-        <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; gap:10px;">
-            <input type="text" id="picker-search" class="form-input" placeholder="Search (e.g. netherite_sword)" style="flex:1;" oninput="filterItems()">
+        <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; gap:10px; background: var(--bg-panel);">
+            <input type="text" id="picker-search" class="form-input" placeholder="Search item..." style="flex:1;" oninput="renderItems(this.value)">
             <button onclick="closePicker()" class="btn">Close</button>
         </div>
-        <div id="picker-list" class="item-list"></div>
+        <div id="picker-loading" style="padding:20px; text-align:center; color:var(--text-muted);">Loading items...</div>
+        <div id="picker-list" class="item-list" style="display:none;"></div>
     </div>
 </div>
 
@@ -48,39 +51,102 @@ permalink: /tools/recipe/
     let currentSlot = -1;
     let grid = new Array(9).fill("minecraft:air");
     let resultItem = "minecraft:diamond";
+    let allItems = []; // Cache for items
+
+    // --- LOGIC ---
 
     function openPicker(idx) {
         currentSlot = idx;
-        document.getElementById('picker-modal').style.display = 'flex';
+        const modal = document.getElementById('picker-modal');
+        modal.style.display = 'flex';
+        document.getElementById('picker-search').value = '';
         document.getElementById('picker-search').focus();
+        
+        if (allItems.length === 0) fetchItems();
+        else renderItems('');
     }
-    function closePicker() { document.getElementById('picker-modal').style.display = 'none'; }
 
-    function filterItems() {
-        const q = document.getElementById('picker-search').value.toLowerCase();
+    function closePicker() { 
+        document.getElementById('picker-modal').style.display = 'none'; 
+    }
+
+    // Fetch items from PrismarineJS (Minecraft Data)
+    async function fetchItems() {
+        const loading = document.getElementById('picker-loading');
+        const list = document.getElementById('picker-list');
+        
+        try {
+            const res = await fetch('https://raw.githubusercontent.com/PrismarineJS/minecraft-data/master/data/pc/1.20/items.json');
+            const data = await res.json();
+            allItems = data.map(i => ({ name: i.name, displayName: i.displayName }));
+            
+            loading.style.display = 'none';
+            list.style.display = 'grid';
+            renderItems('');
+        } catch (e) {
+            loading.textContent = "Failed to load items. Check internet.";
+            console.error(e);
+        }
+    }
+
+    function renderItems(filter) {
         const list = document.getElementById('picker-list');
         list.innerHTML = '';
-        if(q.length < 2) return;
-        
-        // Поиск по "всем" предметам (через динамический ввод)
-        const opt = document.createElement('div');
-        opt.className = 'item-option';
-        const fullId = q.includes(':') ? q : 'minecraft:' + q;
-        opt.innerHTML = `<span>Use: ${fullId}</span>`;
-        opt.onclick = () => selectItem(fullId);
-        list.appendChild(opt);
+        const q = filter.toLowerCase();
+
+        // Always add "Empty/Air" option
+        if(q === '' || 'air'.includes(q)) {
+            const airDiv = document.createElement('div');
+            airDiv.className = 'item-option';
+            airDiv.innerHTML = '<span>🚫 Air</span>';
+            airDiv.onclick = () => selectItem('minecraft:air');
+            list.appendChild(airDiv);
+        }
+
+        // Limit to 100 items for performance when typing
+        let count = 0;
+        for (const item of allItems) {
+            if (count > 100) break;
+            if (item.name.includes(q) || item.displayName.toLowerCase().includes(q)) {
+                const div = document.createElement('div');
+                div.className = 'item-option';
+                // Using mcassets.cloud for icons
+                div.innerHTML = `
+                    <img src="https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${item.name}.png" 
+                         onerror="this.src='https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${item.name}.png'; this.onerror=()=>this.style.opacity=0.3">
+                    <span>${item.displayName}</span>
+                `;
+                div.title = "minecraft:" + item.name;
+                div.onclick = () => selectItem("minecraft:" + item.name);
+                list.appendChild(div);
+                count++;
+            }
+        }
     }
 
     function selectItem(id) {
-        if(currentSlot === -1) { resultItem = id; updateSlotUI('res-slot', id); }
-        else { grid[currentSlot] = id; updateSlotUI('s' + currentSlot, id); }
+        if(currentSlot === -1) { 
+            resultItem = id; 
+            updateSlotUI('res-slot', id); 
+        } else { 
+            grid[currentSlot] = id; 
+            updateSlotUI('s' + currentSlot, id); 
+        }
         closePicker();
+        saveState();
     }
 
     function updateSlotUI(elId, id) {
         const el = document.getElementById(elId);
-        const name = id.split(':')[1];
-        el.innerHTML = `<img src="https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${name}.png" onerror="this.src='https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${name}.png'; this.onerror=()=>this.src='/assets/img/logo.png'">`;
+        const name = id.replace('minecraft:', '');
+        
+        if (id === 'minecraft:air') {
+            el.innerHTML = '';
+            el.title = 'Empty';
+            return;
+        }
+
+        el.innerHTML = `<img src="https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${name}.png" onerror="this.src='https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${name}.png'">`;
         el.title = id;
     }
 
@@ -89,15 +155,55 @@ permalink: /tools/recipe/
         const chars = "ABCDEFGHI";
         const pattern = ["", "", ""];
         let keyIdx = 0;
+        
+        // Map unique items to characters
         grid.forEach((item, i) => {
-            if(item === 'minecraft:air') pattern[Math.floor(i/3)] += " ";
-            else {
+            const row = Math.floor(i/3);
+            if(item === 'minecraft:air') {
+                pattern[row] += " ";
+            } else {
                 let char = Object.keys(keys).find(k => keys[k].item === item);
-                if(!char) { char = chars[keyIdx++]; keys[char] = { item: item }; }
-                pattern[Math.floor(i/3)] += char;
+                if(!char) { 
+                    char = chars[keyIdx++]; 
+                    keys[char] = { item: item }; 
+                }
+                pattern[row] += char;
             }
         });
-        document.getElementById('recipe-out').value = JSON.stringify({ type: "minecraft:crafting_shaped", pattern, key: keys, result: { item: resultItem, count: parseInt(document.getElementById('res-count').value) } }, null, 4);
+
+        // Trim empty rows/cols (Basic trim)
+        // Note: Full shaped recipe logic usually requires shrinking the pattern.
+        // For simplicity, we output fixed 3x3 for now, but users can edit JSON.
+
+        const json = { 
+            type: "minecraft:crafting_shaped", 
+            pattern: pattern, 
+            key: keys, 
+            result: { 
+                item: resultItem, 
+                count: parseInt(document.getElementById('res-count').value) 
+            } 
+        };
+        document.getElementById('recipe-out').value = JSON.stringify(json, null, 4);
     }
-    function copyOut(id) { const el = document.getElementById(id); el.select(); document.execCommand('copy'); }
+
+    function copyOut(id) { 
+        const el = document.getElementById(id); 
+        el.select(); 
+        document.execCommand('copy'); 
+    }
+
+    // Restore state from LocalStorage (UX improvement)
+    function saveState() {
+        localStorage.setItem('recipe_tool_grid', JSON.stringify(grid));
+        localStorage.setItem('recipe_tool_res', resultItem);
+    }
+    
+    // Init default icons
+    updateSlotUI('res-slot', resultItem);
+    const savedGrid = JSON.parse(localStorage.getItem('recipe_tool_grid'));
+    if(savedGrid) {
+        grid = savedGrid;
+        grid.forEach((id, i) => updateSlotUI('s'+i, id));
+    }
 </script>
