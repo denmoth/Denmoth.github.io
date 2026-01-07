@@ -53,13 +53,15 @@ permalink: /
                 <h3>Uncanny</h3>
                 <span class="badge cf-version">---</span>
             </div>
-            {% lang en %}<p>Atmospheric horror expansion designed to unsettle and terrify.</p>{% endlang %}
+            {% lang en %}<p class="cf-summary">Atmospheric horror expansion designed to unsettle and terrify.</p>{% endlang %}
             {% lang ru %}<p>Атмосферный хоррор мод, созданный для полного погружения в ужас.</p>{% endlang %}
             <div class="stat-row">
                 <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
             </div>
             <div class="btn-group">
                 <a href="#" class="btn primary cf-link">CurseForge</a>
+                <a href="https://modrinth.com/project/uncanny" class="btn">Modrinth</a>
+                <a href="/uncanny/" class="btn">Wiki</a>
             </div>
         </div>
     </div>
@@ -76,21 +78,25 @@ permalink: /
             const linkBtn = card.querySelector('.cf-link');
 
             fetch(`https://api.cfwidget.com/${id}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
                 .then(data => {
                     if (data.files && data.files.length > 0) {
-                        const ver = data.files[0].display_name
+                        let ver = data.files[0].display_name
                             .replace('.jar', '')
                             .replace(/\[.*?\]/g, '')
                             .trim();
-                        versionSpan.textContent = ver.substring(0, 15);
+                        if (versionSpan) versionSpan.textContent = ver.substring(0, 15);
                     }
                     
-                    if (data.downloads && data.downloads.total) {
-                        dlSpan.textContent = new Intl.NumberFormat('en-US', { 
+                    if (data.downloads && data.downloads.total !== undefined) {
+                        const count = new Intl.NumberFormat('en-US', { 
                             notation: "compact", 
                             maximumFractionDigits: 1 
                         }).format(data.downloads.total);
+                        if (dlSpan) dlSpan.textContent = count;
                     }
 
                     if (data.urls && data.urls.curseforge && linkBtn) {
@@ -98,10 +104,9 @@ permalink: /
                     }
                 })
                 .catch(err => {
-                    console.error(`Failed to load data for ${id}`, err);
+                    console.error(`Failed to load data for project ${id}:`, err);
+                    if (dlSpan) dlSpan.textContent = "Error";
                 });
         });
     });
 </script>
-
-}
