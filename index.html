@@ -83,41 +83,28 @@ permalink: /
                     return response.json();
                 })
                 .then(data => {
-                    // 1. Обработка Версии (Умный фильтр)
                     if (data.files && data.files.length > 0) {
                         const file = data.files[0];
                         let name = file.display_name || file.name || "";
-                        
-                        // Ищем паттерны вида X.X.X (цифры с точками)
                         let versionMatches = name.match(/(\d+\.\d+(\.\d+)?)/g);
-                        
                         let cleanVer = "---";
+                        
                         if (versionMatches && versionMatches.length > 0) {
-                            // ЕСЛИ НАШЛИ БОЛЬШЕ 1 ВЕРСИИ (например "1.20.1" и "1.4.0")
                             if (versionMatches.length > 1) {
-                                // Регулярка для MC версий: 1.16 - 1.29 (и подверсии)
                                 const mcVersionRegex = /^(1\.1[6-9]|1\.2\d)(\.\d+)?$/;
-                                
-                                // Оставляем только те, что НЕ похожи на версию майнкрафта
                                 const modVersions = versionMatches.filter(v => !mcVersionRegex.test(v));
-                                
-                                // Если что-то осталось (версия мода), используем этот список
                                 if (modVersions.length > 0) {
                                     versionMatches = modVersions;
                                 }
                             }
-
-                            // Берем ПОСЛЕДНЕЕ совпадение из отфильтрованного списка
                             cleanVer = versionMatches[versionMatches.length - 1];
                         } else {
-                            // Фоллбек: если цифр нет, чистим мусор
                             cleanVer = name.replace('.jar', '').replace(/\[.*?\]/g, '').trim();
                         }
                         
                         if (versionSpan) versionSpan.textContent = cleanVer;
                     }
                     
-                    // 2. Обработка Скачиваний
                     if (data.downloads && data.downloads.total !== undefined) {
                         const count = new Intl.NumberFormat('en-US', { 
                             notation: "compact", 
@@ -126,7 +113,6 @@ permalink: /
                         if (dlSpan) dlSpan.textContent = count;
                     }
 
-                    // 3. Ссылка на CurseForge
                     if (data.urls && data.urls.curseforge && linkBtn) {
                         linkBtn.href = data.urls.curseforge;
                     }
