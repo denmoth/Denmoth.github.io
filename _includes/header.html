@@ -35,15 +35,18 @@
 
             <div class="divider-v"></div>
             
-            <select id="lang-select" data-active="{{ site.active_lang }}">
+            <select id="lang-select" class="form-select" style="width:auto; padding: 2px 5px; height:30px; font-size:0.8rem; background:transparent; border-color:transparent;">
                 <option value="en" {% if site.active_lang == "en" %}selected{% endif %}>EN</option>
                 <option value="ru" {% if site.active_lang == "ru" %}selected{% endif %}>RU</option>
             </select>
-            <button id="theme-toggle">🌙</button>
-            <button id="login-btn" class="btn-login"><i class="fa-brands fa-github"></i> 
+            
+            <button id="theme-toggle" style="background:transparent; border:none; font-size:1.1rem; padding:0 8px;">🌙</button>
+            
+            <a id="login-btn" class="btn-login" href="#" onclick="event.preventDefault(); openAuthModal();">
+                <i class="fa-brands fa-github"></i> 
                 {% lang en %}<span>Log In</span>{% endlang %}
                 {% lang ru %}<span>Войти</span>{% endlang %}
-            </button>
+            </a>
         </div>
     </div>
 </header>
