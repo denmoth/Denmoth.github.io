@@ -5,27 +5,32 @@ permalink: /profile/
 ---
 
 <div class="hub-layout" style="max-width:800px; margin:0 auto;">
-    <div id="profile-loading" style="text-align:center; padding:50px;">
-        <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+    <div id="profile-loading" style="text-align:center; padding:80px;">
+        <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:var(--text-muted);"></i>
     </div>
 
-    <div id="profile-content" style="display:none;">
+    <div id="profile-content" style="display:none; animation: fadeUp 0.3s forwards;">
         <div class="profile-header">
             <img id="p-avatar" class="profile-avatar-xl" src="">
             <div class="profile-info">
                 <h1 id="p-name">User</h1>
-                <p id="p-email" style="color:var(--text-muted);">email@example.com</p>
-                <div style="margin-top:10px;">
-                    <span class="badge" style="background:#238636; color:white; border:none; padding:4px 8px; font-size:0.8rem;">
-                        {% lang en %}User{% endlang %}{% lang ru %}Пользователь{% endlang %}
-                    </span>
-                </div>
+                <p id="p-email" style="color:var(--text-muted); margin-bottom:10px;">email@example.com</p>
+                <span id="p-status-badge" class="badge" style="background:#238636; color:white; border:none; padding:4px 10px; font-size:0.85rem;">
+                    User
+                </span>
             </div>
         </div>
 
         <div class="profile-tabs">
-            <button class="profile-tab active" onclick="switchTab('settings')">{% lang en %}Settings{% endlang %}{% lang ru %}Настройки{% endlang %}</button>
-            <button class="profile-tab" onclick="switchTab('security')">{% lang en %}Security{% endlang %}{% lang ru %}Безопасность{% endlang %}</button>
+            <button class="profile-tab active" onclick="switchTab('settings')">
+                <i class="fa-solid fa-sliders"></i> {% lang en %}Settings{% endlang %}{% lang ru %}Настройки{% endlang %}
+            </button>
+            <button class="profile-tab" onclick="switchTab('security')">
+                <i class="fa-solid fa-shield-halved"></i> {% lang en %}Security{% endlang %}{% lang ru %}Безопасность{% endlang %}
+            </button>
+            <button id="btn-tab-admin" class="profile-tab" onclick="switchTab('admin')" style="display:none; color:#d73a49;">
+                <i class="fa-solid fa-terminal"></i> Admin
+            </button>
         </div>
 
         <div id="tab-settings" class="settings-section active">
@@ -34,61 +39,77 @@ permalink: /profile/
                 
                 <div class="settings-row">
                     <div>
-                        <div style="font-weight:600;">{% lang en %}Language{% endlang %}{% lang ru %}Язык{% endlang %}</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted);">{% lang en %}Interface language{% endlang %}{% lang ru %}Язык интерфейса{% endlang %}</div>
+                        <div style="font-weight:600;">{% lang en %}Interface Language{% endlang %}{% lang ru %}Язык интерфейса{% endlang %}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">{% lang en %}Changes text across the site{% endlang %}{% lang ru %}Изменяет язык сайта{% endlang %}</div>
                     </div>
-                    <select class="form-select" style="width:120px;" onchange="window.location.href = this.value === 'ru' ? '/ru/profile/' : '/profile/'">
-                        <option value="en" {% if site.active_lang == 'en' %}selected{% endif %}>English</option>
-                        <option value="ru" {% if site.active_lang == 'ru' %}selected{% endif %}>Русский</option>
+                    <select id="pref-lang" class="form-select" style="width:140px;">
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
                     </select>
                 </div>
 
                 <div class="settings-row">
                     <div>
-                        <div style="font-weight:600;">{% lang en %}Email Notifications{% endlang %}{% lang ru %}Уведомления{% endlang %}</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted);">{% lang en %}Receive updates about tools{% endlang %}{% lang ru %}Получать новости об инструментах{% endlang %}</div>
+                        <div style="font-weight:600;">{% lang en %}Email Newsletter{% endlang %}{% lang ru %}Рассылка новостей{% endlang %}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">{% lang en %}Get updates about new mods{% endlang %}{% lang ru %}Получать новости о новых модах{% endlang %}</div>
                     </div>
-                    <input type="checkbox" checked style="transform:scale(1.2);">
+                    <input id="pref-email-notif" type="checkbox" style="width:20px; height:20px; accent-color: var(--accent);">
+                </div>
+
+                <div style="margin-top:20px; text-align:right;">
+                    <button id="save-settings-btn" onclick="saveProfile()" class="btn primary" style="min-width:120px;">
+                        {% lang en %}Save Changes{% endlang %}{% lang ru %}Сохранить{% endlang %}
+                    </button>
                 </div>
             </div>
         </div>
 
         <div id="tab-security" class="settings-section">
             <div class="settings-card">
-                <h3>{% lang en %}Connected Accounts{% endlang %}{% lang ru %}Подключенные аккаунты{% endlang %}</h3>
-                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">{% lang en %}Manage your login methods.{% endlang %}{% lang ru %}Управление способами входа.{% endlang %}</p>
-                
-                <div class="settings-row">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i class="fa-brands fa-github" style="font-size:1.2rem;"></i> <span>GitHub</span>
-                    </div>
-                    <button class="btn" style="font-size:0.8rem; padding:4px 10px;">{% lang en %}Connect{% endlang %}{% lang ru %}Подключить{% endlang %}</button>
-                </div>
-                
-                <div class="settings-row">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i class="fa-brands fa-discord" style="font-size:1.2rem; color:#5865F2;"></i> <span>Discord</span>
-                    </div>
-                    <button class="btn" style="font-size:0.8rem; padding:4px 10px;">{% lang en %}Connect{% endlang %}{% lang ru %}Подключить{% endlang %}</button>
-                </div>
-            </div>
-
-            <div class="settings-card" style="border-color:#d73a49;">
-                <h3 style="color:#d73a49;">{% lang en %}Danger Zone{% endlang %}{% lang ru %}Опасная зона{% endlang %}</h3>
-                <button onclick="supabase.auth.signOut().then(() => window.location.href = '/')" class="btn" style="width:100%; border-color:#d73a49; color:#d73a49; margin-top:15px;">
-                    <i class="fa-solid fa-right-from-bracket"></i> {% lang en %}Log Out{% endlang %}{% lang ru %}Выйти из аккаунта{% endlang %}
+                <h3>{% lang en %}Session Management{% endlang %}{% lang ru %}Управление сессией{% endlang %}</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">
+                    {% lang en %}Log out of your account on this device.{% endlang %}
+                    {% lang ru %}Выход из аккаунта на этом устройстве.{% endlang %}
+                </p>
+                <button onclick="supabase.auth.signOut().then(() => window.location.href = '/')" class="btn" style="border-color:#d73a49; color:#d73a49;">
+                    <i class="fa-solid fa-right-from-bracket"></i> {% lang en %}Log Out{% endlang %}{% lang ru %}Выйти{% endlang %}
                 </button>
             </div>
         </div>
+
+        <div id="tab-admin" class="settings-section">
+            <div class="settings-card" style="border-color:#d73a49;">
+                <h3 style="color:#d73a49; display:flex; align-items:center; gap:10px;">
+                    <i class="fa-solid fa-user-secret"></i> Admin Console
+                </h3>
+                <div style="background:var(--bg-body); padding:15px; border-radius:6px; margin-top:15px; font-family:monospace; font-size:0.9rem;">
+                    <div>User ID: <span id="adm-uid" style="color:var(--accent);">...</span></div>
+                    <div>Email: <span id="adm-email" style="color:#58a6ff;">...</span></div>
+                    <div>Role: Superuser</div>
+                </div>
+                
+                <h4 style="margin-top:20px;">Newsletter Tools</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted);">To send emails, export users from Supabase who have <code>email_notif: true</code> and use an external service (Resend, Mailgun).</p>
+                <button class="btn" onclick="alert('Go to Supabase Dashboard -> Table Editor -> Profiles -> Filter by email_notif=true -> Export CSV')">
+                    <i class="fa-solid fa-download"></i> How to Export Emails
+                </button>
+            </div>
+        </div>
+
     </div>
     
     <div id="guest-view" style="display:none; text-align:center; padding:80px 20px;">
-        <i class="fa-solid fa-user-lock" style="font-size:4rem; color:var(--text-muted); margin-bottom:20px;"></i>
-        <h2>{% lang en %}Authentication Required{% endlang %}{% lang ru %}Требуется вход{% endlang %}</h2>
-        <p style="margin-bottom:30px; color:var(--text-muted);">{% lang en %}Please log in to manage your profile settings.{% endlang %}{% lang ru %}Пожалуйста, войдите, чтобы управлять настройками профиля.{% endlang %}</p>
-        <button onclick="openAuthModal()" class="btn primary" style="padding:12px 30px; font-size:1.1rem;">
-            {% lang en %}Log In / Sign Up{% endlang %}{% lang ru %}Войти / Регистрация{% endlang %}
-        </button>
+        <div style="background:var(--bg-panel); padding:40px; border-radius:12px; border:1px solid var(--border); display:inline-block; max-width:400px;">
+            <i class="fa-solid fa-user-astronaut" style="font-size:3rem; color:var(--text-muted); margin-bottom:20px;"></i>
+            <h2>{% lang en %}Authentication Required{% endlang %}{% lang ru %}Вход в систему{% endlang %}</h2>
+            <p style="margin-bottom:25px; color:var(--text-muted);">
+                {% lang en %}Please log in to view your profile and manage settings.{% endlang %}
+                {% lang ru %}Пожалуйста, войдите, чтобы управлять профилем.{% endlang %}
+            </p>
+            <button onclick="openAuthModal()" class="btn primary" style="width:100%;">
+                {% lang en %}Log In{% endlang %}{% lang ru %}Войти{% endlang %}
+            </button>
+        </div>
     </div>
 </div>
 
@@ -99,23 +120,11 @@ permalink: /profile/
         
         event.target.classList.add('active');
         document.getElementById('tab-' + tabName).classList.add('active');
-    }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Wait for main.js to init supabase
-        setTimeout(async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            document.getElementById('profile-loading').style.display = 'none';
-            
-            if(session) {
-                document.getElementById('profile-content').style.display = 'block';
-                const user = session.user;
-                document.getElementById('p-avatar').src = user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
-                document.getElementById('p-name').textContent = user.user_metadata.full_name || user.email.split('@')[0];
-                document.getElementById('p-email').textContent = user.email;
-            } else {
-                document.getElementById('guest-view').style.display = 'block';
-            }
-        }, 500);
-    });
+        // Для админки заполняем инфу при открытии
+        if(tabName === 'admin' && window.currentUser) {
+            document.getElementById('adm-uid').textContent = window.currentUser.id;
+            document.getElementById('adm-email').textContent = window.currentUser.email;
+        }
+    }
 </script>
