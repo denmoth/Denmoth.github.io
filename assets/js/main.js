@@ -7,6 +7,9 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 let supabase; 
 let currentUser = null;
 
+// ==========================================
+// INITIALIZATION
+// ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const { createClient } = window.supabase;
@@ -14,7 +17,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         await initAuth();
         initComments();
-        initProfile(); 
+        
+        // Запускаем профиль ТОЛЬКО если функция существует (логика может быть локальной)
+        if (typeof initProfile === 'function') {
+            initProfile(); 
+        } else {
+            // Если мы на странице профиля, но функции нет - обрабатываем тут
+            if(window.location.pathname === '/profile/') {
+                checkProfilePage();
+            }
+        }
     } catch(e) {
         console.error("Supabase init failed:", e);
     }
@@ -28,22 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 // AUTHENTICATION MODULE
 // ==========================================
 async function initAuth() {
+    // Проверка текущей сессии
     const { data: { session } } = await supabase.auth.getSession();
     updateUserUI(session?.user);
 
+    // Подписка на изменения (вход/выход)
     supabase.auth.onAuthStateChange((_event, session) => {
         updateUserUI(session?.user);
     });
-
-    const loginBtn = document.getElementById('login-btn');
-    if(loginBtn) {
-        loginBtn.onclick = (e) => {
-            // Если уже вошли - это ссылка на профиль или дропдаун, не перехватываем
-            if(currentUser) return; 
-            e.preventDefault();
-            openAuthModal();
-        };
-    }
 }
 
 function updateUserUI(user) {
@@ -55,32 +59,62 @@ function updateUserUI(user) {
         const avatar = user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
         const name = user.user_metadata.full_name || user.email.split('@')[0];
         
-        // Меняем кнопку на профиль с выпадающим меню (если нужно) или просто ссылка
+        // Меняем кнопку "Войти" на мини-профиль
         loginBtn.innerHTML = `
             <img src="${avatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:8px; border:1px solid var(--border);">
             <span>${name}</span>
         `;
         loginBtn.href = "/profile/";
-        loginBtn.onclick = null; // Удаляем обработчик модалки
+        // Убираем onclick чтобы ссылка работала как переход
+        loginBtn.onclick = null; 
         
-        // Для страницы профиля - заполняем данные
+        // Если мы уже на странице профиля - обновляем данные
         if(window.location.pathname === '/profile/') {
-            const pName = document.getElementById('p-name');
-            if(pName) pName.textContent = name;
-            const pEmail = document.getElementById('p-email');
-            if(pEmail) pEmail.textContent = user.email;
-            const pAv = document.getElementById('p-avatar');
-            if(pAv) pAv.src = avatar;
+            checkProfilePage();
         }
     } else {
+        // Возвращаем кнопку входа
         loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> <span>Log In</span>`;
         loginBtn.href = "#";
-        loginBtn.onclick = (e) => { e.preventDefault(); openAuthModal(); };
+        loginBtn.onclick = (e) => { 
+            e.preventDefault(); 
+            openAuthModal(); 
+        };
+    }
+}
+
+// Логика страницы профиля (перенесена из profile.html чтобы не терялась)
+function checkProfilePage() {
+    const loading = document.getElementById('profile-loading');
+    const content = document.getElementById('profile-content');
+    const guest = document.getElementById('guest-view');
+    
+    if(!content) return;
+
+    if(loading) loading.style.display = 'none';
+    
+    if(currentUser) {
+        content.style.display = 'block';
+        if(guest) guest.style.display = 'none';
+        
+        const avatar = currentUser.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
+        const name = currentUser.user_metadata.full_name || 'User';
+        
+        const pAvatar = document.getElementById('p-avatar');
+        const pName = document.getElementById('p-name');
+        const pEmail = document.getElementById('p-email');
+        
+        if(pAvatar) pAvatar.src = avatar;
+        if(pName) pName.textContent = name;
+        if(pEmail) pEmail.textContent = currentUser.email;
+    } else {
+        content.style.display = 'none';
+        if(guest) guest.style.display = 'block';
     }
 }
 
 // ==========================================
-// COMMENTS MODULE (FIXED INFINITE LOADING)
+// COMMENTS MODULE
 // ==========================================
 async function initComments() {
     const container = document.getElementById('comments-container');
@@ -92,7 +126,7 @@ async function initComments() {
 
     try {
         const { data: comments, error } = await supabase
-            .from('comments') // Убедись, что таблица существует!
+            .from('comments')
             .select('*')
             .eq('page_slug', pageSlug)
             .order('created_at', { ascending: false });
@@ -104,7 +138,7 @@ async function initComments() {
         list.innerHTML = `
             <div style="text-align:center; padding:20px; color:#d73a49;">
                 <i class="fa-solid fa-triangle-exclamation"></i> Error loading comments.<br>
-                <span style="font-size:0.8rem; color:var(--text-muted);">Ensure 'comments' table exists in Supabase.</span>
+                <span style="font-size:0.8rem; color:var(--text-muted);">Ensure 'comments' table exists & RLS enabled.</span>
             </div>
         `;
     }
@@ -180,7 +214,7 @@ function renderComments(comments) {
 }
 
 // ==========================================
-// UTILS
+// UTILS & UI
 // ==========================================
 function initTheme() {
     const btn = document.getElementById('theme-toggle');
@@ -212,15 +246,23 @@ function initLangSwitcher() {
 function initCopyButtons() {
     document.querySelectorAll('.result-group, .code-container').forEach(group => {
         if(group.querySelector('.copy-icon-btn, .copy-btn')) return;
-        const btn = document.createElement('button');
         
+        let target = group.querySelector('input, textarea');
+        if (!target) target = group.querySelector('pre, code');
+
+        const btn = document.createElement('button');
         if (group.classList.contains('code-container')) {
             btn.className = 'copy-btn btn';
             btn.innerHTML = 'Copy';
             btn.style.cssText = 'position:absolute; right:10px; top:8px;';
             const head = group.querySelector('.code-head');
-            (head || group).style.position = 'relative';
-            (head || group).appendChild(btn);
+            if(head) {
+                head.style.position = 'relative';
+                head.appendChild(btn);
+            } else {
+                group.style.position = 'relative';
+                group.appendChild(btn);
+            }
         } else {
             btn.className = 'copy-icon-btn';
             btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
@@ -228,25 +270,40 @@ function initCopyButtons() {
         }
 
         btn.onclick = () => {
-            let target = group.querySelector('input, textarea') || group.querySelector('pre, code');
-            if(target) {
-                navigator.clipboard.writeText(target.value || target.innerText);
-                const old = btn.innerHTML;
-                btn.innerHTML = group.classList.contains('code-container') ? 'Copied!' : '<i class="fa-solid fa-check"></i>';
-                setTimeout(() => btn.innerHTML = old, 1500);
+            const txt = target && (target.value || target.innerText) || "";
+            navigator.clipboard.writeText(txt);
+            
+            if (group.classList.contains('code-container')) {
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy', 1500);
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1500);
             }
         };
     });
 }
 
-function escapeHtml(text) { return text ? text.replace(/</g, "&lt;").replace(/>/g, "&gt;") : ''; }
+function escapeHtml(text) {
+    if(!text) return "";
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 
-// EXPORTS
-window.openAuthModal = () => document.getElementById('auth-modal').style.display = 'flex';
-window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
+// Global Exports
+window.openAuthModal = () => {
+    const modal = document.getElementById('auth-modal');
+    if(modal) modal.style.display = 'flex';
+};
+window.closeAuthModal = () => {
+    const modal = document.getElementById('auth-modal');
+    if(modal) modal.style.display = 'none';
+};
 window.loginWith = async (provider) => {
+    // ВАЖНО: Добавлена опция redirectTo, чтобы после GitHub/Google возвращало на профиль
     await supabase.auth.signInWithOAuth({ 
         provider: provider,
-        options: { redirectTo: window.location.origin + '/profile/' } // Redirect back
+        options: {
+            redirectTo: window.location.origin + '/profile/'
+        }
     });
 };
