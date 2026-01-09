@@ -62,7 +62,8 @@
         </aside>
     </div>
 
-    <script src="/assets/js/main.js"></script>
+    {% include scripts.html %}
+    
     <script>
         const fsBtn = document.getElementById('fullscreen-btn');
         const wrapper = document.getElementById('tool-wrapper');
@@ -88,7 +89,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                if(!window.currentUser) {
+                if(!window.Denmoth?.State?.currentUser) { // Безопасная проверка через State
                     const ga = document.getElementById('guest-input-area');
                     if(ga) ga.style.display = 'block';
                 }
