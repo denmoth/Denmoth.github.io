@@ -58,6 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
         out.style.transform = 'scale(0.98)';
         out.style.opacity = '0.5';
         
+        // --- TRACKING START ---
+        if(window.trackToolUsage) window.trackToolUsage();
+        // --- TRACKING END ---
+
         setTimeout(() => {
             if(window.crypto && window.crypto.randomUUID) {
                 out.value = crypto.randomUUID();
