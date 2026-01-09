@@ -1,7 +1,32 @@
-/* Auth Modal */
+/* --- HERO (ГЛАВНАЯ СТРАНИЦА) --- */
+.hero { 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    margin-bottom: 50px; 
+}
+.hero h1 { 
+    font-size: 2.5rem; 
+    margin-bottom: 15px; 
+    font-weight: 700; 
+    letter-spacing: -1px; 
+}
+.hero p { 
+    color: var(--text-muted); 
+    font-size: 1.2rem; 
+    max-width: 600px; 
+    line-height: 1.6; 
+}
+.hero img {
+    width: 80px; 
+    height: 80px; 
+    border-radius: 12px; 
+    margin-bottom: 20px;
+}
+
+/* --- AUTH MODAL --- */
 .auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9000; display: none; align-items: center; justify-content: center; opacity: 0; animation: fadeIn 0.3s forwards; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .auth-box { background: var(--bg-panel); border: 1px solid var(--border); padding: 40px; border-radius: 16px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); transform: scale(0.95); animation: scaleUp 0.3s forwards 0.1s; }
 .auth-header { text-align: center; margin-bottom: 30px; }
 .auth-providers { display: flex; flex-direction: column; gap: 12px; }
@@ -12,7 +37,7 @@
 .auth-divider span { padding: 0 15px; }
 .auth-close { width: 100%; margin-top: 20px; background: transparent; border: none; color: var(--text-muted); }
 
-/* Profile */
+/* --- PROFILE --- */
 .profile-header { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin-bottom: 30px; display: flex; align-items: center; gap: 20px; }
 .profile-avatar-xl { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--bg-body); }
 .profile-info h1 { margin: 0 0 5px 0; font-size: 1.8rem; }
@@ -26,7 +51,7 @@
 .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border); }
 .settings-row:last-child { border-bottom: none; }
 
-/* Comments */
+/* --- COMMENTS --- */
 .comments-section { margin-top: 60px; border-top: 1px solid var(--border); padding-top: 30px; }
 .comment-box { background: var(--bg-panel); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 12px; position: relative; transition: 0.2s; }
 .comment-children { margin-left: 25px; border-left: 2px solid rgba(88, 166, 255, 0.2); padding-left: 10px; margin-top: 10px; }
@@ -46,3 +71,8 @@
 .act-btn:hover { color: #58a6ff; text-decoration: none; }
 .act-btn.del:hover { color: #d73a49; }
 .reply-input-area { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
