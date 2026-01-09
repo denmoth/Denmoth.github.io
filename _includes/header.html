@@ -49,8 +49,11 @@
                 <option value="ru" {% if site.active_lang == "ru" %}selected{% endif %}>RU</option>
             </select>
             
-            <button id="theme-toggle" style="background:transparent; border:none; font-size:1.1rem; padding:0 8px; color:var(--text-muted);">
-                <i class="fa-solid fa-moon"></i>
+            <button id="theme-toggle" class="theme-btn" aria-label="Toggle Theme">
+                <div class="theme-icon-wrapper">
+                    <i class="fa-solid fa-sun icon-sun"></i>
+                    <i class="fa-solid fa-moon icon-moon"></i>
+                </div>
             </button>
             
             <a id="login-btn" class="btn-login" href="#" onclick="event.preventDefault(); window.openAuthModal();">
@@ -63,11 +66,9 @@
     
     <script>
         function goBack() {
-            // Если есть история и мы не пришли извне (или реферер наш сайт)
             if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
                 history.back();
             } else {
-                // Иначе на главную
                 window.location.href = '/';
             }
         }
