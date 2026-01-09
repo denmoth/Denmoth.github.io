@@ -1,6 +1,3 @@
-html[lang="ru"] .lang-en { display: none !important; }
-html[lang="en"] .lang-ru { display: none !important; }
-
 html { scroll-behavior: smooth; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
