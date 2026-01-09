@@ -15,17 +15,16 @@
     window.initTheme = function() {
         const btn = document.getElementById('theme-toggle');
         if(!btn) return;
+        
+        // Читаем тему
         let current = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', current);
         
-        const updateIcon = (t) => btn.innerHTML = t === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
-        updateIcon(current);
-
         btn.onclick = () => {
             current = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', current);
             localStorage.setItem('theme', current);
-            updateIcon(current);
+            // Анимация работает через CSS селектор [data-theme="dark"]
         };
     };
 
