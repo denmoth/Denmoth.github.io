@@ -1,39 +1,25 @@
 (function() {
-    // 1. ЗАЩИТА ОТ ПОВТОРНОГО ЗАПУСКА
     if (window.denmothMainInitialized) return;
     window.denmothMainInitialized = true;
 
-    // 2. КОНФИГУРАЦИЯ
     const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
     const ADMIN_EMAIL = 'denmoth8871top@gmail.com'; 
 
-    // Глобальные переменные
     window.currentUser = null;
     window.isAdmin = false;
     let bannedUsersCache = [];
 
-    // 3. ИНИЦИАЛИЗАЦИЯ
     document.addEventListener('DOMContentLoaded', async () => {
         console.log("Denmoth JS: Starting...");
-        
         try {
             if (window.supabase && window.supabase.createClient) {
                 const { createClient } = window.supabase;
                 window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-                
                 await initAuth();
-                
-                // Запускаем комменты только если есть контейнер
-                if (document.getElementById('comments-container')) {
-                    initCommentsModule();
-                }
-            } else {
-                console.warn("Supabase SDK missing.");
+                if (document.getElementById('comments-container')) initCommentsModule();
             }
-        } catch(e) {
-            console.error("Init Error:", e);
-        }
+        } catch(e) { console.error("Init Error:", e); }
         
         initTheme();
         initLangSwitcher();
@@ -41,11 +27,10 @@
         initModalHandlers();
     });
 
-    // --- АВТОРИЗАЦИЯ ---
+    // --- AUTH ---
     async function initAuth() {
         const { data: { session } } = await window.supabase.auth.getSession();
         await handleUserSession(session?.user);
-
         window.supabase.auth.onAuthStateChange(async (_event, session) => {
             await handleUserSession(session?.user);
         });
@@ -54,10 +39,7 @@
     async function handleUserSession(user) {
         window.currentUser = user;
         window.isAdmin = user?.email === ADMIN_EMAIL;
-        
         updateHeaderUI(user);
-        
-        // Если мы на странице профиля
         if (window.location.pathname.includes('/profile/') && typeof window.renderProfilePage === 'function') {
             window.renderProfilePage(user, window.isAdmin);
         }
@@ -73,33 +55,32 @@
             const borderStyle = window.isAdmin ? 'border: 2px solid #d73a49;' : 'border: 1px solid var(--border);';
             const adminIcon = window.isAdmin ? '<i class="fa-solid fa-crown" style="color:#d73a49; margin-right:5px;"></i>' : '';
 
-            // Клонируем кнопку, чтобы убрать старые onclick и превратить в ссылку
             const newBtn = loginBtn.cloneNode(false);
-            newBtn.innerHTML = `
-                <img src="${avatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:8px; ${borderStyle}">
-                <span>${adminIcon}${name}</span>
-            `;
+            newBtn.innerHTML = `<img src="${avatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:8px; ${borderStyle}"><span>${adminIcon}${name}</span>`;
             newBtn.href = "/profile/";
             newBtn.id = "login-btn";
             newBtn.onclick = null;
-            
             if(loginBtn.parentNode) loginBtn.parentNode.replaceChild(newBtn, loginBtn);
         } else {
             const isRu = window.location.pathname.startsWith('/ru');
             loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> <span>${isRu ? 'Войти' : 'Log In'}</span>`;
             loginBtn.href = "#";
-            loginBtn.onclick = (e) => { 
-                e.preventDefault(); 
-                window.openAuthModal(); 
-            };
+            loginBtn.onclick = (e) => { e.preventDefault(); window.openAuthModal(); };
         }
     }
 
-    // --- КОММЕНТАРИИ V2 ---
+    // --- COMMENTS SYSTEM ---
+    function getCleanSlug() {
+        let path = window.location.pathname;
+        if (path.startsWith('/ru')) path = path.substring(3);
+        if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+        if (path === '') path = '/';
+        return path;
+    }
+
     async function initCommentsModule() {
         const container = document.getElementById('comments-container');
         if (!container) return;
-
         const pageSlug = getCleanSlug();
         const list = document.getElementById('comments-list');
 
@@ -111,13 +92,11 @@
 
         if (error) {
             console.error("Comments Error:", error);
-            list.innerHTML = `<div style="text-align:center; color:#d73a49;">Error loading comments. Check DB.</div>`;
+            list.innerHTML = `<div style="text-align:center; color:#d73a49;">Error loading comments.</div>`;
             return;
         }
-
         renderCommentsTree(comments || []);
 
-        // Настройка главной кнопки отправки
         const sendBtn = document.getElementById('send-comment');
         if(sendBtn) {
             const newBtn = sendBtn.cloneNode(true);
@@ -126,20 +105,14 @@
         }
     }
 
-    // ЭКСПОРТИРУЕМ ФУНКЦИЮ В WINDOW, ЧТОБЫ КНОПКИ ЕЁ ВИДЕЛИ
     window.postComment = async function(parentId) {
         const inputId = parentId ? `reply-input-${parentId}` : 'comment-input';
         const input = document.getElementById(inputId);
-        
-        if (!input) {
-            console.error("Input not found:", inputId);
-            return;
-        }
+        if (!input) return console.error("Input not found:", inputId);
 
         const content = input.value.trim();
         if(!content) return;
 
-        // Проверка бана
         if (window.currentUser) {
             const { data: profile } = await window.supabase.from('profiles').select('is_banned').eq('id', window.currentUser.id).single();
             if (profile?.is_banned) return alert("You are banned.");
@@ -196,11 +169,8 @@
 
         const rootComments = [];
         comments.forEach(c => {
-            if (c.parent_id && commentMap[c.parent_id]) {
-                commentMap[c.parent_id].children.push(c);
-            } else {
-                rootComments.push(c);
-            }
+            if (c.parent_id && commentMap[c.parent_id]) commentMap[c.parent_id].children.push(c);
+            else rootComments.push(c);
         });
 
         rootComments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -216,7 +186,7 @@
         const canDelete = window.isAdmin || isOwner;
         const badge = c.is_guest ? '<span class="guest-tag">Guest</span>' : '';
         const adminControls = (window.isAdmin && c.user_id) ? 
-            `<button onclick="banUser('${c.user_id}')" title="Ban" style="color:#d73a49; border:none; background:none; cursor:pointer; margin-left:5px;"><i class="fa-solid fa-ban"></i></button>` : '';
+            `<button onclick="banUser('${c.user_id}')" title="Ban User" style="color:#d73a49; border:none; background:none; cursor:pointer; margin-left:5px;"><i class="fa-solid fa-ban"></i></button>` : '';
 
         let scoreColor = 'var(--text-muted)';
         if(c.score > 0) scoreColor = '#238636';
@@ -238,14 +208,11 @@
                         <span style="color:${scoreColor}; font-weight:bold; font-size:0.9rem;">${c.score}</span>
                         <button onclick="voteComment(${c.id}, -1, ${c.userVote})" class="vote-btn ${c.userVote === -1 ? 'active-down' : ''}"><i class="fa-solid fa-chevron-down"></i></button>
                     </div>
-                    
                     <button onclick="toggleReply(${c.id})" class="act-btn"><i class="fa-solid fa-reply"></i> Reply</button>
-                    
                     ${isOwner ? `<button onclick="editComment(${c.id})" class="act-btn"><i class="fa-solid fa-pen"></i> Edit</button>` : ''}
                     ${canDelete ? `<button onclick="deleteComment(${c.id})" class="act-btn del"><i class="fa-solid fa-trash"></i></button>` : ''}
                     ${!isOwner && window.currentUser ? `<button onclick="reportComment(${c.id})" class="act-btn" title="Report"><i class="fa-regular fa-flag"></i></button>` : ''}
                 </div>
-
                 <div id="reply-area-${c.id}" class="reply-input-area" style="display:none; margin-top:10px;">
                     <div style="display:flex; gap:10px;">
                         <input type="text" id="reply-input-${c.id}" class="form-input" placeholder="Write a reply..." style="padding:8px;">
@@ -264,8 +231,7 @@
         return el;
     }
 
-    // --- ДЕЙСТВИЯ (Глобальные функции) ---
-
+    // --- ACTIONS ---
     window.toggleReply = function(id) {
         const area = document.getElementById(`reply-area-${id}`);
         if(area) area.style.display = area.style.display === 'none' ? 'block' : 'none';
@@ -273,13 +239,7 @@
 
     window.editComment = function(id) {
         const body = document.getElementById(`body-${id}`);
-        
-        // ЕСЛИ УЖЕ ОТКРЫТО ПОЛЕ РЕДАКТИРОВАНИЯ - ОТМЕНЯЕМ
-        if (body.querySelector('textarea')) {
-            window.cancelEdit(id);
-            return;
-        }
-
+        if (body.querySelector('textarea')) { window.cancelEdit(id); return; }
         const currentText = body.innerText;
         body.dataset.original = body.innerHTML;
         body.innerHTML = `
@@ -299,45 +259,49 @@
     window.saveEdit = async function(id) {
         const text = document.getElementById(`edit-txt-${id}`).value;
         const { error } = await window.supabase.from('comments').update({ content: text }).eq('id', id);
-        if(!error) initCommentsModule();
-        else alert(error.message);
+        if(!error) initCommentsModule(); else alert(error.message);
     };
 
     window.voteComment = async function(id, type, currentVote) {
         if (!window.currentUser) return window.openAuthModal();
-        if (currentVote !== 0) {
-            await window.supabase.from('comment_votes').delete().match({ user_id: window.currentUser.id, comment_id: id });
-        }
-        if (currentVote !== type) {
-            await window.supabase.from('comment_votes').insert({ user_id: window.currentUser.id, comment_id: id, vote_type: type });
-        }
+        if (currentVote !== 0) await window.supabase.from('comment_votes').delete().match({ user_id: window.currentUser.id, comment_id: id });
+        if (currentVote !== type) await window.supabase.from('comment_votes').insert({ user_id: window.currentUser.id, comment_id: id, vote_type: type });
         initCommentsModule();
     };
 
     window.deleteComment = async function(id) {
         if (confirm('Delete this comment?')) {
             const { error } = await window.supabase.from('comments').delete().eq('id', id);
-            if (!error) initCommentsModule();
-            else alert("Error: " + error.message);
+            if (!error) initCommentsModule(); else alert("Error: " + error.message);
         }
     };
 
+    window.reportComment = async (id) => {
+        if (!window.currentUser) return window.openAuthModal();
+        const reason = prompt("Reason for reporting:");
+        if (reason) {
+            await window.supabase.from('reports').insert({ reporter_id: window.currentUser.id, comment_id: id, reason });
+            alert("Report sent.");
+        }
+    };
+
+    // --- ADMIN ACTIONS (RPC) ---
     window.banUser = async function(uid) {
         if (!window.isAdmin) return;
-        if (confirm("Ban user? All their comments will be deleted.")) {
-            // Триггер в БД сам удалит комменты
-            const { error } = await window.supabase.from('profiles').upsert({ id: uid, is_banned: true });
+        if (confirm("Ban user? Comments will be deleted.")) {
+            // Вызываем защищенную SQL-функцию
+            const { error } = await window.supabase.rpc('admin_ban_user', { target_id: uid });
             if (!error) {
                 alert("User banned.");
-                location.reload(); 
+                location.reload();
             } else alert(error.message);
         }
     };
 
     window.unbanUser = async function(uid) {
         if (!window.isAdmin) return;
-        if (confirm("Unban this user?")) {
-            const { error } = await window.supabase.from('profiles').update({ is_banned: false }).eq('id', uid);
+        if (confirm("Unban user?")) {
+            const { error } = await window.supabase.rpc('admin_unban_user', { target_id: uid });
             if (!error) {
                 alert("User unbanned.");
                 if (typeof window.loadBannedUsers === 'function') window.loadBannedUsers();
@@ -345,7 +309,7 @@
         }
     };
 
-    // --- ПРОФИЛЬ ---
+    // --- PROFILE ---
     window.renderProfilePage = async function(user, isAdmin) {
         const loading = document.getElementById('profile-loading');
         const content = document.getElementById('profile-content');
@@ -357,15 +321,13 @@
         if(user) {
             content.style.display = 'block';
             if(guest) guest.style.display = 'none';
-            
             document.getElementById('p-avatar').src = user.user_metadata.avatar_url;
             document.getElementById('p-name').textContent = user.user_metadata.full_name || 'User';
             document.getElementById('p-email').textContent = user.email;
 
             if (isAdmin) {
-                const badge = document.getElementById('p-status-badge');
-                badge.style.backgroundColor = '#d73a49';
-                badge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Administrator';
+                document.getElementById('p-status-badge').style.backgroundColor = '#d73a49';
+                document.getElementById('p-status-badge').innerHTML = '<i class="fa-solid fa-shield-halved"></i> Administrator';
                 document.getElementById('btn-tab-admin').style.display = 'inline-flex';
                 window.loadBannedUsers();
             }
@@ -402,7 +364,6 @@
         if (!error) {
             btn.innerHTML = 'Saved!';
             btn.style.color = '#238636';
-            
             const path = window.location.pathname;
             if ((lang === 'ru' && !path.startsWith('/ru')) || (lang === 'en' && path.startsWith('/ru'))) {
                 setTimeout(() => window.location.href = lang === 'ru' ? '/ru/profile/' : '/profile/', 500);
@@ -411,6 +372,7 @@
             }
         } else {
             btn.innerHTML = 'Error';
+            console.error(error);
             alert("Save Error: " + error.message);
             btn.disabled = false;
         }
@@ -421,18 +383,11 @@
         if(!tbody) return;
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Loading...</td></tr>';
         
-        const { data, error } = await window.supabase
-            .from('profiles')
-            .select('*')
-            .eq('is_banned', true)
-            .order('updated_at', { ascending: false });
-
+        const { data, error } = await window.supabase.from('profiles').select('*').eq('is_banned', true).order('updated_at', { ascending: false });
         if (data) {
             bannedUsersCache = data;
             window.renderBanList(data);
-        } else {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#d73a49;">Error loading list</td></tr>';
-        }
+        } else tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#d73a49;">Error loading list</td></tr>';
     };
 
     window.renderBanList = function(list) {
@@ -443,95 +398,50 @@
         }
         tbody.innerHTML = list.map(u => `
             <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:10px;">
-                    <div style="font-weight:600;">${escapeHtml(u.full_name || 'Unknown')}</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(u.email || u.id)}</div>
-                </td>
-                <td style="padding:10px; font-size:0.85rem;">
-                    ${u.updated_at ? new Date(u.updated_at).toLocaleDateString() : 'N/A'}
-                </td>
-                <td style="padding:10px;">
-                    <button onclick="unbanUser('${u.id}')" class="btn" style="padding:4px 8px; font-size:0.8rem; border-color:#238636; color:#238636;">Unban</button>
-                </td>
+                <td style="padding:10px;"><div style="font-weight:600;">${escapeHtml(u.full_name||'Unknown')}</div><div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(u.email||u.id)}</div></td>
+                <td style="padding:10px; font-size:0.85rem;">${u.updated_at ? new Date(u.updated_at).toLocaleDateString() : 'N/A'}</td>
+                <td style="padding:10px;"><button onclick="unbanUser('${u.id}')" class="btn" style="padding:4px 8px; font-size:0.8rem; border-color:#238636; color:#238636;">Unban</button></td>
             </tr>
         `).join('');
     };
 
     window.filterBanList = function() {
         const q = document.getElementById('ban-search').value.toLowerCase();
-        const filtered = bannedUsersCache.filter(u => 
-            (u.full_name && u.full_name.toLowerCase().includes(q)) || 
-            (u.email && u.email.toLowerCase().includes(q))
-        );
+        const filtered = bannedUsersCache.filter(u => (u.full_name && u.full_name.toLowerCase().includes(q)) || (u.email && u.email.toLowerCase().includes(q)));
         window.renderBanList(filtered);
     };
 
     // --- UTILS ---
-    function getCleanSlug() {
-        let path = window.location.pathname;
-        if (path.startsWith('/ru')) path = path.substring(3);
-        if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
-        if (path === '') path = '/';
-        return path;
-    }
-
     window.openAuthModal = () => document.getElementById('auth-modal').style.display = 'flex';
     window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
-    window.loginWith = async (p) => {
-        await window.supabase.auth.signInWithOAuth({ 
-            provider: p, 
-            options: { redirectTo: window.location.origin + '/profile/' } 
-        });
-    };
+    window.loginWith = async (p) => { await window.supabase.auth.signInWithOAuth({ provider: p, options: { redirectTo: window.location.origin + '/profile/' } }); };
     
-    function initTheme() {
-        const btn = document.getElementById('theme-toggle');
-        if(!btn) return;
-        let current = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', current);
+    function initTheme() { /* theme logic */ 
+        const btn = document.getElementById('theme-toggle'); if(!btn) return;
+        let current = localStorage.getItem('theme') || 'dark'; document.documentElement.setAttribute('data-theme', current);
         const updateIcon = (t) => btn.innerHTML = t === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
         updateIcon(current);
-        btn.onclick = () => {
-            current = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', current);
-            localStorage.setItem('theme', current);
-            updateIcon(current);
-        };
+        btn.onclick = () => { current = current === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', current); localStorage.setItem('theme', current); updateIcon(current); };
     }
     
-    function initLangSwitcher() {
-        const select = document.getElementById('lang-select');
-        if(!select) return;
-        const newSelect = select.cloneNode(true);
-        if(select.parentNode) select.parentNode.replaceChild(newSelect, select);
+    function initLangSwitcher() { /* lang logic */ 
+        const select = document.getElementById('lang-select'); if(!select) return;
+        const newSelect = select.cloneNode(true); select.parentNode.replaceChild(newSelect, select);
         newSelect.addEventListener('change', (e) => {
             const path = window.location.pathname;
-            if (e.target.value === 'ru' && !path.startsWith('/ru')) {
-                window.location.href = path === '/' ? '/ru/' : '/ru' + path;
-            } else if (e.target.value === 'en' && path.startsWith('/ru')) {
-                window.location.href = path.replace('/ru', '') || '/';
-            }
+            if (e.target.value === 'ru' && !path.startsWith('/ru')) window.location.href = path === '/' ? '/ru/' : '/ru' + path;
+            else if (e.target.value === 'en' && path.startsWith('/ru')) window.location.href = path.replace('/ru', '') || '/';
         });
     }
     
-    function initCopyButtons() {
+    function initCopyButtons() { /* copy logic */ 
         document.querySelectorAll('.result-group, .code-container').forEach(group => {
             if(group.querySelector('.copy-icon-btn, .copy-btn')) return;
             let target = group.querySelector('input, textarea') || group.querySelector('pre, code');
             const btn = document.createElement('button');
-            if (group.classList.contains('code-container')) {
-                btn.className = 'copy-btn btn'; btn.innerHTML = 'Copy'; btn.style.cssText = 'position:absolute; right:10px; top:8px;';
-                const head = group.querySelector('.code-head'); head ? head.appendChild(btn) : group.appendChild(btn);
-            } else {
-                btn.className = 'copy-icon-btn'; btn.innerHTML = '<i class="fa-regular fa-copy"></i>'; group.appendChild(btn);
-            }
-            btn.onclick = () => {
-                const txt = target && (target.value || target.innerText) || "";
-                navigator.clipboard.writeText(txt);
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = group.classList.contains('code-container') ? 'Copied!' : '<i class="fa-solid fa-check"></i>';
-                setTimeout(() => btn.innerHTML = originalHtml, 1500);
-            };
+            if (group.classList.contains('code-container')) { btn.className = 'copy-btn btn'; btn.innerHTML = 'Copy'; btn.style.cssText = 'position:absolute; right:10px; top:8px;'; const head = group.querySelector('.code-head'); head ? head.appendChild(btn) : group.appendChild(btn); }
+            else { btn.className = 'copy-icon-btn'; btn.innerHTML = '<i class="fa-regular fa-copy"></i>'; group.appendChild(btn); }
+            btn.onclick = () => { navigator.clipboard.writeText(target && (target.value || target.innerText) || ""); const originalHtml = btn.innerHTML; btn.innerHTML = group.classList.contains('code-container') ? 'Copied!' : '<i class="fa-solid fa-check"></i>'; setTimeout(() => btn.innerHTML = originalHtml, 1500); };
         });
     }
     
@@ -540,8 +450,5 @@
         window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
     }
     
-    function escapeHtml(text) {
-        if(!text) return "";
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
+    function escapeHtml(text) { if(!text) return ""; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 })();
