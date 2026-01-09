@@ -4,6 +4,7 @@
 
     const SUPABASE_URL = 'https://dtkmclmaboutpbeogqmw.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0a21jbG1hYm91dHBiZW9ncW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNDA4NDUsImV4cCI6MjA4MjYxNjg0NX0.BcfRGmUuOKkAs5KYrLNyoymry1FnY4jqQyCanZ4x-PM';
+    
     const ADMIN_EMAIL = 'denmoth8871top@gmail.com'; 
 
     window.currentUser = null;
@@ -14,16 +15,37 @@
             if (window.supabase && window.supabase.createClient) {
                 const { createClient } = window.supabase;
                 window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+                
                 await initAuth();
+                // Загружаем комменты
                 initCommentsModule();
             }
-        } catch(e) { console.error("Supabase init failed:", e); }
+        } catch(e) {
+            console.error("Supabase init failed:", e);
+        }
         
         initTheme();
         initLangSwitcher();
         initCopyButtons();
         initModalHandlers();
     });
+
+    // --- HELPER: Normalize URL (Merge RU and EN comments) ---
+    function getCleanSlug() {
+        let path = window.location.pathname;
+        // Убираем префикс языка
+        if (path.startsWith('/ru')) {
+            path = path.substring(3);
+        }
+        // Убираем лишние слэши в конце для единообразия (/tools/uuid/ -> /tools/uuid)
+        if (path.length > 1 && path.endsWith('/')) {
+            path = path.slice(0, -1);
+        }
+        // Если корень
+        if (path === '') path = '/';
+        
+        return path;
+    }
 
     // --- AUTH ---
     async function initAuth() {
@@ -38,12 +60,13 @@
     async function handleUserSession(user) {
         window.currentUser = user;
         window.isAdmin = user?.email === ADMIN_EMAIL;
+        
         updateHeaderUI(user);
         
-        // Если мы в профиле, запускаем рендер.
-        // Функция теперь глобальная, так что race condition исключен.
-        if (window.location.pathname.includes('/profile/') && typeof window.renderProfilePage === 'function') {
-            window.renderProfilePage(user, window.isAdmin);
+        if (window.location.pathname.includes('/profile/')) {
+            if (typeof window.renderProfilePage === 'function') {
+                window.renderProfilePage(user, window.isAdmin);
+            }
         }
     }
 
@@ -57,6 +80,7 @@
             const borderStyle = window.isAdmin ? 'border: 2px solid #d73a49;' : 'border: 1px solid var(--border);';
             const adminIcon = window.isAdmin ? '<i class="fa-solid fa-crown" style="color:#d73a49; margin-right:5px;"></i>' : '';
 
+            // Клонируем кнопку, чтобы убрать старые эвенты
             const newBtn = loginBtn.cloneNode(false);
             newBtn.innerHTML = `
                 <img src="${avatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:8px; ${borderStyle}">
@@ -65,7 +89,8 @@
             newBtn.href = "/profile/";
             newBtn.id = "login-btn";
             newBtn.onclick = null;
-            loginBtn.parentNode.replaceChild(newBtn, loginBtn);
+            
+            if(loginBtn.parentNode) loginBtn.parentNode.replaceChild(newBtn, loginBtn);
         } else {
             const isRu = window.location.pathname.startsWith('/ru');
             loginBtn.innerHTML = `<i class="fa-brands fa-github"></i> <span>${isRu ? 'Войти' : 'Log In'}</span>`;
@@ -74,12 +99,12 @@
         }
     }
 
-    // --- COMMENTS V2 ---
+    // --- COMMENTS SYSTEM V2.1 ---
     async function initCommentsModule() {
         const container = document.getElementById('comments-container');
         if (!container) return;
 
-        const pageSlug = window.location.pathname;
+        const pageSlug = getCleanSlug(); // Используем нормализованный путь
         const list = document.getElementById('comments-list');
 
         const { data: comments, error } = await window.supabase
@@ -89,29 +114,49 @@
             .order('created_at', { ascending: true });
 
         if (error) {
-            console.error(error);
-            list.innerHTML = `<div style="text-align:center; color:#d73a49;">Error loading comments</div>`;
+            console.error("Comments Load Error:", error);
+            list.innerHTML = `<div style="text-align:center; color:#d73a49;">Error loading comments.</div>`;
             return;
         }
+
         renderCommentsTree(comments || []);
 
         const sendBtn = document.getElementById('send-comment');
         if(sendBtn) {
             const newBtn = sendBtn.cloneNode(true);
-            sendBtn.parentNode.replaceChild(newBtn, sendBtn);
+            if(sendBtn.parentNode) sendBtn.parentNode.replaceChild(newBtn, sendBtn);
             newBtn.onclick = () => postComment(null); 
         }
     }
 
     async function postComment(parentId = null) {
+        // Формируем ID инпута. Если parentId есть, ищем его поле ответа.
         const inputId = parentId ? `reply-input-${parentId}` : 'comment-input';
         const input = document.getElementById(inputId);
+        
+        if (!input) {
+            console.error("Input not found:", inputId);
+            return;
+        }
+
         const content = input.value.trim();
         if(!content) return;
 
+        // Проверка бана перед отправкой
         if (window.currentUser) {
-            const { data: profile } = await window.supabase.from('profiles').select('is_banned').eq('id', window.currentUser.id).single();
-            if (profile?.is_banned) return alert("You are banned.");
+            const { data: profile } = await window.supabase
+                .from('profiles')
+                .select('is_banned')
+                .eq('id', window.currentUser.id)
+                .single();
+            
+            if (profile?.is_banned) {
+                alert("You are banned from commenting.");
+                return;
+            }
+        } else {
+            // Если гость пытается ответить - просим войти (опционально, но лучше для защиты от спама)
+            // Но пока оставим логику как была: гостевое имя
         }
 
         let authorName = "Guest", authorAvatar = null, userId = null, isGuest = true;
@@ -126,16 +171,25 @@
         }
 
         const { error } = await window.supabase.from('comments').insert({
-            page_slug: window.location.pathname,
-            content, author_name: authorName, author_avatar: authorAvatar,
-            user_id: userId, is_guest: isGuest, parent_id: parentId
+            page_slug: getCleanSlug(), // Нормализуем путь при сохранении
+            content: content,
+            author_name: authorName,
+            author_avatar: authorAvatar,
+            user_id: userId,
+            is_guest: isGuest,
+            parent_id: parentId
         });
 
         if(!error) {
             input.value = '';
+            // Если это был ответ, скроем поле
+            if (parentId) {
+                const area = document.getElementById(`reply-area-${parentId}`);
+                if(area) area.style.display = 'none';
+            }
             initCommentsModule();
         } else {
-            alert("Error: " + error.message);
+            alert("Error sending comment: " + error.message);
         }
     }
 
@@ -168,6 +222,7 @@
             }
         });
 
+        // Сортировка: новые сверху для корневых
         rootComments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         rootComments.forEach(c => list.appendChild(createCommentElement(c)));
     }
@@ -180,6 +235,8 @@
         const isOwner = window.currentUser && window.currentUser.id === c.user_id;
         const canDelete = window.isAdmin || isOwner;
         const badge = c.is_guest ? '<span class="guest-tag">Guest</span>' : '';
+        
+        // Кнопка бана только для админа и если автор не гость
         const adminControls = (window.isAdmin && c.user_id) ? 
             `<button onclick="banUser('${c.user_id}')" title="Ban" style="color:#d73a49; border:none; background:none; cursor:pointer; margin-left:5px;"><i class="fa-solid fa-ban"></i></button>` : '';
 
@@ -206,7 +263,7 @@
                     <button onclick="toggleReply(${c.id})" class="act-btn"><i class="fa-solid fa-reply"></i> Reply</button>
                     ${isOwner ? `<button onclick="editComment(${c.id})" class="act-btn"><i class="fa-solid fa-pen"></i> Edit</button>` : ''}
                     ${canDelete ? `<button onclick="deleteComment(${c.id})" class="act-btn del"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    ${!isOwner ? `<button onclick="reportComment(${c.id})" class="act-btn" title="Report"><i class="fa-regular fa-flag"></i></button>` : ''}
+                    ${!isOwner && window.currentUser ? `<button onclick="reportComment(${c.id})" class="act-btn" title="Report"><i class="fa-regular fa-flag"></i></button>` : ''}
                 </div>
 
                 <div id="reply-area-${c.id}" class="reply-input-area" style="display:none; margin-top:10px;">
@@ -227,34 +284,50 @@
         return el;
     }
 
-    // --- SMART VOTING LOGIC ---
+    // --- ACTIONS EXPORTS ---
     window.voteComment = async (id, type, currentVote) => {
         if (!window.currentUser) return window.openAuthModal();
         
-        if (currentVote === type) {
-            // Cancel vote (delete)
+        // 1. Убираем старый голос
+        if (currentVote !== 0) {
             await window.supabase.from('comment_votes').delete().match({ user_id: window.currentUser.id, comment_id: id });
-        } else {
-            // Update or Insert (Upsert handles both usually, but we need to be explicit with unique constraint)
-            if (currentVote !== 0) {
-                // Remove old vote first to avoid unique constraint error if upsert isn't perfect
-                await window.supabase.from('comment_votes').delete().match({ user_id: window.currentUser.id, comment_id: id });
-            }
+        }
+        
+        // 2. Если нажали на другой тип (или голоса не было), ставим новый
+        // Если нажали на тот же (currentVote === type), то мы его уже удалили выше, и больше ничего не делаем (отмена лайка)
+        if (currentVote !== type) {
             await window.supabase.from('comment_votes').insert({ user_id: window.currentUser.id, comment_id: id, vote_type: type });
         }
+        
         initCommentsModule();
     };
 
     window.toggleReply = (id) => {
         const area = document.getElementById(`reply-area-${id}`);
-        area.style.display = area.style.display === 'none' ? 'block' : 'none';
+        if(area) area.style.display = area.style.display === 'none' ? 'block' : 'none';
     };
 
     window.deleteComment = async (id) => {
-        if (confirm('Delete?')) {
+        if (confirm('Delete this comment?')) {
             const { error } = await window.supabase.from('comments').delete().eq('id', id);
-            if(!error) initCommentsModule();
-            else alert(error.message); // Should be fixed by SQL cascade
+            if (!error) {
+                initCommentsModule();
+            } else {
+                alert("Error deleting: " + error.message);
+            }
+        }
+    };
+
+    window.banUser = async (uid) => {
+        if (!window.isAdmin) return;
+        if (confirm("Ban this user permanently?")) {
+            const { error } = await window.supabase.from('profiles').upsert({ id: uid, is_banned: true });
+            if (!error) {
+                alert("User banned.");
+                location.reload(); // Перезагружаем, чтобы применилось
+            } else {
+                alert(error.message);
+            }
         }
     };
 
@@ -263,10 +336,10 @@
         const currentText = body.innerText;
         body.dataset.original = body.innerHTML;
         body.innerHTML = `
-            <textarea id="edit-txt-${id}" class="form-area" style="min-height:50px; margin-bottom:5px;">${currentText}</textarea>
+            <textarea id="edit-txt-${id}" class="form-area" style="min-height:60px; margin-bottom:5px;">${currentText}</textarea>
             <div style="display:flex; gap:5px;">
-                <button onclick="saveEdit(${id})" class="btn primary" style="padding:2px 8px; font-size:0.8rem;">Save</button>
-                <button onclick="cancelEdit(${id})" class="btn" style="padding:2px 8px; font-size:0.8rem;">Cancel</button>
+                <button onclick="saveEdit(${id})" class="btn primary" style="padding:4px 10px; font-size:0.8rem;">Save</button>
+                <button onclick="cancelEdit(${id})" class="btn" style="padding:4px 10px; font-size:0.8rem;">Cancel</button>
             </div>
         `;
     };
@@ -280,22 +353,53 @@
 
     window.cancelEdit = (id) => {
         const body = document.getElementById(`body-${id}`);
-        body.innerHTML = body.dataset.original;
+        if(body.dataset.original) body.innerHTML = body.dataset.original;
     };
 
     window.reportComment = async (id) => {
-        if (!window.currentUser) return window.openAuthModal();
         const reason = prompt("Reason for reporting:");
         if (reason) {
             await window.supabase.from('reports').insert({ reporter_id: window.currentUser.id, comment_id: id, reason });
-            alert("Report sent.");
+            alert("Report sent to admin.");
         }
     };
 
-    window.banUser = async (uid) => {
-        if (confirm("Ban this user?")) {
-            await window.supabase.from('profiles').upsert({ id: uid, is_banned: true });
-            alert("User banned.");
+    // --- PROFILE HELPERS ---
+    window.saveProfile = async () => {
+        if(!window.currentUser) return;
+        const btn = document.getElementById('save-settings-btn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        btn.disabled = true;
+
+        const lang = document.getElementById('pref-lang').value;
+        const notif = document.getElementById('pref-email-notif').checked;
+
+        const { error } = await window.supabase.from('profiles').upsert({ 
+            id: window.currentUser.id, 
+            language: lang, 
+            email_notif: notif,
+            updated_at: new Date()
+        });
+
+        if (!error) {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+            btn.style.color = '#238636';
+            
+            const currentPath = window.location.pathname;
+            const isRu = currentPath.startsWith('/ru');
+            
+            // Если язык сменился, редиректим
+            if (lang === 'ru' && !isRu) {
+                setTimeout(() => window.location.href = '/ru/profile/', 500);
+            } else if (lang === 'en' && isRu) {
+                setTimeout(() => window.location.href = '/profile/', 500);
+            } else {
+                setTimeout(() => { btn.innerHTML = 'Save Changes'; btn.disabled = false; btn.style.color = ''; }, 2000);
+            }
+        } else {
+            btn.innerHTML = 'Error';
+            console.error(error);
+            setTimeout(() => { btn.innerHTML = 'Save Changes'; btn.disabled = false; }, 2000);
         }
     };
 
@@ -324,7 +428,8 @@
         const select = document.getElementById('lang-select');
         if(!select) return;
         const newSelect = select.cloneNode(true);
-        select.parentNode.replaceChild(newSelect, select);
+        if(select.parentNode) select.parentNode.replaceChild(newSelect, select);
+        
         newSelect.addEventListener('change', (e) => {
             const path = window.location.pathname;
             if (e.target.value === 'ru' && !path.startsWith('/ru')) {
@@ -364,8 +469,14 @@
     }
 
     function initModalHandlers() {
-        window.openAuthModal = () => document.getElementById('auth-modal').style.display = 'flex';
-        window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
+        window.openAuthModal = () => {
+            const m = document.getElementById('auth-modal');
+            if(m) m.style.display = 'flex';
+        };
+        window.closeAuthModal = () => {
+            const m = document.getElementById('auth-modal');
+            if(m) m.style.display = 'none';
+        };
         window.loginWith = async (p) => {
             await window.supabase.auth.signInWithOAuth({ 
                 provider: p, 
@@ -373,6 +484,7 @@
             });
         };
     }
+    
     function escapeHtml(text) {
         if(!text) return "";
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
