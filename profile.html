@@ -56,6 +56,14 @@ permalink: /profile/
                     <input id="pref-email-notif" type="checkbox" style="width:20px; height:20px; accent-color: var(--accent);">
                 </div>
 
+                <div class="settings-row">
+                    <div>
+                        <div style="font-weight:600;">{% lang en %}Developer Mode{% endlang %}{% lang ru %}Режим разработчика{% endlang %}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">Enable advanced tool features</div>
+                    </div>
+                    <input id="pref-dev-mode" type="checkbox" style="width:20px; height:20px; accent-color: var(--accent);">
+                </div>
+
                 <div style="margin-top:20px; text-align:right;">
                     <button id="save-settings-btn" onclick="saveProfile()" class="btn primary" style="min-width:120px;">
                         {% lang en %}Save Changes{% endlang %}{% lang ru %}Сохранить{% endlang %}
@@ -132,7 +140,7 @@ permalink: /profile/
                 badge.style.backgroundColor = '#d73a49';
                 badge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Administrator';
                 document.getElementById('btn-tab-admin').style.display = 'inline-flex';
-                loadBannedUsers(); // Загружаем список банов
+                loadBannedUsers(); 
             }
 
             // Загрузка настроек
@@ -140,8 +148,13 @@ permalink: /profile/
             if (data) {
                 const ls = document.getElementById('pref-lang');
                 const ns = document.getElementById('pref-email-notif');
+                const dev = document.getElementById('pref-dev-mode');
+                
                 if(ls && data.language) ls.value = data.language;
                 if(ns && data.email_notif !== undefined) ns.checked = data.email_notif;
+                // Предполагаем, что dev_mode может быть в JSONB поле или отдельной колонке, 
+                // если нет - просто сохраняем в локалсторадж для UI эффекта
+                if(dev) dev.checked = localStorage.getItem('dev_mode') === 'true';
             }
         } else {
             content.style.display = 'none';
@@ -156,6 +169,10 @@ permalink: /profile/
 
         const lang = document.getElementById('pref-lang').value;
         const notif = document.getElementById('pref-email-notif').checked;
+        const devMode = document.getElementById('pref-dev-mode').checked;
+
+        // Сохраняем dev_mode локально (или добавь колонку в БД)
+        localStorage.setItem('dev_mode', devMode);
 
         const { error } = await window.supabase.from('profiles').upsert({ 
             id: window.currentUser.id, 
@@ -174,7 +191,8 @@ permalink: /profile/
             }
         } else {
             btn.innerHTML = 'Error';
-            alert(error.message);
+            console.error(error);
+            alert(error.message); // Увидишь детальную ошибку если SQL не сработает
             btn.disabled = false;
         }
     };
@@ -183,13 +201,19 @@ permalink: /profile/
     let bannedUsersCache = [];
 
     window.loadBannedUsers = async () => {
-        if (!window.fetchBannedUsers) return;
+        if (!window.fetchBannedUsers) return; // Функция может не быть в глобале, если admin.js не подгружен
+        // Лучше использовать прямой запрос здесь, если admin.js глючит
         const tbody = document.getElementById('ban-list-body');
         tbody.innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center;">Loading...</td></tr>';
         
-        const data = await window.fetchBannedUsers();
-        bannedUsersCache = data || [];
-        renderBanList(bannedUsersCache);
+        const { data, error } = await window.supabase.from('profiles').select('*').eq('is_banned', true);
+        
+        if(data) {
+            bannedUsersCache = data;
+            renderBanList(data);
+        } else {
+            tbody.innerHTML = '<tr><td colspan="3">Error loading</td></tr>';
+        }
     };
 
     function renderBanList(list) {
