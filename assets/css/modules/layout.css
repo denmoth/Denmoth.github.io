@@ -11,7 +11,29 @@ header {
     width: 100%; 
     flex-shrink: 0;
 }
-.header-inner { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; padding: 0 24px; }
+.header-inner { 
+    display: flex; 
+    justify-content: space-between; /* Разносит влево и вправо */
+    align-items: center; 
+    width: 100%; 
+    max-width: 1200px; 
+    padding: 0 24px; 
+}
+
+/* Группировка слева: кнопка назад + лого */
+.left-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand { font-weight: 600; font-size: 1.1rem; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+.brand img { width: 24px; height: 24px; border-radius: 4px; }
+
+.controls { display: flex; gap: 15px; align-items: center; position: relative; }
+.divider-v { width: 1px; height: 20px; background: var(--border); margin: 0 10px; }
+.nav-btn-link { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: 0.2s; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.nav-btn-link:hover { color: var(--text-main); }
 
 .wrapper { display: flex; flex-direction: column; flex: 1; align-items: center; width: 100%; }
 .hub-layout { max-width: 1000px; margin: 0 auto; padding: 40px 20px; width: 100%; flex: 1; }
