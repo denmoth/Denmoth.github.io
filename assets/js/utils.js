@@ -72,10 +72,26 @@
         if(m) m.addEventListener('click', (e) => { if(e.target === m) window.closeAuthModal(); });
     };
 
+    // FIX: Логика поиска по инструментам
+    window.initToolSearch = function() {
+        const input = document.getElementById('tool-search');
+        if (!input) return;
+
+        input.addEventListener('input', (e) => {
+            const filter = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.card-grid .card');
+            
+            cards.forEach(card => {
+                // Ищем в заголовке и описании
+                const text = (card.querySelector('h3')?.innerText + " " + card.querySelector('p')?.innerText).toLowerCase();
+                card.style.display = text.includes(filter) ? 'flex' : 'none';
+            });
+        });
+    };
+
     window.switchTab = function(tabName) {
         document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
-        // Безопасное получение event
         if(window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
         document.getElementById('tab-' + tabName).classList.add('active');
     };
