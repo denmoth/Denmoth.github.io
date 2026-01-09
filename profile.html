@@ -87,12 +87,6 @@ permalink: /profile/
                     <div>Email: <span id="adm-email" style="color:#58a6ff;">...</span></div>
                     <div>Role: Superuser</div>
                 </div>
-                
-                <h4 style="margin-top:20px;">Newsletter Tools</h4>
-                <p style="font-size:0.85rem; color:var(--text-muted);">To send emails, export users from Supabase who have <code>email_notif: true</code> and use an external service (Resend, Mailgun).</p>
-                <button class="btn" onclick="alert('Go to Supabase Dashboard -> Table Editor -> Profiles -> Filter by email_notif=true -> Export CSV')">
-                    <i class="fa-solid fa-download"></i> How to Export Emails
-                </button>
             </div>
         </div>
 
@@ -114,17 +108,86 @@ permalink: /profile/
 </div>
 
 <script>
-    function switchTab(tabName) {
-        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+    // Объявляем глобально, чтобы main.js мог вызвать
+    window.renderProfilePage = async function(user, isAdmin) {
+        const loading = document.getElementById('profile-loading');
+        const content = document.getElementById('profile-content');
+        const guest = document.getElementById('guest-view');
         
-        event.target.classList.add('active');
-        document.getElementById('tab-' + tabName).classList.add('active');
+        if(!content) return;
+        if(loading) loading.style.display = 'none';
+        
+        if(user) {
+            content.style.display = 'block';
+            if(guest) guest.style.display = 'none';
+            
+            document.getElementById('p-avatar').src = user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
+            document.getElementById('p-name').textContent = user.user_metadata.full_name || 'User';
+            document.getElementById('p-email').textContent = user.email;
 
-        // Для админки заполняем инфу при открытии
-        if(tabName === 'admin' && window.currentUser) {
-            document.getElementById('adm-uid').textContent = window.currentUser.id;
-            document.getElementById('adm-email').textContent = window.currentUser.email;
+            if (isAdmin) {
+                const badge = document.getElementById('p-status-badge');
+                badge.style.backgroundColor = '#d73a49';
+                badge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Administrator';
+                const adminTab = document.getElementById('btn-tab-admin');
+                if(adminTab) adminTab.style.display = 'inline-flex'; // Fix display
+                
+                // Fill admin info
+                document.getElementById('adm-uid').textContent = user.id;
+                document.getElementById('adm-email').textContent = user.email;
+            }
+
+            await loadUserSettings(user.id);
+        } else {
+            content.style.display = 'none';
+            if(guest) guest.style.display = 'block';
+        }
+    };
+
+    async function loadUserSettings(userId) {
+        if(!window.supabase) return;
+        const { data } = await window.supabase.from('profiles').select('*').eq('id', userId).single();
+        if (data) {
+            const langSelect = document.getElementById('pref-lang');
+            const notifCheck = document.getElementById('pref-email-notif');
+            if(langSelect && data.language) langSelect.value = data.language;
+            if(notifCheck && data.email_notif !== undefined) notifCheck.checked = data.email_notif;
         }
     }
+
+    window.saveProfile = async () => {
+        if(!window.currentUser) return;
+        const btn = document.getElementById('save-settings-btn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        btn.disabled = true;
+
+        const lang = document.getElementById('pref-lang').value;
+        const notif = document.getElementById('pref-email-notif').checked;
+
+        const { error } = await window.supabase.from('profiles').upsert({ 
+            id: window.currentUser.id, 
+            language: lang, 
+            email_notif: notif,
+            updated_at: new Date()
+        });
+
+        if (!error) {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+            btn.style.color = '#238636';
+            if ((lang === 'ru' && !window.location.pathname.startsWith('/ru')) || (lang === 'en' && window.location.pathname.startsWith('/ru'))) {
+                setTimeout(() => window.location.href = lang === 'ru' ? '/ru/profile/' : '/profile/', 1000);
+            }
+        } else {
+            btn.innerHTML = 'Error';
+            console.error(error);
+        }
+        setTimeout(() => { btn.innerHTML = 'Save Changes'; btn.disabled = false; btn.style.color = ''; }, 2000);
+    };
+
+    window.switchTab = function(tabName) {
+        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+        event.currentTarget.classList.add('active'); // Use currentTarget for button w/ icon
+        document.getElementById('tab-' + tabName).classList.add('active');
+    };
 </script>
