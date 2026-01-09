@@ -20,6 +20,14 @@ button:hover, select:hover, .btn-login:hover, .btn:hover { border-color: var(--t
 .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 .btn.primary:hover { background: var(--accent-hover); color: #fff; border-color: var(--accent-hover); }
 
+/* Large Button for Home Cards */
+.btn-lg {
+    height: 44px;
+    padding: 0 20px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
 /* Generic Input Styling for Tools */
 input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea {
     background: var(--bg-panel);
