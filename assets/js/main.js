@@ -11,7 +11,6 @@
     let bannedUsersCache = [];
 
     document.addEventListener('DOMContentLoaded', async () => {
-        console.log("Denmoth JS: Starting...");
         try {
             if (window.supabase && window.supabase.createClient) {
                 const { createClient } = window.supabase;
@@ -31,9 +30,7 @@
     async function initAuth() {
         const { data: { session } } = await window.supabase.auth.getSession();
         await handleUserSession(session?.user);
-        window.supabase.auth.onAuthStateChange(async (_event, session) => {
-            await handleUserSession(session?.user);
-        });
+        window.supabase.auth.onAuthStateChange(async (_event, session) => await handleUserSession(session?.user));
     }
 
     async function handleUserSession(user) {
@@ -69,7 +66,7 @@
         }
     }
 
-    // --- COMMENTS SYSTEM ---
+    // --- COMMENTS ---
     function getCleanSlug() {
         let path = window.location.pathname;
         if (path.startsWith('/ru')) path = path.substring(3);
@@ -114,7 +111,8 @@
         if(!content) return;
 
         if (window.currentUser) {
-            const { data: profile } = await window.supabase.from('profiles').select('is_banned').eq('id', window.currentUser.id).single();
+            // FIX: Используем maybeSingle, чтобы не падать с 406
+            const { data: profile } = await window.supabase.from('profiles').select('is_banned').eq('id', window.currentUser.id).maybeSingle();
             if (profile?.is_banned) return alert("You are banned.");
         }
 
@@ -142,9 +140,7 @@
                 if(area) area.style.display = 'none';
             }
             initCommentsModule();
-        } else {
-            alert("Error: " + error.message);
-        }
+        } else alert("Error: " + error.message);
     };
 
     function renderCommentsTree(comments) {
@@ -278,18 +274,17 @@
 
     window.reportComment = async (id) => {
         if (!window.currentUser) return window.openAuthModal();
-        const reason = prompt("Reason for reporting:");
+        const reason = prompt("Reason:");
         if (reason) {
             await window.supabase.from('reports').insert({ reporter_id: window.currentUser.id, comment_id: id, reason });
             alert("Report sent.");
         }
     };
 
-    // --- ADMIN ACTIONS (RPC) ---
+    // --- ADMIN (RPC) ---
     window.banUser = async function(uid) {
         if (!window.isAdmin) return;
-        if (confirm("Ban user? Comments will be deleted.")) {
-            // Вызываем защищенную SQL-функцию
+        if (confirm("Ban user?")) {
             const { error } = await window.supabase.rpc('admin_ban_user', { target_id: uid });
             if (!error) {
                 alert("User banned.");
@@ -332,7 +327,8 @@
                 window.loadBannedUsers();
             }
 
-            const { data } = await window.supabase.from('profiles').select('*').eq('id', user.id).single();
+            // Используем maybeSingle(), чтобы не было 406
+            const { data } = await window.supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
             if (data) {
                 const ls = document.getElementById('pref-lang');
                 const ns = document.getElementById('pref-email-notif');
@@ -354,6 +350,7 @@
         const lang = document.getElementById('pref-lang').value;
         const notif = document.getElementById('pref-email-notif').checked;
 
+        // Upsert в таблицу profiles (создаст если нет)
         const { error } = await window.supabase.from('profiles').upsert({ 
             id: window.currentUser.id, 
             language: lang, 
@@ -383,6 +380,7 @@
         if(!tbody) return;
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Loading...</td></tr>';
         
+        // Тут 400 из-за отсутствия прав на select по колонке is_banned. RLS это фиксит.
         const { data, error } = await window.supabase.from('profiles').select('*').eq('is_banned', true).order('updated_at', { ascending: false });
         if (data) {
             bannedUsersCache = data;
@@ -416,15 +414,14 @@
     window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
     window.loginWith = async (p) => { await window.supabase.auth.signInWithOAuth({ provider: p, options: { redirectTo: window.location.origin + '/profile/' } }); };
     
-    function initTheme() { /* theme logic */ 
+    function initTheme() { 
         const btn = document.getElementById('theme-toggle'); if(!btn) return;
         let current = localStorage.getItem('theme') || 'dark'; document.documentElement.setAttribute('data-theme', current);
         const updateIcon = (t) => btn.innerHTML = t === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
         updateIcon(current);
         btn.onclick = () => { current = current === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', current); localStorage.setItem('theme', current); updateIcon(current); };
     }
-    
-    function initLangSwitcher() { /* lang logic */ 
+    function initLangSwitcher() { 
         const select = document.getElementById('lang-select'); if(!select) return;
         const newSelect = select.cloneNode(true); select.parentNode.replaceChild(newSelect, select);
         newSelect.addEventListener('change', (e) => {
@@ -433,8 +430,7 @@
             else if (e.target.value === 'en' && path.startsWith('/ru')) window.location.href = path.replace('/ru', '') || '/';
         });
     }
-    
-    function initCopyButtons() { /* copy logic */ 
+    function initCopyButtons() { 
         document.querySelectorAll('.result-group, .code-container').forEach(group => {
             if(group.querySelector('.copy-icon-btn, .copy-btn')) return;
             let target = group.querySelector('input, textarea') || group.querySelector('pre, code');
@@ -444,11 +440,9 @@
             btn.onclick = () => { navigator.clipboard.writeText(target && (target.value || target.innerText) || ""); const originalHtml = btn.innerHTML; btn.innerHTML = group.classList.contains('code-container') ? 'Copied!' : '<i class="fa-solid fa-check"></i>'; setTimeout(() => btn.innerHTML = originalHtml, 1500); };
         });
     }
-    
     function initModalHandlers() {
         window.openAuthModal = () => document.getElementById('auth-modal').style.display = 'flex';
         window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
     }
-    
     function escapeHtml(text) { if(!text) return ""; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 })();
