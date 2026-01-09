@@ -17,17 +17,16 @@ window.initAuth = async function() {
 };
 
 window.handleUserSession = async function(user) {
-window.handleUserSession = async function(user) {
     window.Denmoth.State.currentUser = user;
-    window.Denmoth.State.isAdmin = false; // По дефолту false
+    window.Denmoth.State.isAdmin = false; 
 
     if (user) {
-        // Запрашиваем статус админа из базы
+        // Безопасная проверка админа через БД
         const { data, error } = await window.supabase
             .from('profiles')
             .select('is_admin')
             .eq('id', user.id)
-            .maybeSingle(); // Используем maybeSingle, чтобы не падало, если профиля нет
+            .maybeSingle(); 
         
         if (data && data.is_admin) {
             window.Denmoth.State.isAdmin = true;
@@ -37,11 +36,10 @@ window.handleUserSession = async function(user) {
     
     window.updateHeaderUI(user);
     
-    // Если мы на странице профиля
+    // Если мы на странице профиля, рендерим её
     if (window.location.pathname.includes('/profile/') && typeof window.renderProfilePage === 'function') {
         window.renderProfilePage(user, window.Denmoth.State.isAdmin);
     }
-};
 };
 
 window.updateHeaderUI = function(user) {
