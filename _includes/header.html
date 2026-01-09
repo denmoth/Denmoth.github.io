@@ -40,7 +40,9 @@
                 <option value="ru" {% if site.active_lang == "ru" %}selected{% endif %}>RU</option>
             </select>
             
-            <button id="theme-toggle" style="background:transparent; border:none; font-size:1.1rem; padding:0 8px;">🌙</button>
+            <button id="theme-toggle" style="background:transparent; border:none; font-size:1.1rem; padding:0 8px; color:var(--text-muted);">
+                <i class="fa-solid fa-moon"></i>
+            </button>
             
             <a id="login-btn" class="btn-login" href="#" onclick="event.preventDefault(); window.openAuthModal();">
                 <i class="fa-brands fa-github"></i> 
