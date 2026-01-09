@@ -13,14 +13,13 @@ header {
 }
 .header-inner { 
     display: flex; 
-    justify-content: space-between; /* Разносит влево и вправо */
+    justify-content: space-between; 
     align-items: center; 
     width: 100%; 
     max-width: 1200px; 
     padding: 0 24px; 
 }
 
-/* Группировка слева: кнопка назад + лого */
 .left-section {
     display: flex;
     align-items: center;
@@ -35,10 +34,53 @@ header {
 .nav-btn-link { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: 0.2s; display: flex; align-items: center; gap: 6px; cursor: pointer; }
 .nav-btn-link:hover { color: var(--text-main); }
 
+/* --- THEME TOGGLE ANIMATION --- */
+.theme-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    overflow: hidden; /* Скрываем то, что уезжает */
+    position: relative;
+    border-radius: 50%;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-icon-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.icon-sun, .icon-moon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.1rem;
+}
+
+.icon-sun { top: 50%; }
+.icon-moon { top: 150%; } /* Луна прячется снизу */
+
+/* Когда активна темная тема (класс вешается на кнопку или html) */
+[data-theme="dark"] .theme-icon-wrapper {
+    transform: translateY(-100%);
+}
+
 .wrapper { display: flex; flex-direction: column; flex: 1; align-items: center; width: 100%; }
 .hub-layout { max-width: 1000px; margin: 0 auto; padding: 40px 20px; width: 100%; flex: 1; }
 
 .footer { width: 100%; padding: 30px 0; text-align: center; border-top: 1px solid var(--border); background: var(--bg-body); font-size: 0.9rem; margin-top: auto; color: var(--text-muted); }
-.socials { margin-bottom: 15px; }
-.socials a { color: var(--text-muted); font-size: 1.2rem; margin: 0 10px; transition: color 0.2s; }
+.socials { margin-bottom: 15px; display: flex; justify-content: center; align-items: center; gap: 20px; }
+.socials a { color: var(--text-muted); font-size: 1.2rem; transition: color 0.2s; display: flex; align-items: center; }
 .socials a:hover { color: var(--text-main); }
+
+/* Modrinth SVG Fix */
+.modrinth-icon { fill: currentColor; width: 1.1em; height: 1.1em; }
