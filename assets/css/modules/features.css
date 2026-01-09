@@ -1,7 +1,7 @@
 /* --- TOOLS LAYOUT --- */
 .tool-wrapper { 
     display: flex; 
-    justify-content: center; /* Центрируем контент */
+    justify-content: center;
     gap: 20px; 
     width: 100%; 
     min-height: calc(100vh - var(--header-h)); 
@@ -10,7 +10,7 @@
 
 .tool-content { 
     flex-grow: 1; 
-    max-width: 1000px; /* Чуть шире для удобства */
+    max-width: 1000px; 
     margin: 0 auto; 
     padding: 40px 0; 
     display: flex; 
@@ -29,29 +29,95 @@
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 30px;
+    padding: 25px; /* Чуть меньше паддинг */
     width: 100%;
     margin-bottom: 30px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Рекламные сайдбары (пока скрыты или для широких экранов) */
-.ad-sidebar { width: 200px; flex-shrink: 0; padding-top: 40px; display: none; }
-.ad-placeholder { width: 100%; height: 600px; background: rgba(255,255,255,0.03); border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.8rem; }
-
-@media (min-width: 1600px) { .ad-sidebar { display: block; } }
-@media (max-width: 1000px) { 
-    .tool-wrapper { padding: 0 10px; }
-    .ad-sidebar { display: none; }
+/* --- SEARCH BOX (ГЛАВНАЯ ИНСТРУМЕНТОВ) --- */
+.search-box { 
+    width: 100%; 
+    max-width: 700px; /* Оптимальная ширина */
+    margin: 0 auto 50px; /* Центрирование */
+    position: relative; 
 }
 
-/* Fullscreen Mode */
-.tool-wrapper.maximized { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-body); z-index: 5000; padding: 20px; overflow-y: auto; align-items: flex-start; }
-.tool-wrapper.maximized .ad-sidebar { display: none; }
-.tool-wrapper.maximized .tool-content { max-width: 1200px; padding-top: 0; }
+.search-box input { 
+    width: 100%; 
+    padding: 16px 50px 16px 25px; /* Большие отступы */
+    background: var(--bg-panel); 
+    border: 1px solid var(--border); 
+    border-radius: 50px; /* Полностью круглые края */
+    color: var(--text-main); 
+    font-size: 1.1rem; /* Крупный текст */
+    transition: all 0.2s ease; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
 
-/* --- CRAFTING & ITEMS (Specific to Recipe Tool) --- */
-.craft-slot { width: 60px; height: 60px; background-color: #8b8b8b; border: 2px solid #373737; border-right-color: #fff; border-bottom-color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; position: relative; }
+.search-box input:focus { 
+    border-color: #58a6ff; 
+    box-shadow: 0 0 0 4px rgba(88,166,255,0.15), 0 4px 25px rgba(0,0,0,0.15); 
+    transform: translateY(-2px);
+    outline: none; 
+}
+
+.search-box i { 
+    position: absolute; 
+    right: 25px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    color: var(--text-muted); 
+    font-size: 1.2rem;
+    pointer-events: none;
+}
+
+/* --- FORMS & INPUTS (FIXED) --- */
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
+
+/* Применяем стили только к классу form-input, а не ко всем input подряд */
+.form-input, .form-area { 
+    display: block;
+    width: 100%; 
+    padding: 10px 15px; 
+    background: var(--bg-body); 
+    border: 1px solid var(--border); 
+    color: var(--text-main); 
+    border-radius: 8px; 
+    outline: none; 
+    transition: 0.2s; 
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+/* Для инпутов, у которых задана ширина inline (как в рецептах), разрешаем переопределение */
+input[style*="width"] {
+    width: auto !important; /* Фикс для "разъехавшихся" маленьких полей */
+    display: inline-block;
+}
+
+.form-input:focus, .form-area:focus { 
+    border-color: #58a6ff; 
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.1); 
+}
+
+/* --- SPECIFIC TOOL STYLES --- */
+
+/* Crafting Grid */
+.craft-slot { 
+    width: 60px; 
+    height: 60px; 
+    background-color: #8b8b8b; 
+    border: 2px solid #373737; 
+    border-right-color: #fff; 
+    border-bottom-color: #fff; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    position: relative; 
+}
 .craft-slot:hover { background-color: #a0a0a0; }
 .craft-slot img { width: 48px; height: 48px; image-rendering: pixelated; }
 
@@ -64,77 +130,12 @@
 .item-option img { width: 32px; height: 32px; margin-bottom: 5px; image-rendering: pixelated; }
 .item-option span { font-size: 0.7rem; color: var(--text-muted); word-break: break-all; line-height: 1.2; }
 
-/* --- WIKI & ARTICLES STYLES --- */
-.wiki-wrapper { display: grid; grid-template-columns: 280px minmax(0, 1fr) 240px; width: 100%; max-width: 1440px; margin: 0 auto; gap: 48px; align-items: start; }
-.wiki-sidebar { position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; padding: 32px 0 32px 20px; border-right: 1px solid var(--border); background: var(--bg-body); }
-.wiki-content { padding: 48px 0; min-width: 0; }
-@media (max-width: 1280px) { .wiki-wrapper { grid-template-columns: 260px 1fr; padding-right: 30px; } }
-@media (max-width: 900px) { .wiki-wrapper { display: block; } .wiki-sidebar { display: none; } .wiki-content { padding: 30px 20px; } }
+/* Sidebar & Wiki */
+.ad-sidebar { width: 200px; flex-shrink: 0; padding-top: 40px; display: none; }
+.ad-placeholder { width: 100%; height: 600px; background: rgba(255,255,255,0.03); border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.8rem; }
 
-/* --- SEARCH & FORMS (UPDATED) --- */
-
-/* BIG CENTERED SEARCH BOX */
-.search-box { 
-    width: 100%; 
-    max-width: 800px; /* Шире */
-    margin: 0 auto 50px; 
-    position: relative; 
-}
-.search-box input { 
-    width: 100%; 
-    padding: 18px 50px 18px 25px; /* Больше отступы */
-    background: var(--bg-panel); 
-    border: 1px solid var(--border); 
-    border-radius: 16px; /* Круглее */
-    color: var(--text-main); 
-    font-size: 1.2rem; /* Крупнее шрифт */
-    transition: 0.2s; 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-.search-box input:focus { 
-    border-color: #58a6ff; 
-    box-shadow: 0 0 0 4px rgba(88,166,255,0.15); 
-    outline: none; 
-}
-.search-box i { 
-    position: absolute; 
-    right: 25px; 
-    top: 50%; 
-    transform: translateY(-50%); 
-    color: var(--text-muted); 
-    font-size: 1.3rem;
-    pointer-events: none;
-}
-
-/* Формы внутри инструментов */
-.form-group { margin-bottom: 20px; }
-.form-label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
-
-/* Общий стиль для всех инпутов */
-.form-input, .form-area, 
-input[type="text"], input[type="number"], input[type="email"], select, textarea { 
-    width: 100%; 
-    padding: 12px 15px; 
-    background: var(--bg-body); /* Чуть темнее чем панель */
-    border: 1px solid var(--border); 
-    color: var(--text-main); 
-    border-radius: 8px; 
-    outline: none; 
-    transition: 0.2s; 
-    font-family: inherit;
-    font-size: 0.95rem;
-    box-sizing: border-box; /* ВАЖНО: чтобы padding не ломал ширину */
-}
-
-.form-input:focus, .form-area:focus, 
-input:focus, select:focus, textarea:focus { 
-    border-color: #58a6ff; 
-    box-shadow: 0 0 0 3px rgba(88,166,255,0.1); 
-}
-
-/* Фикс для color picker */
-input[type="color"] {
-    padding: 2px;
-    height: 40px;
-    cursor: pointer;
+@media (min-width: 1600px) { .ad-sidebar { display: block; } }
+@media (max-width: 1000px) { 
+    .tool-wrapper { padding: 0 10px; }
+    .ad-sidebar { display: none; }
 }
