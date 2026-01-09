@@ -59,7 +59,7 @@ permalink: /profile/
                 <div class="settings-row">
                     <div>
                         <div style="font-weight:600;">{% lang en %}Developer Mode{% endlang %}{% lang ru %}Режим разработчика{% endlang %}</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted);">Enable advanced tool features</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">Shows technical IDs and debug logs</div>
                     </div>
                     <input id="pref-dev-mode" type="checkbox" style="width:20px; height:20px; accent-color: var(--accent);">
                 </div>
@@ -152,9 +152,11 @@ permalink: /profile/
                 
                 if(ls && data.language) ls.value = data.language;
                 if(ns && data.email_notif !== undefined) ns.checked = data.email_notif;
-                // Предполагаем, что dev_mode может быть в JSONB поле или отдельной колонке, 
-                // если нет - просто сохраняем в локалсторадж для UI эффекта
-                if(dev) dev.checked = localStorage.getItem('dev_mode') === 'true';
+                if(dev && data.dev_mode !== undefined) dev.checked = data.dev_mode;
+                
+                // Синхронизация с LS для мгновенного доступа на клиенте
+                if(data.dev_mode) localStorage.setItem('dev_mode', 'true');
+                else localStorage.removeItem('dev_mode');
             }
         } else {
             content.style.display = 'none';
@@ -171,17 +173,20 @@ permalink: /profile/
         const notif = document.getElementById('pref-email-notif').checked;
         const devMode = document.getElementById('pref-dev-mode').checked;
 
-        // Сохраняем dev_mode локально (или добавь колонку в БД)
-        localStorage.setItem('dev_mode', devMode);
-
+        // Сохраняем в Supabase (теперь с dev_mode)
         const { error } = await window.supabase.from('profiles').upsert({ 
             id: window.currentUser.id, 
             language: lang, 
             email_notif: notif,
+            dev_mode: devMode,
             updated_at: new Date()
         });
 
         if (!error) {
+            // Обновляем локальный стейт
+            if(devMode) localStorage.setItem('dev_mode', 'true');
+            else localStorage.removeItem('dev_mode');
+
             btn.innerHTML = 'Saved!';
             const path = window.location.pathname;
             if ((lang === 'ru' && !path.startsWith('/ru')) || (lang === 'en' && path.startsWith('/ru'))) {
@@ -192,7 +197,7 @@ permalink: /profile/
         } else {
             btn.innerHTML = 'Error';
             console.error(error);
-            alert(error.message); // Увидишь детальную ошибку если SQL не сработает
+            alert("DB Error: " + error.message); 
             btn.disabled = false;
         }
     };
@@ -201,8 +206,7 @@ permalink: /profile/
     let bannedUsersCache = [];
 
     window.loadBannedUsers = async () => {
-        if (!window.fetchBannedUsers) return; // Функция может не быть в глобале, если admin.js не подгружен
-        // Лучше использовать прямой запрос здесь, если admin.js глючит
+        if (!window.fetchBannedUsers && !window.supabase) return;
         const tbody = document.getElementById('ban-list-body');
         tbody.innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center;">Loading...</td></tr>';
         
@@ -212,13 +216,13 @@ permalink: /profile/
             bannedUsersCache = data;
             renderBanList(data);
         } else {
-            tbody.innerHTML = '<tr><td colspan="3">Error loading</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3">Error loading or no data</td></tr>';
         }
     };
 
     function renderBanList(list) {
         const tbody = document.getElementById('ban-list-body');
-        if (list.length === 0) {
+        if (!list || list.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" style="padding:15px; text-align:center; color:var(--text-muted);">No banned users found.</td></tr>';
             return;
         }
