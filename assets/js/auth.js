@@ -17,15 +17,31 @@ window.initAuth = async function() {
 };
 
 window.handleUserSession = async function(user) {
+window.handleUserSession = async function(user) {
     window.Denmoth.State.currentUser = user;
-    window.Denmoth.State.isAdmin = user?.email === window.Denmoth.Config.ADMIN_EMAIL;
+    window.Denmoth.State.isAdmin = false; // По дефолту false
+
+    if (user) {
+        // Запрашиваем статус админа из базы
+        const { data, error } = await window.supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .maybeSingle(); // Используем maybeSingle, чтобы не падало, если профиля нет
+        
+        if (data && data.is_admin) {
+            window.Denmoth.State.isAdmin = true;
+            console.log("Admin privileges granted.");
+        }
+    }
     
     window.updateHeaderUI(user);
     
-    // Если мы на странице профиля, рендерим её
+    // Если мы на странице профиля
     if (window.location.pathname.includes('/profile/') && typeof window.renderProfilePage === 'function') {
         window.renderProfilePage(user, window.Denmoth.State.isAdmin);
     }
+};
 };
 
 window.updateHeaderUI = function(user) {
