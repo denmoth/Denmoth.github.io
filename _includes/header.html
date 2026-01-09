@@ -1,9 +1,11 @@
 <header>
     <div class="header-inner">
         <div class="left-section" style="display:flex; align-items:center; gap:15px;">
+            {% unless page.url == "/" or page.url == "/index.html" or page.url == "/ru/" %}
             <button onclick="history.back()" class="btn" style="background:transparent; border:none; padding:0; font-size:1.1rem; color:var(--text-muted); cursor:pointer;" title="Go Back">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
+            {% endunless %}
 
             <div class="brand">
                 <a href="/" style="color:var(--text-main); display:flex; gap:10px; align-items:center; text-decoration:none;">
