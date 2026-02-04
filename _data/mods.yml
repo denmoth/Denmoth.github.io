@@ -1,0 +1,47 @@
+- id: "cso"
+  name: "Create: Structures Overhaul"
+  cf_id: "1303344"
+  priority: 1
+  desc:
+    en: "Handcrafted aesthetic structures for the Create mod."
+    ru: "Проработанные эстетичные структуры для мода Create."
+
+- id: "aso"
+  name: "Ad Astra: Structures Overhaul"
+  cf_id: "1419799" # Пример ID
+  priority: 2
+  desc:
+    en: "Expanding space exploration with unique orbital and planetary structures."
+    ru: "Расширение космических исследований с уникальными постройками."
+
+- id: "cubeui"
+  name: "CubeUI"
+  cf_id: "1415948"
+  priority: 3
+  desc:
+    en: "Modular UI library for Minecraft developers."
+    ru: "Модульная UI библиотека для разработчиков модов."
+
+- id: "uncanny"
+  name: "Uncanny"
+  cf_id: "1423100"
+  priority: 4
+  desc:
+    en: "Atmospheric horror expansion for survival."
+    ru: "Атмосферное хоррор-дополнение для выживания."
+
+- id: "cso-bop"
+  name: "CSO: BOP Integration"
+  cf_id: "1421470" # Пример ID
+  priority: 5
+  desc:
+    en: "Integration with Biomes O' Plenty for CSO structures."
+    ru: "Интеграция структур CSO с биомами Biomes O' Plenty."
+
+- id: "regions"
+  name: "Regions & POI Names"
+  cf_id: "1425100" # Пример ID
+  priority: 6
+  desc:
+    en: "Display region names and POI markers on your HUD."
+    ru: "Отображение названий регионов и маркеров POI на экране."

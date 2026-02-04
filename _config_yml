@@ -1,0 +1,16 @@
+title: Denmoth
+url: "https://denmoth.pp.ua"
+baseurl: ""
+
+# Localization
+languages: ["en", "ru"]
+default_lang: "en"
+exclude_from_localization: ["assets", "css", "js"]
+
+plugins:
+  - jekyll-polyglot
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Кастомная переменная для перевода
+t: {{ site.data.t }}

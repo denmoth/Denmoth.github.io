@@ -1,0 +1,16 @@
+# Тексты интерфейса
+nav_articles:
+  en: "Articles"
+  ru: "Статьи"
+nav_tools:
+  en: "Tools"
+  ru: "Инструменты"
+btn_wiki:
+  en: "Documentation"
+  ru: "Документация"
+mod_status_found:
+  en: "Latest version found"
+  ru: "Найдена актуальная версия"
+footer_copy:
+  en: "All rights reserved."
+  ru: "Все права защищены."

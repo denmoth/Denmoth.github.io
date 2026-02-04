@@ -1,0 +1,70 @@
+---
+---
+:root {
+  --gh-bg: #0d1117;
+  --gh-panel: #161b22;
+  --gh-border: #30363d;
+  --gh-text: #c9d1d9;
+  --gh-muted: #8b949e;
+  --gh-blue: #58a6ff;
+  --gh-green: #238636;
+}
+
+body {
+  background: var(--gh-bg);
+  color: var(--gh-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.header {
+  border-bottom: 1px solid var(--gh-border);
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--gh-panel);
+}
+
+.mod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.mod-card {
+  background: var(--gh-panel);
+  border: 1px solid var(--gh-border);
+  border-radius: 6px;
+  padding: 24px;
+  transition: 0.2s;
+  &:hover { border-color: var(--gh-blue); }
+  
+  .mod-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--gh-blue); }
+  .mod-desc { color: var(--gh-muted); font-size: 14px; margin-bottom: 20px; height: 44px; overflow: hidden; }
+}
+
+.btn {
+  display: inline-flex;
+  padding: 5px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid var(--gh-border);
+  color: var(--gh-text);
+  background: #21262d;
+  &.primary { background: var(--gh-green); border-color: rgba(240,246,252,0.1); color: white; }
+}
+
+// Sidebar Docs Layout
+.wiki-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  max-width: 1400px;
+  margin: 0 auto;
+}

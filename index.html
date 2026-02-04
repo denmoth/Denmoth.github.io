@@ -1,126 +1,26 @@
 ---
 layout: default
 title: Home
-permalink: /
 ---
 
-<div class="hub-layout">
-    <div class="hero">
-        <img src="/assets/img/logo.png" style="width:80px; height:80px; border-radius:12px; margin-bottom:20px;" alt="Logo">
-        <h1>Denmoth</h1>
-        {% lang en %}<p>Minecraft Mods, Libraries & Developer Tools</p>{% endlang %}
-        {% lang ru %}<p>Моды, библиотеки и инструменты для Minecraft</p>{% endlang %}
-    </div>
-
-    <div class="card-grid">
-        <div class="card" data-cf-id="1303344">
-            <div class="card-header">
-                <h3>Create: Structures Overhaul</h3>
-                <span class="badge cf-version">---</span> 
-            </div>
-            {% lang en %}<p class="cf-summary">Enhancing world generation with handcrafted aesthetic structures for Create mod.</p>{% endlang %}
-            {% lang ru %}<p>Масштабное улучшение генерации мира с проработанными структурами для Create mod.</p>{% endlang %}
-            <div class="stat-row">
-                <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
-            </div>
-            <div class="btn-group">
-                <a href="#" class="btn btn-lg primary cf-link">CurseForge</a>
-                <a href="https://modrinth.com/mod/create-structures-overhaul" class="btn btn-lg">Modrinth</a>
-                <a href="/cso/" class="btn btn-lg">Wiki</a>
-            </div>
-        </div>
-
-        <div class="card" data-cf-id="1415948">
-            <div class="card-header">
-                <h3>CubeUI</h3>
-                <span class="badge cf-version">---</span> 
-            </div>
-            {% lang en %}<p class="cf-summary">Modular UI library for Minecraft. 9-slice rendering and custom widgets.</p>{% endlang %}
-            {% lang ru %}<p>Модульная UI библиотека. 9-slice рендеринг и кастомные виджеты для ваших модов.</p>{% endlang %}
-            <div class="stat-row">
-                <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
-            </div>
-            <div class="btn-group">
-                {% lang en %}<a href="/cubeui/" class="btn btn-lg primary">Docs</a>{% endlang %}
-                {% lang ru %}<a href="/cubeui/" class="btn btn-lg primary">Доки</a>{% endlang %}
-                <a href="#" class="btn btn-lg cf-link">CurseForge</a>
-                <a href="https://modrinth.com/mod/cubeui" class="btn btn-lg">Modrinth</a>
-            </div>
-        </div>
-
-        <div class="card" data-cf-id="1423100">
-            <div class="card-header">
-                <h3>Uncanny</h3>
-                <span class="badge cf-version">---</span>
-            </div>
-            {% lang en %}<p class="cf-summary">Atmospheric horror expansion designed to unsettle and terrify.</p>{% endlang %}
-            {% lang ru %}<p>Атмосферный хоррор мод, созданный для полного погружения в ужас.</p>{% endlang %}
-            <div class="stat-row">
-                <span title="Downloads"><i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span></span>
-            </div>
-            <div class="btn-group">
-                <a href="#" class="btn btn-lg primary cf-link">CurseForge</a>
-                <a href="https://modrinth.com/project/uncanny" class="btn btn-lg">Modrinth</a>
-                <a href="/uncanny/" class="btn btn-lg">Wiki</a>
-            </div>
-        </div>
-    </div>
+<div class="hero-section">
+    <h1>Denmoth</h1>
+    <p>{% lang en %}Handcrafted Minecraft experiences and tools.{% endlang %}{% lang ru %}Проработанные моды и инструменты для Minecraft.{% endlang %}</p>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const cards = document.querySelectorAll('.card[data-cf-id]');
-        
-        cards.forEach(card => {
-            const id = card.getAttribute('data-cf-id');
-            const versionSpan = card.querySelector('.cf-version');
-            const dlSpan = card.querySelector('.cf-downloads');
-            const linkBtn = card.querySelector('.cf-link');
-
-            fetch(`https://api.cfwidget.com/${id}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.files && data.files.length > 0) {
-                        const file = data.files[0];
-                        let name = file.display_name || file.name || "";
-                        let versionMatches = name.match(/(\d+\.\d+(\.\d+)?)/g);
-                        let cleanVer = "---";
-                        
-                        if (versionMatches && versionMatches.length > 0) {
-                            if (versionMatches.length > 1) {
-                                const mcVersionRegex = /^(1\.1[6-9]|1\.2\d)(\.\d+)?$/;
-                                const modVersions = versionMatches.filter(v => !mcVersionRegex.test(v));
-                                if (modVersions.length > 0) {
-                                    versionMatches = modVersions;
-                                }
-                            }
-                            cleanVer = versionMatches[versionMatches.length - 1];
-                        } else {
-                            cleanVer = name.replace('.jar', '').replace(/\[.*?\]/g, '').trim();
-                        }
-                        
-                        if (versionSpan) versionSpan.textContent = cleanVer;
-                    }
-                    
-                    if (data.downloads && data.downloads.total !== undefined) {
-                        const count = new Intl.NumberFormat('en-US', { 
-                            notation: "compact", 
-                            maximumFractionDigits: 1 
-                        }).format(data.downloads.total);
-                        if (dlSpan) dlSpan.textContent = count;
-                    }
-
-                    if (data.urls && data.urls.curseforge && linkBtn) {
-                        linkBtn.href = data.urls.curseforge;
-                    }
-                })
-                .catch(err => {
-                    console.error(`Failed to load data for project ${id}:`, err);
-                    if (dlSpan) dlSpan.textContent = "Error";
-                });
-        });
-    });
-</script>
+<div class="mod-grid">
+    {% assign featured_mods = "cso,aso,cubeui,uncanny" | split: "," %}
+    {% for mod_id in featured_mods %}
+        {% assign mod = site.data.mods[mod_id] %}
+        <div class="mod-card" data-id="{{ mod_id }}">
+            <div class="card-content">
+                <h3>{{ mod.name }}</h3>
+                <p>{{ mod.description[site.active_lang] }}</p>
+                <div class="card-links">
+                    <a href="/{{ mod_id }}/" class="btn primary">Wiki</a>
+                    <a href="{{ mod.curseforge }}" class="btn">CurseForge</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

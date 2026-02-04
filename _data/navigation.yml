@@ -1,0 +1,14 @@
+# Меню для каждого проекта
+cso:
+  - title: { en: "Introduction", ru: "Введение" }
+    url: "/cso/"
+  - title: { en: "Structures", ru: "Структуры" }
+    url: "/cso/structures/"
+
+aso:
+  - title: { en: "Ad Astra Guide", ru: "Гайд Ad Astra" }
+    url: "/aso/"
+
+cubeui:
+  - title: { en: "Getting Started", ru: "Начало работы" }
+    url: "/cubeui/"

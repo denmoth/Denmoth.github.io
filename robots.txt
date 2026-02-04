@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://denmoth.pp.ua/sitemap.xml
