@@ -1,26 +1,42 @@
 ---
 layout: default
-title: Home
 ---
-
-<div class="hero-section">
-    <h1>Denmoth</h1>
-    <p>{% lang en %}Handcrafted Minecraft experiences and tools.{% endlang %}{% lang ru %}Проработанные моды и инструменты для Minecraft.{% endlang %}</p>
+<div class="hero" style="text-align: center; padding: 60px 0;">
+  <h1>Denmoth</h1>
+  <p style="color: #8b949e;">
+    {% lang en %}Minecraft Mods, Libraries & Developer Tools{% endlang %}
+    {% lang ru %}Моды, библиотеки и инструменты для Minecraft{% endlang %}
+  </p>
 </div>
 
-<div class="mod-grid">
-    {% assign featured_mods = "cso,aso,cubeui,uncanny" | split: "," %}
-    {% for mod_id in featured_mods %}
-        {% assign mod = site.data.mods[mod_id] %}
-        <div class="mod-card" data-id="{{ mod_id }}">
-            <div class="card-content">
-                <h3>{{ mod.name }}</h3>
-                <p>{{ mod.description[site.active_lang] }}</p>
-                <div class="card-links">
-                    <a href="/{{ mod_id }}/" class="btn primary">Wiki</a>
-                    <a href="{{ mod.curseforge }}" class="btn">CurseForge</a>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
+<div class="mod-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+  {% assign sorted_mods = site.data.mods | sort: "priority" %}
+  {% for mod in sorted_mods %}
+  <div class="mod-card" style="background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 24px;">
+    <h3 style="color: #58a6ff; margin-top: 0;">{{ mod.name }}</h3>
+    <p style="color: #8b949e; font-size: 14px; min-height: 45px;">{{ mod.desc[site.active_lang] }}</p>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+      <a href="/{{ mod.id }}/" class="btn primary" style="background: #238636; color: white; padding: 5px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600;">Wiki</a>
+      <span class="cf-stats" data-cf="{{ mod.cf_id }}" style="color: #8b949e; font-size: 12px;">
+        <i class="fa-solid fa-download"></i> <span class="count">...</span>
+      </span>
+    </div>
+  </div>
+  {% endfor %}
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.cf-stats').forEach(el => {
+        const id = el.dataset.cf;
+        fetch(`https://api.cfwidget.com/${id}`)
+            .then(r => r.json())
+            .then(data => {
+                const count = new Intl.NumberFormat('en-US', { notation: "compact" }).format(data.downloads.total);
+                el.querySelector('.count').textContent = count;
+            })
+            .catch(() => el.querySelector('.count').textContent = "error");
+    });
+});
+</script>

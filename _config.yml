@@ -1,0 +1,18 @@
+title: Denmoth
+url: "https://denmoth.pp.ua"
+baseurl: ""
+
+# Настройки локализации (Polyglot)
+languages: ["en", "ru"]
+default_lang: "en"
+exclude_from_localization: ["assets", "css", "js", "images"]
+
+# Плагины должны быть перечислены здесь
+plugins:
+  - jekyll-polyglot
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+markdown: kramdown
+# Указываем Jekyll искать плагины в папке _plugins
+plugins_dir: [_plugins]
