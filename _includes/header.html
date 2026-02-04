@@ -1,0 +1,18 @@
+<header>
+    <div class="brand">
+        <a href="/">
+            <img src="/assets/img/logo.png" alt="Denmoth">
+            <span>Denmoth</span>
+        </a>
+    </div>
+    <div class="nav-links">
+        <a href="/articles/">{{ site.data.t.nav_articles[site.active_lang] }}</a>
+        <a href="/tools/">{{ site.data.t.nav_tools[site.active_lang] }}</a>
+        <div style="height: 16px; width: 1px; background: var(--border);"></div>
+        <select onchange="location.href=this.value" style="background: none; color: var(--text); border: none; font-size: 13px; font-weight: 600; cursor: pointer;">
+            <option value="/" {% if site.active_lang == 'en' %}selected{% endif %}>EN</option>
+            <option value="/ru/" {% if site.active_lang == 'ru' %}selected{% endif %}>RU</option>
+        </select>
+        <a href="#" class="btn" onclick="openAuthModal(); return false;">Log In</a>
+    </div>
+</header>
