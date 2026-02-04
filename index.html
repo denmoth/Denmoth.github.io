@@ -1,39 +1,51 @@
 ---
 layout: default
 ---
-<div class="hero">
-    <h1>Denmoth</h1>
-    <p>
-        {% lang en %}Minecraft Mods, Libraries & Developer Tools{% endlang %}
-        {% lang ru %}Моды, библиотеки и инструменты для Minecraft{% endlang %}
-    </p>
+<div class="hero" style="text-align: center; padding: 80px 20px;">
+    <img src="/assets/img/logo.png" style="width:80px; height:80px; border-radius:12px; margin-bottom:20px;">
+    <h1 style="font-size: 3rem; margin-bottom: 10px;">Denmoth</h1>
+    <p style="color: var(--text-muted); font-size: 1.2rem;">Minecraft Mods, Libraries & Developer Tools</p>
 </div>
 
-<div class="mod-grid">
-    {% assign sorted = site.data.mods | sort: "priority" %}
-    {% for mod in sorted %}
-    <div class="mod-card">
-        <h3>{{ mod.name }}</h3>
-        <p>{{ mod.desc[site.active_lang] }}</p>
-        <div class="card-footer">
-            <a href="/{{ mod.id }}/" class="btn primary">{{ site.data.t.wiki_btn[site.active_lang] }}</a>
-            <span class="cf-stats" data-cf="{{ mod.cf_id }}">
-                <i class="fa-solid fa-download" style="margin-right: 4px; opacity: 0.5;"></i>
-                <span class="count">...</span>
-            </span>
+<div class="card-grid mod-grid">
+    {% assign sorted_mods = site.data.mods | sort: "priority" %}
+    {% for mod in sorted_mods %}
+    <div class="card" data-cf-id="{{ mod.cf_id }}">
+        <div class="card-header">
+            <h3>{{ mod.name }}</h3>
+            <span class="badge cf-version">---</span> 
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
+            {{ mod.desc[site.active_lang] }}
+        </p>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+                <i class="fa-solid fa-download"></i> <span class="cf-downloads">---</span>
+            </div>
+            <a href="/{{ mod.id }}/" class="btn primary">Wiki</a>
         </div>
     </div>
     {% endfor %}
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.cf-stats').forEach(el => {
-        fetch(`https://api.cfwidget.com/${el.dataset.cf}`)
-            .then(r => r.json()).then(d => {
-                const count = new Intl.NumberFormat('en-US', { notation: "compact" }).format(d.downloads.total);
-                el.querySelector('.count').textContent = count;
-            });
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('.card[data-cf-id]').forEach(card => {
+            const id = card.getAttribute('data-cf-id');
+            const versionSpan = card.querySelector('.cf-version');
+            const dlSpan = card.querySelector('.cf-downloads');
+
+            fetch(`https://api.cfwidget.com/${id}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.files && data.files.length > 0) {
+                        versionSpan.textContent = data.files[0].version || "1.20.1";
+                    }
+                    if (data.downloads) {
+                        dlSpan.textContent = new Intl.NumberFormat('en-US', { notation: "compact" }).format(data.downloads.total);
+                    }
+                })
+                .catch(() => { dlSpan.textContent = "error"; });
+        });
     });
-});
 </script>

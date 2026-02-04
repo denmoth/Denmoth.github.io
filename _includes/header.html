@@ -1,18 +1,25 @@
 <header>
-    <div class="brand">
-        <a href="/">
-            <img src="/assets/img/logo.png" alt="Denmoth">
-            <span>Denmoth</span>
-        </a>
-    </div>
-    <div class="nav-links">
-        <a href="/articles/">{{ site.data.t.nav_articles[site.active_lang] }}</a>
-        <a href="/tools/">{{ site.data.t.nav_tools[site.active_lang] }}</a>
-        <div style="height: 16px; width: 1px; background: var(--border);"></div>
-        <select onchange="location.href=this.value" style="background: none; color: var(--text); border: none; font-size: 13px; font-weight: 600; cursor: pointer;">
-            <option value="/" {% if site.active_lang == 'en' %}selected{% endif %}>EN</option>
-            <option value="/ru/" {% if site.active_lang == 'ru' %}selected{% endif %}>RU</option>
-        </select>
-        <a href="#" class="btn" onclick="openAuthModal(); return false;">Log In</a>
+    <div class="header-inner">
+        <div class="brand">
+            <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text-main);">
+                <img src="/assets/img/logo.png" alt="Denmoth" style="width:24px; height:24px; border-radius:4px;">
+                Denmoth
+            </a>
+        </div>
+
+        <div class="controls" style="display:flex; align-items:center; gap:20px;">
+            <select id="lang-select" onchange="location.href=this.value" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); border-radius:4px; padding:2px 5px; cursor:pointer;">
+                <option value="/" {% if site.active_lang == 'en' %}selected{% endif %}>EN</option>
+                <option value="/ru/" {% if site.active_lang == 'ru' %}selected{% endif %}>RU</option>
+            </select>
+            
+            <button id="theme-toggle" class="theme-btn" style="background:none; border:none; color:var(--text-main); cursor:pointer;">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+
+            <a id="login-btn" class="btn" href="#" onclick="openAuthModal(); return false;" style="font-size:14px; font-weight:600;">
+                <i class="fa-brands fa-github"></i> <span>Log In</span>
+            </a>
+        </div>
     </div>
 </header>
