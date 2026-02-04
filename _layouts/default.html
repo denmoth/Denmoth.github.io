@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{{ site.active_lang }}">
+<head>
+    {% include head.html %}
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <a href="/">
+                <img src="/assets/img/logo.png" alt="Logo" style="width:24px; height:24px; border-radius:4px;"> 
+                Denmoth
+            </a>
+        </div>
+        <nav style="display: flex; gap: 20px; align-items: center;">
+            <a href="/articles/" style="color: var(--text-muted); text-decoration: none;">Articles</a>
+            <a href="/tools/" style="color: var(--text-muted); text-decoration: none;">Tools</a>
+            <select onchange="location.href=this.value" style="background: none; color: white; border: 1px solid var(--border); border-radius: 4px; padding: 2px 5px;">
+                <option value="/" {% if site.active_lang == 'en' %}selected{% endif %}>EN</option>
+                <option value="/ru/" {% if site.active_lang == 'ru' %}selected{% endif %}>RU</option>
+            </select>
+        </nav>
+    </header>
+
+    <main>{{ content }}</main>
+
+    <footer style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: auto;">
+        © 2026 Denmoth
+    </footer>
+
+    {% include scripts.html %}
+</body>
+</html>
