@@ -1,25 +1,76 @@
 <header>
     <div class="header-inner">
-        <div class="brand">
-            <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text-main);">
-                <img src="/assets/img/logo.png" alt="Denmoth" style="width:24px; height:24px; border-radius:4px;">
-                Denmoth
-            </a>
+        <div class="left-section" style="display:flex; align-items:center; gap:15px;">
+            {% unless page.url == "/" or page.url == "/index.html" or page.url == "/ru/" %}
+            <button onclick="goBack()" class="btn" style="background:transparent; border:none; padding:0; font-size:1.1rem; color:var(--text-muted); cursor:pointer;" title="Go Back">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            {% endunless %}
+
+            <div class="brand">
+                <a href="/" style="color:var(--text-main); display:flex; gap:10px; align-items:center; text-decoration:none;">
+                    <img src="/assets/img/logo.png" alt="Denmoth" style="width:24px; height:24px; border-radius:4px;"> Denmoth
+                </a>
+            </div>
         </div>
 
-        <div class="controls" style="display:flex; align-items:center; gap:20px;">
-            <select id="lang-select" onchange="location.href=this.value" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); border-radius:4px; padding:2px 5px; cursor:pointer;">
-                <option value="/" {% if site.active_lang == 'en' %}selected{% endif %}>EN</option>
-                <option value="/ru/" {% if site.active_lang == 'ru' %}selected{% endif %}>RU</option>
+        <div class="controls">
+            <a href="/articles/" class="nav-btn-link" title="Knowledge Base">
+                <i class="fa-solid fa-file-lines"></i>
+                {% lang en %}<span>Articles</span>{% endlang %}
+                {% lang ru %}<span>Статьи</span>{% endlang %}
+            </a>
+
+            <div class="divider-v"></div>
+
+            <div class="dropdown">
+                <a href="/tools/" class="nav-btn-link dropdown-btn">
+                    <i class="fa-solid fa-toolbox"></i> 
+                    {% lang en %}<span>Tools</span>{% endlang %}
+                    {% lang ru %}<span>Тулзы</span>{% endlang %}
+                    <i class="fa-solid fa-chevron-down" style="font-size:0.7em; margin-left:6px; opacity:0.7;"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="/tools/uuid/">UUID Generator</a>
+                    <a href="/tools/json-text/">JSON Text Builder</a>
+                    <a href="/tools/gradient/">RGB Gradient</a>
+                    <a href="/tools/color/">Color Converter</a>
+                    <a href="/tools/loot-table/">Loot Table Gen</a>
+                    <a href="/tools/recipe/">Recipe Generator</a>
+                    <a href="/tools/pack-mcmeta/">Pack.mcmeta</a>
+                    <a href="/tools/stack/">Stack Calculator</a>
+                </div>
+            </div>
+
+            <div class="divider-v"></div>
+            
+            <select id="lang-select" class="form-select" style="width:auto; padding: 2px 5px; height:30px; font-size:0.8rem; background:transparent; border-color:transparent;">
+                <option value="en" {% if site.active_lang == "en" %}selected{% endif %}>EN</option>
+                <option value="ru" {% if site.active_lang == "ru" %}selected{% endif %}>RU</option>
             </select>
             
-            <button id="theme-toggle" class="theme-btn" style="background:none; border:none; color:var(--text-main); cursor:pointer;">
-                <i class="fa-solid fa-moon"></i>
+            <button id="theme-toggle" class="theme-btn" aria-label="Toggle Theme">
+                <div class="theme-icon-wrapper">
+                    <i class="fa-solid fa-sun icon-sun"></i>
+                    <i class="fa-solid fa-moon icon-moon"></i>
+                </div>
             </button>
-
-            <a id="login-btn" class="btn" href="#" onclick="openAuthModal(); return false;" style="font-size:14px; font-weight:600;">
-                <i class="fa-brands fa-github"></i> <span>Log In</span>
+            
+            <a id="login-btn" class="btn-login" href="#" onclick="event.preventDefault(); window.openAuthModal();">
+                <i class="fa-brands fa-github"></i> 
+                {% lang en %}<span>Log In</span>{% endlang %}
+                {% lang ru %}<span>Войти</span>{% endlang %}
             </a>
         </div>
     </div>
+    
+    <script>
+        function goBack() {
+            if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+                history.back();
+            } else {
+                window.location.href = '/';
+            }
+        }
+    </script>
 </header>

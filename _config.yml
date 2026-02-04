@@ -1,15 +1,21 @@
 title: Denmoth
-url: "https://denmoth.pp.ua"
+email: denmoth8871top@gmail.com
+description: >-
+  Minecraft Mods & Tools
 baseurl: ""
+url: "https://denmoth.pp.ua"
+future: true
+permalink: pretty
+markdown: kramdown
+theme: jekyll-theme-primer
 
 languages: ["en", "ru"]
 default_lang: "en"
-exclude_from_localization: ["assets", "css", "js", "images"]
+exclude_from_localization: ["javascript", "images", "css", "assets"]
+
+parallel_localization: false
 
 plugins:
-  - jekyll-polyglot
   - jekyll-seo-tag
   - jekyll-sitemap
-
-markdown: kramdown
-plugins_dir: [_plugins]
+  - jekyll-polyglot

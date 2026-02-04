@@ -1,0 +1,53 @@
+---
+layout: tool
+title: Advanced Loot Table Gen
+permalink: /tools/loot-table/
+---
+
+<div class="form-group">
+    <label class="form-label">Type</label>
+    <select id="lt-type" class="form-select">
+        <option value="minecraft:block">Block</option>
+        <option value="minecraft:entity">Entity / Mob</option>
+        <option value="minecraft:chest">Chest / Container</option>
+    </select>
+</div>
+
+<div id="pools-container"></div>
+<button onclick="addPool()" class="btn" style="width:100%; margin-bottom:20px;">+ Add Pool</button>
+
+<button onclick="generateLT()" class="btn primary" style="width:100%;">Generate JSON</button>
+<textarea id="lt-out" class="form-area" style="height:300px; margin-top:20px; font-family:monospace;" readonly></textarea>
+
+<script>
+    let pools = [];
+    function addPool() {
+        const id = Date.now();
+        pools.push({ id, item: 'minecraft:diamond', min: 1, max: 1, chance: 100 });
+        renderPools();
+    }
+    function renderPools() {
+        const container = document.getElementById('pools-container');
+        container.innerHTML = pools.map(p => `
+            <div class="result-box" style="margin-bottom:15px; padding:15px;">
+                <input type="text" value="${p.item}" class="form-input" style="margin-bottom:10px;" onchange="updatePool(${p.id}, 'item', this.value)">
+                <div style="display:flex; gap:10px;">
+                    <input type="number" value="${p.min}" class="form-input" placeholder="Min" onchange="updatePool(${p.id}, 'min', this.value)">
+                    <input type="number" value="${p.max}" class="form-input" placeholder="Max" onchange="updatePool(${p.id}, 'max', this.value)">
+                </div>
+            </div>
+        `).join('');
+    }
+    function updatePool(id, key, val) {
+        const p = pools.find(x => x.id === id);
+        p[key] = val;
+    }
+    function generateLT() {
+        const out = { type: document.getElementById('lt-type').value, pools: pools.map(p => ({
+            rolls: 1,
+            entries: [{ type: "minecraft:item", name: p.item, functions: [{ function: "minecraft:set_count", count: { min: parseInt(p.min), max: parseInt(p.max) } }] }]
+        })) };
+        document.getElementById('lt-out').value = JSON.stringify(out, null, 4);
+    }
+    addPool();
+</script>

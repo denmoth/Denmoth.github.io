@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ site.active_lang | default: 'en' }}">
+<head>
+    {% include head.html %}
+</head>
+<body>
+    <div class="wrapper">
+        {% include header.html %}
+        
+        <main class="article-wrapper">
+            <article class="article-container">
+                <header class="article-header">
+                    <div class="article-meta">
+                        <span class="meta-item"><i class="fa-regular fa-calendar"></i> {{ page.date | date: "%d.%m.%Y" }}</span>
+                        <span class="meta-item"><i class="fa-regular fa-user"></i> Denmoth</span>
+                        <span class="meta-tag">{{ page.category }}</span>
+                    </div>
+                    <h1 class="article-h1">{{ page.title }}</h1>
+                    <p class="article-lead">{{ page.excerpt }}</p>
+                </header>
+
+                <div class="article-body">
+                    {{ content }}
+                </div>
+
+                <div class="article-footer">
+                    <a href="/articles/" class="btn"><i class="fa-solid fa-arrow-left"></i> Back to Articles</a>
+                </div>
+
+                <div class="comments-section" id="comments-container">
+                    <h3>Comments</h3>
+                    
+                    <div class="form-group" style="position:relative;">
+                        <div id="guest-input-area" style="margin-bottom:10px; display:none;">
+                            <input type="text" id="guest-name" class="form-input" placeholder="Name (Guest)" style="max-width:300px;">
+                        </div>
+                        <textarea id="comment-input" class="form-area" placeholder="Share your thoughts..." style="min-height:100px;"></textarea>
+                        <div style="display:flex; justify-content:space-between; margin-top:10px; align-items:center;">
+                            <div style="font-size:0.8rem; color:var(--text-muted);">Markdown supported</div>
+                            <button id="send-comment" class="btn primary">Post</button>
+                        </div>
+                    </div>
+
+                    <div id="comments-list">
+                        <div style="text-align:center; padding:20px; color:var(--text-muted);">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </main>
+
+        <footer class="footer">
+            <div class="socials">
+                <a href="https://discord.gg/BCXqNfPnSh"><i class="fa-brands fa-discord"></i></a>
+                <a href="https://github.com/Denmoth"><i class="fa-brands fa-github"></i></a>
+            </div>
+            <div style="margin-top:10px;">© 2026 Denmoth</div>
+        </footer>
+    </div>
+
+    {% include auth_modal.html %}
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

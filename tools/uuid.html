@@ -1,0 +1,96 @@
+---
+layout: tool
+title: UUID Generator
+permalink: /tools/uuid/
+---
+
+{% lang en %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Generate offline (random) UUIDs for players or entities.</p>
+{% endlang %}
+{% lang ru %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Генерация оффлайн (случайных) UUID для игроков или сущностей.</p>
+{% endlang %}
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+    <button id="gen-btn" class="btn primary" style="height:50px; font-size:1.1rem;">
+        <i class="fa-solid fa-rotate"></i> 
+        {% lang en %}Generate{% endlang %}
+        {% lang ru %}Сгенерировать{% endlang %}
+    </button>
+    <button id="copy-btn" class="btn" style="height:50px; font-size:1.1rem;">
+        <i class="fa-regular fa-copy"></i> Copy
+    </button>
+</div>
+
+<div class="form-group">
+    <label class="form-label">Result</label>
+    <input type="text" id="uuid-out" class="form-input" readonly value="Loading..." style="text-align:center; font-size:1.4rem; letter-spacing:1px; font-family:monospace; height:60px;">
+</div>
+
+<div class="seo-section">
+    {% lang en %}
+    <h2>What is a Minecraft UUID?</h2>
+    <p>A UUID (Universally Unique Identifier) is a 128-bit label used to uniquely identify objects. In Minecraft, they are used for:</p>
+    <ul>
+        <li><strong>Entities:</strong> Persistent mobs that map makers can target with commands (e.g., boss bars).</li>
+        <li><strong>Attributes:</strong> Items with custom modifiers (damage, speed) need unique UUIDs to stack correctly.</li>
+        <li><strong>Player Data:</strong> While online players use Mojang UUIDs, offline players or NPCs use random ones generated here.</li>
+    </ul>
+    {% endlang %}
+    {% lang ru %}
+    <h2>Что такое UUID в Minecraft?</h2>
+    <p>UUID (Универсальный Уникальный Идентификатор) — это 128-битная метка. В Майнкрафте они используются для:</p>
+    <ul>
+        <li><strong>Сущностей:</strong> Постоянные мобы, которых картоделы могут находить командами (например, для боссбаров).</li>
+        <li><strong>Атрибутов:</strong> Предметы с кастомными модификаторами (урон, скорость) требуют уникальные UUID, чтобы корректно стакаться.</li>
+        <li><strong>Игроков:</strong> Оффлайн игроки или NPC используют случайные UUID, которые генерирует этот инструмент.</li>
+    </ul>
+    {% endlang %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const out = document.getElementById('uuid-out');
+    const genBtn = document.getElementById('gen-btn');
+    const copyBtn = document.getElementById('copy-btn');
+
+    function generate() {
+        out.style.transform = 'scale(0.98)';
+        out.style.opacity = '0.5';
+        
+        // --- TRACKING START ---
+        if(window.trackToolUsage) window.trackToolUsage();
+        // --- TRACKING END ---
+
+        setTimeout(() => {
+            if(window.crypto && window.crypto.randomUUID) {
+                out.value = crypto.randomUUID();
+            } else {
+                out.value = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+            out.style.transform = 'scale(1)';
+            out.style.opacity = '1';
+        }, 100);
+    }
+
+    genBtn.addEventListener('click', generate);
+    
+    copyBtn.addEventListener('click', () => {
+        if(out.value) {
+            navigator.clipboard.writeText(out.value);
+            const oldIcon = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            copyBtn.style.borderColor = '#238636';
+            setTimeout(() => {
+                copyBtn.innerHTML = oldIcon;
+                copyBtn.style.borderColor = '';
+            }, 1000);
+        }
+    });
+
+    generate();
+});
+</script>

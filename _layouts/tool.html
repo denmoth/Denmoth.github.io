@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="{{ site.active_lang }}">
+<head>
+    {% include head.html %}
+</head>
+<body class="lang-{{ site.active_lang }} tool-body">
+    {% include header.html %}
+
+    {% include auth_modal.html %}
+
+    <div class="tool-wrapper" id="tool-wrapper">
+        <aside class="ad-sidebar left">
+            <div class="ad-placeholder">Ad Space</div>
+        </aside>
+
+        <main class="tool-content">
+            <div class="tool-header">
+                <h1 class="page-title">{{ page.title }}</h1>
+                <div class="tool-controls">
+                    <button id="fullscreen-btn" class="btn-icon" title="Fullscreen">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="fullscreen-ad-banner" style="display:none; width:100%; height:90px; background:var(--bg-panel); border:1px solid var(--border); margin-bottom:20px; align-items:center; justify-content:center; border-radius:8px; color:var(--text-muted);">
+                Fullscreen Ad Banner
+            </div>
+
+            <div class="tool-card" id="tool-card-container">
+                {{ content }}
+            </div>
+
+            <div class="comments-section" id="comments-container">
+                <h3>Comments</h3>
+                
+                <div class="form-group" style="position:relative;">
+                    <div id="guest-input-area" style="margin-bottom:10px; display:none;">
+                        <input type="text" id="guest-name" class="form-input" placeholder="Name (Guest)" style="max-width:300px;">
+                    </div>
+                    <textarea id="comment-input" class="form-area" placeholder="Write a comment..." style="min-height:100px;"></textarea>
+                    <div style="display:flex; justify-content:space-between; margin-top:10px; align-items:center;">
+                        <div style="font-size:0.8rem; color:var(--text-muted);">Markdown supported</div>
+                        <button id="send-comment" class="btn primary">Post Comment</button>
+                    </div>
+                </div>
+
+                <div id="comments-list">
+                    <div style="text-align:center; padding:20px; color:var(--text-muted);">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading...
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer" style="margin-top:40px; width:100%; border:none; background:transparent;">
+                <div style="margin-top:10px;">© 2026 Denmoth</div>
+            </footer>
+        </main>
+
+        <aside class="ad-sidebar right">
+            <div class="ad-placeholder">Ad Space</div>
+        </aside>
+    </div>
+
+    {% include scripts.html %}
+    
+    <script>
+        const fsBtn = document.getElementById('fullscreen-btn');
+        const wrapper = document.getElementById('tool-wrapper');
+        const fsAd = document.querySelector('.fullscreen-ad-banner');
+        
+        if(fsBtn && wrapper) {
+            fsBtn.addEventListener('click', () => {
+                wrapper.classList.toggle('maximized');
+                const isMax = wrapper.classList.contains('maximized');
+                const icon = fsBtn.querySelector('i');
+                
+                if (isMax) {
+                    icon.classList.remove('fa-expand');
+                    icon.classList.add('fa-compress');
+                    if(fsAd) fsAd.style.display = 'flex';
+                } else {
+                    icon.classList.remove('fa-compress');
+                    icon.classList.add('fa-expand');
+                    if(fsAd) fsAd.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if(!window.Denmoth?.State?.currentUser) { // Безопасная проверка через State
+                    const ga = document.getElementById('guest-input-area');
+                    if(ga) ga.style.display = 'block';
+                }
+            }, 800);
+        });
+    </script>
+</body>
+</html>

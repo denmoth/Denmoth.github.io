@@ -7,7 +7,6 @@ module Jekyll
 
     def render(context)
       site = context.registers[:site]
-      # Проверка активного языка из jekyll-polyglot
       if @lang == site.active_lang
         super
       else

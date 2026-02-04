@@ -1,0 +1,80 @@
+---
+layout: tool
+title: pack.mcmeta Generator
+permalink: /tools/pack-mcmeta/
+---
+
+{% lang en %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Generate <code>pack.mcmeta</code> files for Resource Packs and Data Packs.</p>
+{% endlang %}
+{% lang ru %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Генератор файла <code>pack.mcmeta</code> для Ресурспаков и Датапаков.</p>
+{% endlang %}
+
+<div class="form-group">
+<label class="form-label">Target Version</label>
+    <select id="mc-version" class="form-select" onchange="updateJson()">
+        <option value="46">1.21.4 (Pack Format 46)</option>
+        <option value="42">1.21.2 - 1.21.3 (Pack Format 42)</option>
+        <option value="34">1.21 - 1.21.1 (Pack Format 34)</option>
+        <option value="32">1.20.6 (Pack Format 32)</option>
+        <option value="22">1.20.4 (Pack Format 22)</option>
+        <option value="18">1.20.2 (Pack Format 18)</option>
+        <option value="15">1.20 - 1.20.1 (Pack Format 15)</option>
+        <option value="13">1.19.4 (Pack Format 13)</option>
+        <option value="9">1.19 - 1.19.3 (Pack Format 9)</option>
+        <option value="8">1.18 (Pack Format 8)</option>
+        <option value="6">1.16.2 - 1.17 (Pack Format 6)</option>
+        <option value="1">Older</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label class="form-label">Description</label>
+    <input type="text" id="desc" class="form-input" value="My Awesome Pack" oninput="updateJson()">
+</div>
+
+<div class="form-group">
+    <label class="form-label">Result (pack.mcmeta)</label>
+    <textarea id="json-out" class="form-area" readonly style="font-family:monospace; height: 150px;"></textarea>
+</div>
+
+<div style="display:flex; gap:10px;">
+    <button onclick="copyJson()" class="btn primary" style="flex:1;">Copy JSON</button>
+    <button onclick="downloadFile()" class="btn" style="width: 50px;"><i class="fa-solid fa-download"></i></button>
+</div>
+
+<script>
+    function updateJson() {
+        const fmt = parseInt(document.getElementById('mc-version').value);
+        const desc = document.getElementById('desc').value;
+
+        const obj = {
+            pack: {
+                pack_format: fmt,
+                description: desc
+            }
+        };
+
+        document.getElementById('json-out').value = JSON.stringify(obj, null, 4);
+    }
+
+    function copyJson() {
+        navigator.clipboard.writeText(document.getElementById('json-out').value);
+        const btn = event.target;
+        const oldText = btn.innerText;
+        btn.innerText = "Copied!";
+        setTimeout(() => btn.innerText = oldText, 1000);
+    }
+    
+    function downloadFile() {
+        const text = document.getElementById('json-out').value;
+        const blob = new Blob([text], { type: "text/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "pack.mcmeta";
+        a.click();
+    }
+
+    updateJson();
+</script>

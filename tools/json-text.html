@@ -1,0 +1,183 @@
+---
+layout: tool
+title: JSON Text Builder
+permalink: /tools/json-text/
+---
+
+{% lang en %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Construct complex tellraw messages component by component.</p>
+{% endlang %}
+{% lang ru %}
+<p style="color:var(--text-muted); margin-bottom:20px;">Конструктор сложных сообщений из нескольких компонентов.</p>
+{% endlang %}
+
+<div style="background: var(--bg-panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+    <h3 style="margin-bottom: 15px; font-size: 1.1rem;">
+        {% lang en %}Add Component{% endlang %}
+        {% lang ru %}Добавить компонент{% endlang %}
+    </h3>
+    
+    <div class="form-group">
+        <input type="text" id="comp-text" class="form-input" placeholder="Text..." onkeypress="if(event.key==='Enter') addComponent()">
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; align-items:center;">
+        <input type="color" id="comp-color" value="#ffffff" style="height:35px; border:none; background:none; cursor:pointer;">
+        
+        <button class="btn format-btn" id="btn-bold" onclick="toggleFmt('bold')"><b>B</b></button>
+        <button class="btn format-btn" id="btn-italic" onclick="toggleFmt('italic')"><i>I</i></button>
+        <button class="btn format-btn" id="btn-underlined" onclick="toggleFmt('underlined')"><u>U</u></button>
+        <button class="btn format-btn" id="btn-strikethrough" onclick="toggleFmt('strikethrough')"><s>S</s></button>
+        <button class="btn format-btn" id="btn-obfuscated" onclick="toggleFmt('obfuscated')">k</button>
+    </div>
+
+    <details style="margin-bottom: 15px; border: 1px solid var(--border); border-radius: 4px;">
+        <summary style="padding: 10px; cursor: pointer; background: var(--bg-body);">
+            {% lang en %}Click & Hover Events{% endlang %}
+            {% lang ru %}События (Клик и Наведение){% endlang %}
+        </summary>
+        <div style="padding: 15px;">
+            <label class="form-label">
+                {% lang en %}Click Action{% endlang %}
+                {% lang ru %}Действие при клике{% endlang %}
+            </label>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <select id="comp-click-action" class="form-select" style="width:150px;">
+                    <option value="none">None</option>
+                    <option value="run_command">Run Command</option>
+                    <option value="suggest_command">Suggest Command</option>
+                    <option value="open_url">Open URL</option>
+                    <option value="copy_to_clipboard">Copy Clipboard</option>
+                </select>
+                <input type="text" id="comp-click-value" class="form-input" placeholder="Value...">
+            </div>
+
+            <label class="form-label">
+                {% lang en %}Hover Text{% endlang %}
+                {% lang ru %}Текст при наведении{% endlang %}
+            </label>
+            <input type="text" id="comp-hover-value" class="form-input" placeholder="Tooltip text...">
+        </div>
+    </details>
+
+    <button onclick="addComponent()" class="btn primary" style="width:100%;">
+        <i class="fa-solid fa-plus"></i> 
+        {% lang en %}Add Component{% endlang %}
+        {% lang ru %}Добавить{% endlang %}
+    </button>
+</div>
+
+<div id="components-list" style="margin-bottom: 20px;"></div>
+
+<div class="form-group">
+    <label class="form-label">Output JSON</label>
+    <textarea id="json-output" class="form-area" readonly></textarea>
+</div>
+<div style="display:flex; gap:10px;">
+    <button onclick="copyJson()" class="btn primary" style="flex:1;">
+        {% lang en %}Copy Command{% endlang %}
+        {% lang ru %}Копировать Команду{% endlang %}
+    </button>
+    <button onclick="clearAll()" class="btn" style="color:#d73a49; border-color:#d73a49;">
+        {% lang en %}Clear{% endlang %}
+        {% lang ru %}Очистить{% endlang %}
+    </button>
+</div>
+
+<script>
+    let components = [];
+    let currentFmt = { bold: false, italic: false, underlined: false, strikethrough: false, obfuscated: false };
+
+    // Placeholder localization hack
+    document.addEventListener('DOMContentLoaded', () => {
+        const isRu = window.location.pathname.startsWith('/ru/');
+        if(isRu) {
+            document.getElementById('comp-text').placeholder = "Текст сообщения...";
+            document.getElementById('comp-click-value').placeholder = "Значение (/spawn, https://...)";
+            document.getElementById('comp-hover-value').placeholder = "Текст всплывающей подсказки...";
+        }
+    });
+
+    function toggleFmt(fmt) {
+        currentFmt[fmt] = !currentFmt[fmt];
+        const btn = document.getElementById('btn-' + fmt);
+        if(currentFmt[fmt]) {
+            btn.style.borderColor = '#58a6ff';
+            btn.style.color = '#58a6ff';
+        } else {
+            btn.style.borderColor = '';
+            btn.style.color = '';
+        }
+    }
+
+    function addComponent() {
+        const text = document.getElementById('comp-text').value;
+        if(!text) return;
+
+        const comp = {
+            text: text,
+            color: document.getElementById('comp-color').value,
+            ...currentFmt // Copy styles
+        };
+
+        const cAction = document.getElementById('comp-click-action').value;
+        const cVal = document.getElementById('comp-click-value').value;
+        if(cAction !== 'none' && cVal) comp.clickEvent = { action: cAction, value: cVal };
+
+        const hVal = document.getElementById('comp-hover-value').value;
+        if(hVal) comp.hoverEvent = { action: 'show_text', value: hVal };
+
+        components.push(comp);
+        render();
+        
+        // Reset inputs
+        document.getElementById('comp-text').value = "";
+        document.getElementById('comp-text').focus();
+    }
+
+    function render() {
+        const list = document.getElementById('components-list');
+        list.innerHTML = "";
+        
+        components.forEach((comp, idx) => {
+            const item = document.createElement('div');
+            item.style.cssText = "display:flex; align-items:center; background:var(--bg-body); padding:10px; margin-bottom:5px; border:1px solid var(--border); border-radius:4px;";
+            
+            const preview = document.createElement('span');
+            preview.textContent = comp.text;
+            preview.style.color = comp.color;
+            if(comp.bold) preview.style.fontWeight = "bold";
+            if(comp.italic) preview.style.fontStyle = "italic";
+            if(comp.underlined) preview.style.textDecoration = "underline";
+            preview.style.flex = "1";
+            preview.style.marginLeft = "10px";
+
+            const delBtn = document.createElement('button');
+            delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            delBtn.className = "btn";
+            delBtn.style.padding = "5px 10px";
+            delBtn.onclick = () => { components.splice(idx, 1); render(); };
+
+            item.appendChild(preview);
+            item.appendChild(delBtn);
+            list.appendChild(item);
+        });
+
+        // Generate JSON output
+        const out = ["", ...components];
+        document.getElementById('json-output').value = '/tellraw @p ' + JSON.stringify(out);
+    }
+
+    function clearAll() {
+        components = [];
+        render();
+    }
+
+    function copyJson() {
+        navigator.clipboard.writeText(document.getElementById('json-output').value);
+        const btn = event.target;
+        const oldText = btn.innerText;
+        btn.innerText = "✓";
+        setTimeout(() => btn.innerText = oldText, 1000);
+    }
+</script>

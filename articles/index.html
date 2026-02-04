@@ -1,0 +1,106 @@
+---
+layout: default
+title: Articles
+permalink: /articles/
+---
+
+<div class="hub-layout" style="max-width:1000px; margin:0 auto;">
+    
+    <div class="articles-hero">
+        <h1>
+            {% lang en %}Knowledge Base{% endlang %}
+            {% lang ru %}База Знаний{% endlang %}
+        </h1>
+        {% lang en %}<p>Deep dives into architecture, platform analysis, and development insights.</p>{% endlang %}
+        {% lang ru %}<p>Глубокий разбор архитектуры, анализ платформ и инсайты разработки.</p>{% endlang %}
+    </div>
+
+    <div class="articles-filter">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Engineering</button>
+        <button class="filter-btn">Analytics</button>
+        <button class="filter-btn">Tutorials</button>
+    </div>
+
+    <div class="articles-grid">
+        {% for post in site.posts %}
+        <a href="{{ post.url }}" class="article-card">
+            <div class="card-badges">
+                <span class="badge-cat">{{ post.category | default: 'Dev' }}</span>
+            </div>
+            
+            <h3 class="article-title">{{ post.title }}</h3>
+            
+            <div class="article-meta">
+                <span><i class="fa-regular fa-calendar"></i> {{ post.date | date: "%d.%m.%Y" }}</span>
+                <span><i class="fa-regular fa-clock"></i> {{ post.content | number_of_words | divided_by: 180 | plus: 1 }} min</span>
+            </div>
+            
+            <p class="article-excerpt">
+                {{ post.excerpt | strip_html | truncatewords: 25 }}
+            </p>
+            
+            <div class="read-link">
+                {% lang en %}<span>Read Article <i class="fa-solid fa-arrow-right-long"></i></span>{% endlang %}
+                {% lang ru %}<span>Читать <i class="fa-solid fa-arrow-right-long"></i></span>{% endlang %}
+            </div>
+        </a>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-pen-ruler"></i>
+            {% lang en %}<h3>Content in production</h3>{% endlang %}
+            {% lang ru %}<h3>Материалы в работе</h3>{% endlang %}
+            {% lang en %}<p>First analytical articles are being written right now.</p>{% endlang %}
+            {% lang ru %}<p>Первые аналитические статьи пишутся прямо сейчас.</p>{% endlang %}
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<style>
+/* Стили без изменений, можно скопировать из оригинала */
+    .articles-hero { padding: 40px 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+    .articles-hero h1 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; letter-spacing: -1px; }
+    .articles-hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; }
+
+    .articles-filter { display: flex; gap: 10px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 5px; }
+    .filter-btn { 
+        background: transparent; border: 1px solid var(--border); color: var(--text-muted); 
+        padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: 0.2s; white-space: nowrap;
+    }
+    .filter-btn:hover { border-color: var(--text-main); color: var(--text-main); }
+    .filter-btn.active { background: var(--text-main); color: var(--bg-body); border-color: var(--text-main); font-weight: 600; }
+
+    .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+    
+    .article-card { 
+        background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; padding: 25px;
+        display: flex; flex-direction: column; text-decoration: none; color: var(--text-main);
+        transition: all 0.25s ease; position: relative; overflow: hidden;
+    }
+    .article-card:hover { transform: translateY(-5px); border-color: #58a6ff; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+    
+    .card-badges { margin-bottom: 15px; }
+    .badge-cat { 
+        font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+        color: #58a6ff; background: rgba(88, 166, 255, 0.1); padding: 4px 8px; border-radius: 6px;
+    }
+
+    .article-title { font-size: 1.4rem; margin-bottom: 10px; line-height: 1.3; font-weight: 700; }
+    
+    .article-meta { 
+        display: flex; gap: 15px; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; 
+    }
+    
+    .article-excerpt { color: #8b949e; font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
+    
+    .read-link { font-weight: 600; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .article-card:hover .read-link { color: #58a6ff; }
+
+    .empty-state { 
+        grid-column: 1 / -1; text-align: center; padding: 60px; 
+        background: var(--bg-panel); border-radius: 12px; border: 1px dashed var(--border); color: var(--text-muted);
+    }
+    .empty-state i { font-size: 3rem; margin-bottom: 20px; opacity: 0.5; }
+</style>
